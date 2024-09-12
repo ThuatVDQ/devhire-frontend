@@ -19,7 +19,7 @@
           <div class="mb-4">
             <label class="form-label font-medium">Search:</label>
             <div class="filter-search-form relative mt-2 flex items-center">
-              <i class="pi pi-shopping-bag absolute left-3 text-green-500"></i>
+              <i class="pi pi-briefcase absolute left-3 text-green-500"></i>
               <input
                 type="text"
                 placeholder="Job title, keywords..."
@@ -45,7 +45,7 @@
           <div class="mb-4">
             <label class="form-label font-medium">Job Type:</label>
             <div class="filter-search-form relative mt-2 flex items-center">
-              <i class="pi pi-shopping-bag absolute left-3 text-green-500"></i>
+              <i class="pi pi-briefcase absolute left-3 text-green-500"></i>
               <select
                 class="form-select w-full bg-gray-50 dark:bg-slate-800 rounded-md pl-10 px-4 py-2 focus:ring-2 focus:ring-emerald-500"
               >
