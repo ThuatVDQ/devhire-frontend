@@ -4,7 +4,7 @@ import Card from './Card.vue'
 
 <template>
   <section class="relative md:py-24 py-16">
-    <div class="container mx-auto">
+    <div class="container mx-auto px-32">
       <div class="grid grid-cols-1 pb-8 text-center">
         <h3 class="mb-4 md:text-[26px] md:leading-normal text-2xl leading-normal font-semibold">
           How it's Work?
@@ -32,7 +32,7 @@ import Card from './Card.vue'
         />
       </div>
     </div>
-    <div class="container md:mt-24 mt-16 mx-auto">
+    <div class="container md:mt-24 mt-16 mx-auto px-32">
       <div class="grid md:grid-cols-12 grid-cols-1 items-center gap-[30px]">
         <div class="lg:col-span-5 md:col-span-6">
           <div class="relative">

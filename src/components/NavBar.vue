@@ -8,7 +8,7 @@ const toggleMenu = () => {
 
 <template>
   <header class="bg-white shadow-lg">
-    <nav class="container mx-auto p-4 flex justify-between items-center">
+    <nav class="container mx-auto p-4 flex justify-between items-center px-32">
       <!-- Logo -->
       <div class="flex items-center">
         <img src="@/assets/logo.svg" alt="DevHire Logo" class="w-12 h-12" />
