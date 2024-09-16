@@ -1,6 +1,6 @@
 <template>
   <footer class="relative bg-slate-900 dark:bg-slate-800">
-    <div class="container px-32 mx-auto">
+    <div class="container">
       <div class="grid grid-cols-1">
         <div class="relative py-12">
           <div class="relative w-full">
@@ -60,7 +60,7 @@
       </div>
     </div>
     <div class="py-[30px] px-0 border-t border-gray-800 dark:border-gray-700">
-      <div class="container px-32 mx-auto">
+      <div class="container">
         <div class="grid md:grid-cols-2 gap-6">
           <div class="ltr:md:text-left rtl:md:text-right text-center">
             <p class="mb-0 text-gray-300 font-medium">

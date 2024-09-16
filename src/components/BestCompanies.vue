@@ -4,7 +4,7 @@ import CardCompany from './CardCompany.vue'
 
 <template>
   <div class="relative md:py-24 py-16">
-    <div class="container mx-auto px-32">
+    <div class="container">
       <div class="grid grid-cols-1 pb-8 text-center">
         <h3 class="mb-4 md:text-[26px] md:leading-normal text-2xl leading-normal font-semibold">
           Find Best Companies

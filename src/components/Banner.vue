@@ -3,7 +3,7 @@
     class="py-20 w-full table relative bg-[url(../assets/banner.png)] bg-top bg-no-repeat bg-cover"
   >
     <div class="absolute inset-0 bg-slate-900/70"></div>
-    <div class="container relative mx-auto">
+    <div class="container relative">
       <div class="grid grid-cols-1 text-center">
         <h3 class="mb-4 md:text-[26px] text-2xl text-white font-medium">
           Get the job that's right for you

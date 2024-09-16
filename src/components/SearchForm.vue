@@ -1,3 +1,5 @@
+<script setup></script>
+
 <template>
   <div
     class="bg-white dark:bg-slate-900 rounded-xl shadow dark:shadow-gray-800 md:p-8 p-6 lg:me-10 relative"
