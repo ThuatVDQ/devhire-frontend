@@ -13,12 +13,14 @@ import CardJob from './CardJob.vue'
         reviews on over 30000+ companies worldwide.
       </p>
     </div>
-    <CardJob />
-    <CardJob />
-    <CardJob />
-    <CardJob />
-    <CardJob />
-    <CardJob />
+    <div class="grid lg:grid-cols-2 md:grid-cols-2 grid-cols-1 mt-8 gap-[30px]"> 
+        <CardJob />
+      <CardJob />
+      <CardJob />
+      <CardJob />
+      <CardJob />
+      <CardJob />
+    </div>
     <div class="grid md:grid-cols-1 grid-cols-1 mt-8">
       <div class="md:col-span-12 text-center">
         <a
