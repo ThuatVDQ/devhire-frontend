@@ -3,7 +3,7 @@ import CardJob from './CardJob.vue'
 </script>
 
 <template>
-  <div class="container md:mt-24 mt-16 mx-auto px-32 py-32">
+  <div class="container md:mt-24 mt-16 py-16">
     <div class="grid grid-cols-1 pb-8 text-center">
       <h3 class="mb-4 md:text-[26px] md:leading-normal text-2xl leading-normal font-semibold">
         Popular Jobs

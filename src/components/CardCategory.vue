@@ -1,3 +1,20 @@
+<script setup>
+defineProps({
+  category: {
+    type: String,
+    required: true
+  },
+  slots: {
+    type: String,
+    required: true
+  },
+  id: {
+    type: int,
+    required: true
+  }
+})
+</script>
+
 <template>
   <div
     class="group p-4 rounded-md shadow dark:shadow-gray-700 bg-slate-50 dark:bg-slate-800 hover:bg-emerald-600 dark:hover:bg-emerald-600 transition-all duration-500"

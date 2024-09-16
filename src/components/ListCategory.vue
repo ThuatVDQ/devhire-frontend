@@ -3,7 +3,7 @@ import CardCategory from './CardCategory.vue'
 </script>
 
 <template>
-  <div class="container md:mt-24 mt-16 mx-auto px-32">
+  <div class="container md:mt-24 mt-16">
     <div class="flex justify-between items-end pb-8">
       <div class="text-left">
         <h3 class="mb-4 text-2xl leading-normal font-semibold">Browse by Categories</h3>
