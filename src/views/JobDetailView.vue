@@ -1,3 +1,30 @@
+<script setup>
+import { reactive, onMounted } from 'vue'
+import { RouterLink, useRoute } from 'vue-router'
+import SimilarJobs from '@/components/SimilarJobs.vue'
+import axios from 'axios'
+
+const route = useRoute()
+
+const jobId = route.params.id
+
+const state = reactive({
+  job: {},
+  isLoading: true
+})
+
+onMounted(async () => {
+  try {
+    const response = await axios.get(`http://localhost:8000/jobs/${jobId}`)
+    state.job = response.data
+  } catch (e) {
+    console.error(e)
+  } finally {
+    state.isLoading = false
+  }
+})
+</script>
+
 <template>
   <section class="bg-slate-50 dark:bg-slate-800 md:pb-24 pb-16">
     <div class="container mt-10">
@@ -12,7 +39,7 @@
               class="rounded-full size-28 p-4 bg-white dark:bg-slate-900 shadow dark:shadow-gray-700"
             />
             <div class="md:ms-4 md:mt-0 mt-6">
-              <h5 class="text-xl font-semibold">Lenovo</h5>
+              <h5 class="text-xl font-semibold">{{ state.job.title }}</h5>
               <div class="mt-2">
                 <span class="text-slate-400 font-medium me-2 inline-flex items-center">
                   <i class="pi pi-building"></i>Lenovo pvt. ltd .
@@ -25,11 +52,9 @@
           </div>
           <h5 class="text-lg font-semibold mt-6">Job Description:</h5>
           <p class="text-slate-400 mt-4">
-            One disadvantage of Lorum Ipsum is that in Latin certain letters appear more frequently
-            than others - which creates a distinct visual impression. Moreover, in Latin only words
-            at the beginning of sentences are capitalized.
+            {{ state.job.description }}
           </p>
-          <p class="text-slate-400 mt-4">
+          <!-- <p class="text-slate-400 mt-4">
             This means that Lorem Ipsum cannot accurately represent, for example, German, in which
             all nouns are capitalized. Thus, Lorem Ipsum has only limited suitability as a visual
             filler for German texts. If the fill text is intended to illustrate the characteristics
@@ -38,13 +63,12 @@
           <p class="text-slate-400 mt-4">
             It sometimes makes sense to select texts containing the various letters and symbols
             specific to the output language.
-          </p>
-          <h5 class="text-lg font-semibold mt-6">Responsibilities and Duties:</h5>
+          </p> -->
+          <h5 class="text-lg font-semibold mt-6">Requirements:</h5>
           <p class="text-slate-400 mt-4">
-            It sometimes makes sense to select texts containing the various letters and symbols
-            specific to the output language.
+            {{ state.job.requirement }}
           </p>
-          <ul class="list-none">
+          <!-- <ul class="list-none">
             <li class="text-slate-400 mt-2 items-center inline-flex">
               <i></i>Participate in requirements analysis
             </li>
@@ -66,15 +90,12 @@
             <li class="text-slate-400 mt-2 items-center inline-flex">
               <i></i>Serve as an expert on applications and provide technical support
             </li>
-          </ul>
-          <h5 class="text-lg font-semibold mt-6">
-            Required Experience, Skills and Qualifications:
-          </h5>
+          </ul> -->
+          <h5 class="text-lg font-semibold mt-6">Benefit:</h5>
           <p class="text-slate-400 mt-4">
-            It sometimes makes sense to select texts containing the various letters and symbols
-            specific to the output language.
+            {{ state.job.benefit }}
           </p>
-          <ul class="list-none">
+          <!-- <ul class="list-none">
             <li class="text-slate-400 mt-2 items-center inline-flex">
               <i></i>Proven experience as a .NET Developer or Application Developer
             </li>
@@ -100,10 +121,10 @@
             <li class="text-slate-400 mt-2 items-center inline-flex">
               <i></i>Excellent problem solving and analytical skills
             </li>
-          </ul>
+          </ul> -->
           <div class="mt-5">
             <a
-              class="btn rounded-md bg-emerald-600 hover:bg-emerald-700 border-emerald-600 hover:border-emerald-700 text-white md:ms-2 w-full md:w-auto"
+              class="py-2 px-4 font-[600] rounded-md bg-emerald-600 hover:bg-emerald-700 border-emerald-600 hover:border-emerald-700 text-white md:ms-2 w-full md:w-auto"
               href="/job-apply"
               >Apply Now</a
             >
@@ -122,7 +143,7 @@
                   <i class="pi pi-verified"></i>
                   <div class="ms-4">
                     <p class="font-medium">Employee Type:</p>
-                    <span class="text-emerald-600 font-medium text-sm">Full Time</span>
+                    <span class="text-emerald-600 font-medium text-sm">{{ state.job.type }}</span>
                   </div>
                 </li>
                 <li class="flex items-center mt-3">
@@ -137,7 +158,7 @@
                   <div class="ms-4">
                     <p class="font-medium">Job Type:</p>
                     <span class="text-emerald-600 font-medium text-sm"
-                      >Web Designer / Developer</span
+                      >{{ state.job.level }} {{ state.job.position }}</span
                     >
                   </div>
                 </li>
@@ -145,7 +166,9 @@
                   <i class="pi pi-briefcase"></i>
                   <div class="ms-4">
                     <p class="font-medium">Experience:</p>
-                    <span class="text-emerald-600 font-medium text-sm">2+ years</span>
+                    <span class="text-emerald-600 font-medium text-sm">{{
+                      state.job.experience
+                    }}</span>
                   </div>
                 </li>
                 <li class="flex items-center mt-3">
@@ -159,14 +182,19 @@
                   <i class="pi pi-dollar"></i>
                   <div class="ms-4">
                     <p class="font-medium">Salary:</p>
-                    <span class="text-emerald-600 font-medium text-sm">$4000 - $4500</span>
+                    <span class="text-emerald-600 font-medium text-sm"
+                      >{{ state.job.salary_start }} - {{ state.job.salary_end }}
+                      {{ state.job.currency }}</span
+                    >
                   </div>
                 </li>
                 <li class="flex items-center mt-3">
                   <i class="pi pi-clock"></i>
                   <div class="ms-4">
                     <p class="font-medium">Date posted:</p>
-                    <span class="text-emerald-600 font-medium text-sm">28th Feb, 2023</span>
+                    <span class="text-emerald-600 font-medium text-sm">{{
+                      state.job.created_at
+                    }}</span>
                   </div>
                 </li>
               </ul>
@@ -175,5 +203,6 @@
         </div>
       </div>
     </div>
+    <SimilarJobs />
   </section>
 </template>

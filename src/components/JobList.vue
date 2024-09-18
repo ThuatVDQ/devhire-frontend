@@ -1,19 +1,22 @@
 <script setup>
 import CardJob from './CardJob.vue'
+
+defineProps({
+  jobs: Object,
+  pagination: {
+    type: Boolean,
+    default: true
+  }
+})
 </script>
 
 <template>
   <div class="container md:mt-24 pb-24">
     <div class="grid lg:grid-cols-2 md:grid-cols-2 grid-cols-1 mt-8 gap-[30px]">
-      <CardJob />
-      <CardJob />
-      <CardJob />
-      <CardJob />
-      <CardJob />
-      <CardJob />
+      <CardJob v-for="job in jobs" :key="job.id" :job="job" />
     </div>
     <div class="grid md:grid-cols-12 grid-cols-1 mt-8">
-      <div class="md:col-span-12 text-center">
+      <div v-if="pagination" class="md:col-span-12 text-center">
         <nav aria-label="Page navigation example"></nav>
         <ul class="inline-flex items-center -space-x-px">
           <li>
@@ -62,6 +65,7 @@ import CardJob from './CardJob.vue'
           </li>
         </ul>
       </div>
+      <div v-else></div>
     </div>
   </div>
 </template>
