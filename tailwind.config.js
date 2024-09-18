@@ -2,20 +2,6 @@
 export default {
   content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
   theme: {
-    container: {
-      center: true,
-      padding: {
-        DEFAULT: '1rem',
-        sm: '12px',
-        md: '1rem',
-        lg: '45px',
-        xl: '5rem',
-        '2xl': '13rem'
-      },
-      margin: {
-        sm: 'auto'
-      }
-    },
     extend: {
       fontFamily: {
         sans: ['Poppins', 'sans-serif']
@@ -25,8 +11,27 @@ export default {
       }
     }
   },
-  variants: {
-    extend: {}
-  },
-  plugins: []
+  plugins: [
+    function ({ addComponents, theme }) {
+      addComponents({
+        '.form-input': {
+          backgroundColor: '#F9FAFB',
+          borderColor: '#D1D5DB',
+          color: '#111827',
+          fontSize: theme('fontSize.sm'),
+          borderRadius: '0.5rem',
+          padding: '0.625rem',
+          width: '100%',
+          display: 'block',
+          borderWidth: '1px',
+          borderStyle: 'solid',
+          '&:focus': {
+            outline: 'none',
+            borderColor: '#3B82F6',
+            boxShadow: `0 0 0 1px #3B82F6`
+          }
+        }
+      })
+    }
+  ]
 }
