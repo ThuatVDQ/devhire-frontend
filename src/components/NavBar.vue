@@ -17,7 +17,7 @@ const toggleMenu = () => {
 
       <!-- Navigation Links -->
       <ul class="hidden md:flex space-x-6 text-gray-600">
-        <li><a href="#jobs" class="hover:text-blue-500">Jobs</a></li>
+        <li><a href="jobs" class="hover:text-blue-500">Jobs</a></li>
         <li><a href="#companies" class="hover:text-blue-500">Companies</a></li>
         <li><a href="#about" class="hover:text-blue-500">About Us</a></li>
         <li><a href="#contact" class="hover:text-blue-500">Contact</a></li>
