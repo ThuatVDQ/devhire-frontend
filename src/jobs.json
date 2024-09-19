@@ -250,5 +250,47 @@
       "company_id": 1010,
       "job_address_id": 2010
     }
+  ],
+  "categories": [
+    {
+      "id": 1,
+      "name": "Engineering",
+      "description": "Roles related to software and hardware engineering.",
+      "status": "ACTIVE",
+      "created_at": "2024-09-01 10:00:00",
+      "updated_at": "2024-09-01 10:00:00"
+    },
+    {
+      "id": 2,
+      "name": "Management",
+      "description": "Roles focused on managing teams and projects.",
+      "status": "ACTIVE",
+      "created_at": "2024-09-02 12:00:00",
+      "updated_at": "2024-09-02 12:00:00"
+    },
+    {
+      "id": 3,
+      "name": "Design",
+      "description": "Roles related to UX/UI and graphic design.",
+      "status": "ACTIVE",
+      "created_at": "2024-09-03 14:00:00",
+      "updated_at": "2024-09-03 14:00:00"
+    },
+    {
+      "id": 4,
+      "name": "Marketing",
+      "description": "Roles focused on digital marketing and promotion.",
+      "status": "ACTIVE",
+      "created_at": "2024-09-04 16:00:00",
+      "updated_at": "2024-09-04 16:00:00"
+    },
+    {
+      "id": 5,
+      "name": "Support",
+      "description": "Roles that involve providing technical support and customer assistance.",
+      "status": "ACTIVE",
+      "created_at": "2024-09-05 18:00:00",
+      "updated_at": "2024-09-05 18:00:00"
+    }
   ]
 }

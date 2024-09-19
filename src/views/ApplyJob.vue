@@ -1,7 +1,7 @@
 <script setup>
-import Post_Form from '@/components/Post_Form.vue'
+import PostForm from '@/components/PostForm.vue'
 </script>
 
 <template>
-  <Post_Form />
+  <PostForm />
 </template>
