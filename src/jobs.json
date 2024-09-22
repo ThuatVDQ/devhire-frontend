@@ -292,5 +292,156 @@
       "created_at": "2024-09-05 18:00:00",
       "updated_at": "2024-09-05 18:00:00"
     }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "full_name": "John Doe",
+      "email": "johndoe@example.com",
+      "password": "hashed_password_here",
+      "phone": "123-456-7890",
+      "gender": "Male",
+      "avatar_url": "https://example.com/avatars/johndoe.png",
+      "introduction": "Software engineer with 5 years of experience in full-stack development.",
+      "created_at": "2024-09-20 10:00:00",
+      "updated_at": "2024-09-20 10:00:00",
+      "status": "Active"
+    },
+    {
+      "id": 2,
+      "full_name": "Jane Smith",
+      "email": "janesmith@example.com",
+      "password": "hashed_password_here",
+      "phone": "098-765-4321",
+      "gender": "Female",
+      "avatar_url": "https://example.com/avatars/janesmith.png",
+      "introduction": "Marketing professional with a passion for digital strategies.",
+      "created_at": "2024-09-21 11:00:00",
+      "updated_at": "2024-09-21 11:00:00",
+      "status": "Active"
+    },
+    {
+      "id": 3,
+      "full_name": "Michael Brown",
+      "email": "michaelbrown@example.com",
+      "password": "hashed_password_here",
+      "phone": "234-567-8901",
+      "gender": "Male",
+      "avatar_url": "https://example.com/avatars/michaelbrown.png",
+      "introduction": "Data analyst with expertise in data visualization.",
+      "created_at": "2024-09-22 12:30:00",
+      "updated_at": "2024-09-22 12:30:00",
+      "status": "Active"
+    },
+    {
+      "id": 4,
+      "full_name": "Emily Johnson",
+      "email": "emilyjohnson@example.com",
+      "password": "hashed_password_here",
+      "phone": "345-678-9012",
+      "gender": "Female",
+      "avatar_url": "https://example.com/avatars/emilyjohnson.png",
+      "introduction": "UX/UI designer dedicated to improving user experiences.",
+      "created_at": "2024-09-23 13:00:00",
+      "updated_at": "2024-09-23 13:00:00",
+      "status": "Active"
+    },
+    {
+      "id": 5,
+      "full_name": "David Wilson",
+      "email": "davidwilson@example.com",
+      "password": "hashed_password_here",
+      "phone": "456-789-0123",
+      "gender": "Male",
+      "avatar_url": "https://example.com/avatars/davidwilson.png",
+      "introduction": "Senior developer with a strong background in Java.",
+      "created_at": "2024-09-24 14:00:00",
+      "updated_at": "2024-09-24 14:00:00",
+      "status": "Active"
+    },
+    {
+      "id": 6,
+      "full_name": "Sophia Miller",
+      "email": "sophiamiller@example.com",
+      "password": "hashed_password_here",
+      "phone": "567-890-1234",
+      "gender": "Female",
+      "avatar_url": "https://example.com/avatars/sophiamiller.png",
+      "introduction": "Creative graphic designer with a flair for branding.",
+      "created_at": "2024-09-25 15:00:00",
+      "updated_at": "2024-09-25 15:00:00",
+      "status": "Active"
+    },
+    {
+      "id": 7,
+      "full_name": "James Taylor",
+      "email": "jamestaylor@example.com",
+      "password": "hashed_password_here",
+      "phone": "678-901-2345",
+      "gender": "Male",
+      "avatar_url": "https://example.com/avatars/jamestaylor.png",
+      "introduction": "HR manager with experience in recruitment and employee relations.",
+      "created_at": "2024-09-26 16:00:00",
+      "updated_at": "2024-09-26 16:00:00",
+      "status": "Active"
+    }
+  ],
+  "social_accounts": [
+    {
+      "id": 1,
+      "provider": "Facebook",
+      "provider_id": "fb12345",
+      "url": "https://facebook.com/johndoe",
+      "email": "johndoe@example.com",
+      "name": "John Doe"
+    },
+    {
+      "id": 2,
+      "provider": "LinkedIn",
+      "provider_id": "li12345",
+      "url": "https://linkedin.com/in/janedoe",
+      "email": "janesmith@example.com",
+      "name": "Jane Smith"
+    },
+    {
+      "id": 3,
+      "provider": "Twitter",
+      "provider_id": "tw12345",
+      "url": "https://twitter.com/michaelbrown",
+      "email": "michaelbrown@example.com",
+      "name": "Michael Brown"
+    },
+    {
+      "id": 4,
+      "provider": "Dribbble",
+      "provider_id": "dribbble12345",
+      "url": "https://dribbble.com/emilyjohnson",
+      "email": "emilyjohnson@example.com",
+      "name": "Emily Johnson"
+    },
+    {
+      "id": 5,
+      "provider": "GitHub",
+      "provider_id": "gh12345",
+      "url": "https://github.com/davidwilson",
+      "email": "davidwilson@example.com",
+      "name": "David Wilson"
+    },
+    {
+      "id": 6,
+      "provider": "Instagram",
+      "provider_id": "ig12345",
+      "url": "https://instagram.com/sophiamiller",
+      "email": "sophiamiller@example.com",
+      "name": "Sophia Miller"
+    },
+    {
+      "id": 7,
+      "provider": "LinkedIn",
+      "provider_id": "li67890",
+      "url": "https://linkedin.com/in/jamestaylor",
+      "email": "jamestaylor@example.com",
+      "name": "James Taylor"
+    }
   ]
 }

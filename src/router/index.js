@@ -4,6 +4,7 @@ import JobsView from '@/views/JobsView.vue'
 import JobDetailView from '@/views/JobDetailView.vue'
 import LoginView from '@/views/LoginView.vue'
 import ApplyJob from '@/views/ApplyJob.vue'
+import ProfileView from '@/views/ProfileView.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -31,6 +32,11 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: LoginView
+    },
+    {
+      path: '/profile/:id',
+      name: 'profile',
+      component: ProfileView
     }
   ]
 })
