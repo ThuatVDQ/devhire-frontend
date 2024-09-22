@@ -4,13 +4,34 @@ import flatpickr from 'flatpickr'
 import 'flatpickr/dist/flatpickr.css'
 import axios from 'axios'
 
-// Reactive state
-const state = reactive({
-  selectedDate: '',
-  categories: [],
+const address = reactive({
   countries: [],
   cities: [],
   selectedCountry: ''
+})
+
+const inf = reactive({
+  selectedDate: '',
+  description:
+    'We are looking for a motivated Intern to join our team. You will assist with various tasks, gain hands-on experience, and contribute to ongoing projects. The ideal candidate should be eager to learn, enthusiastic about technology, and ready to take on new challenges.',
+  requirements: `- Currently pursuing a degree in Computer Science or a related field.
+- Basic understanding of programming concepts and languages such as JavaScript or Python.
+- Familiarity with development tools and frameworks is a plus.
+- Strong willingness to learn and adapt to new technologies.
+- Good communication skills and ability to work in a team.`,
+  benefits: `- Opportunity to gain practical experience in a professional environment.
+- Mentorship and guidance from experienced professionals.
+- Flexible working hours and potential for remote work.
+- Exposure to various technologies and development practices.
+- Possibility of full-time employment upon successful completion of the internship.`,
+  experience: '',
+  position: 'Intern',
+  slots: 10
+})
+
+const details = reactive({
+  categories: [],
+  title: 'Intern Software Engineer'
 })
 
 // On component mounted
@@ -19,7 +40,7 @@ onMounted(() => {
   flatpickr(document.querySelector('#deadline'), {
     dateFormat: 'd-m-Y', // Định dạng ngày
     onChange: (selectedDates, dateStr) => {
-      state.selectedDate = dateStr // Cập nhật dữ liệu khi ngày được chọn
+      inf.selectedDate = dateStr // Cập nhật dữ liệu khi ngày được chọn
     }
   })
 
@@ -29,10 +50,8 @@ onMounted(() => {
 
 async function fetchCategories() {
   try {
-    console.log('Fetching categories...')
     const response = await axios.get('http://localhost:8000/categories')
-    state.categories = response.data
-    console.log(state.categories)
+    details.categories = response.data
   } catch (e) {
     console.error(e)
   }
@@ -40,21 +59,18 @@ async function fetchCategories() {
 
 async function fetchCountries() {
   try {
-    console.log('Fetching countries...')
     const response = await axios.get('https://restcountries.com/v3.1/all') // API để lấy danh sách quốc gia
     // Sắp xếp danh sách quốc gia theo thứ tự chữ cái
-    state.countries = response.data.sort((a, b) => a.name.common.localeCompare(b.name.common))
+    address.countries = response.data.sort((a, b) => a.name.common.localeCompare(b.name.common))
   } catch (e) {
     console.error(e)
   }
 }
 async function fetchCities(countryCode) {
   try {
-    console.log(`Fetching cities for country code: ${countryCode}...`)
     // Thay thế bằng URL thực tế hoặc dữ liệu tĩnh của bạn
     const response = await axios.get(`https://example.com/api/cities?country=${countryCode}`)
-    state.cities = response.data.sort((a, b) => a.name.localeCompare(b.name))
-    console.log(state.cities)
+    address.cities = response.data.sort((a, b) => a.name.localeCompare(b.name))
   } catch (e) {
     console.error(e)
   }
@@ -62,12 +78,12 @@ async function fetchCities(countryCode) {
 
 // Watch for changes in selected country and fetch corresponding cities
 watch(
-  () => state.selectedCountry,
+  () => address.selectedCountry,
   (newCountryCode) => {
     if (newCountryCode) {
       fetchCities(newCountryCode)
     } else {
-      state.cities = []
+      address.cities = []
     }
   }
 )
@@ -85,13 +101,13 @@ watch(
               <div class="grid grid-cols-12 gap-4 mt-4">
                 <div class="col-span-12 ltr:text-left rtl:text-right">
                   <label class="font-semibold">Job Title</label>
-                  <input type="text" class="form-input" />
+                  <input v-model="details.title" type="text" class="form-input" />
                 </div>
                 <div class="md:col-span-6 col-span-12 ltr:text-left rtl:text-right">
                   <label class="font-semibold">Categories</label>
                   <select class="custom-select">
                     <option
-                      v-for="category in state.categories"
+                      v-for="category in details.categories"
                       :key="category.id"
                       :value="category.id"
                     >
@@ -133,32 +149,45 @@ watch(
                 <div class="col-span-12 ltr:text-left rtl:text-right">
                   <label class="font-semibold">Description</label>
                   <textarea
-                    class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 overflow-auto resize-y min-h-[100px]"
+                    v-model="inf.description"
+                    class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 overflow-auto resize-y min-h-[200px]"
                   ></textarea>
                 </div>
                 <div class="col-span-12 ltr:text-left rtl:text-right">
                   <label class="font-semibold">Requirements</label>
                   <textarea
-                    class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 min-h-[100px]"
+                    v-model="inf.requirements"
+                    class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 min-h-[200px]"
                   ></textarea>
                 </div>
                 <div class="col-span-12 ltr:text-left rtl:text-right">
                   <label class="font-semibold">Benefit</label>
                   <textarea
-                    class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 min-h-[100px]"
+                    v-model="inf.benefits"
+                    class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 min-h-[200px]"
                   ></textarea>
                 </div>
                 <div class="md:col-span-6 col-span-12 ltr:text-left rtl:text-right">
                   <label class="font-semibold">Experience</label>
-                  <input type="text" class="form-input" placeholder="Experience" />
+                  <input
+                    v-model="inf.experience"
+                    type="text"
+                    class="form-input"
+                    placeholder="Experience"
+                  />
                 </div>
                 <div class="md:col-span-6 col-span-12 ltr:text-left rtl:text-right">
                   <label class="font-semibold">Position</label>
-                  <input type="text" class="form-input" placeholder="Position" />
+                  <input
+                    v-model="inf.position"
+                    type="text"
+                    class="form-input"
+                    placeholder="Position"
+                  />
                 </div>
                 <div class="md:col-span-4 col-span-12 ltr:text-left rtl:text-right">
                   <label class="font-semibold">Slots</label>
-                  <input type="number" class="form-input" />
+                  <input v-model="inf.slots" type="number" class="form-input" />
                 </div>
                 <div class="md:col-span-4 col-span-12 ltr:text-left rtl:text-right">
                   <label class="font-semibold">Application Deadline</label>
@@ -166,7 +195,7 @@ watch(
                     <input
                       type="text"
                       id="deadline"
-                      v-model="state.selectedDate"
+                      v-model="inf.selectedDate"
                       ref="datepicker"
                       class="form-input pl-10"
                       placeholder="Select date"
@@ -185,9 +214,9 @@ watch(
               <div class="grid grid-cols-12 gap-4 mt-4">
                 <div class="md:col-span-4 col-span-12 ltr:text-left rtl:text-right">
                   <label class="font-semibold">Country</label>
-                  <select class="custom-select" v-model="state.selectedCountry">
+                  <select class="custom-select" v-model="address.selectedCountry">
                     <option
-                      v-for="country in state.countries"
+                      v-for="country in address.countries"
                       :key="country.cca3"
                       :value="country.cca3"
                     >
@@ -198,7 +227,7 @@ watch(
                 <div class="md:col-span-4 col-span-12 ltr:text-left rtl:text-right">
                   <label class="font-semibold">City</label>
                   <select class="custom-select">
-                    <option v-for="city in state.cities" :key="city.id" :value="city.id">
+                    <option v-for="city in address.cities" :key="city.id" :value="city.id">
                       {{ city.name }}
                     </option>
                   </select>
