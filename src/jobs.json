@@ -443,5 +443,137 @@
       "email": "jamestaylor@example.com",
       "name": "James Taylor"
     }
+  ],
+  "companies": [
+    {
+      "id": 1,
+      "tax_code": "123456789",
+      "name": "Tech Innovators Ltd.",
+      "logo": "https://example.com/logos/tech_innovators.png",
+      "description": "A leading company in tech innovation and solutions.",
+      "scale": 500,
+      "email": "info@techinnovators.com",
+      "phone": "1234567890",
+      "address": "Silicon Valley",
+      "web_url": "https://www.techinnovators.com",
+      "status": "ACTIVE"
+    },
+    {
+      "id": 2,
+      "tax_code": "987654321",
+      "name": "Green Energy Co.",
+      "logo": "https://example.com/logos/green_energy.png",
+      "description": "Pioneers in sustainable energy solutions.",
+      "scale": 250,
+      "email": "contact@greenenergy.com",
+      "phone": "0987654321",
+      "address": "Eco City",
+      "web_url": "https://www.greenenergy.com",
+      "status": "ACTIVE"
+    },
+    {
+      "id": 3,
+      "tax_code": "112233445",
+      "name": "Global Finance Group",
+      "logo": "https://example.com/logos/global_finance.png",
+      "description": "Global leaders in financial services and consulting.",
+      "scale": 1200,
+      "email": "support@globalfinance.com",
+      "phone": "1122334455",
+      "address": "New York",
+      "web_url": "https://www.globalfinance.com",
+      "status": "ACTIVE"
+    },
+    {
+      "id": 4,
+      "tax_code": "556677889",
+      "name": "Health First Corp.",
+      "logo": "https://example.com/logos/health_first.png",
+      "description": "Providing innovative health solutions worldwide.",
+      "scale": 700,
+      "email": "services@healthfirst.com",
+      "phone": "5566778899",
+      "address": "Care City",
+      "web_url": "https://www.healthfirst.com",
+      "status": "INACTIVE"
+    },
+    {
+      "id": 5,
+      "tax_code": "334455667",
+      "name": "Smart Homes Inc.",
+      "logo": "https://example.com/logos/smart_homes.png",
+      "description": "Revolutionizing the way we live with smart technology.",
+      "scale": 300,
+      "email": "hello@smarthomes.com",
+      "phone": "3344556677",
+      "address": "Tech Town",
+      "web_url": "https://www.smarthomes.com",
+      "status": "ACTIVE"
+    },
+    {
+      "id": 6,
+      "tax_code": "998877665",
+      "name": "AutoDrive",
+      "logo": "https://example.com/logos/autodrive.png",
+      "description": "Automating the future of transportation.",
+      "scale": 1500,
+      "email": "info@autodrive.com",
+      "phone": "9988776655",
+      "address": "Motor City",
+      "web_url": "https://www.autodrive.com",
+      "status": "INACTIVE"
+    },
+    {
+      "id": 7,
+      "tax_code": "776655443",
+      "name": "Blue Ocean Tech",
+      "logo": "https://example.com/logos/blue_ocean.png",
+      "description": "Innovative technology solutions for marine exploration.",
+      "scale": 200,
+      "email": "contact@blueocean.com",
+      "phone": "7766554433",
+      "address": "Blue City",
+      "web_url": "https://www.blueocean.com",
+      "status": "ACTIVE"
+    },
+    {
+      "id": 8,
+      "tax_code": "667788990",
+      "name": "MountainPeak Adventures",
+      "logo": "https://example.com/logos/mountain_peak.png",
+      "description": "Experience the best outdoor adventures with us.",
+      "scale": 80,
+      "email": "hello@mountainpeak.com",
+      "phone": "6677889900",
+      "address": "Adventure City",
+      "web_url": "https://www.mountainpeak.com",
+      "status": "ACTIVE"
+    },
+    {
+      "id": 9,
+      "tax_code": "112244668",
+      "name": "Urban Gardens",
+      "logo": "https://example.com/logos/urban_gardens.png",
+      "description": "Green solutions for urban living.",
+      "scale": 120,
+      "email": "contact@urbangardens.com",
+      "phone": "1122446688",
+      "address": "Urban City",
+      "web_url": "https://www.urbangardens.com",
+      "status": "ACTIVE"
+    },
+    {
+      "id": 10,
+      "tax_code": "445566778",
+      "name": "SkyNet Solutions",
+      "logo": "https://example.com/logos/skynet_solutions.png",
+      "description": "Connecting the world through advanced network solutions.",
+      "scale": 800,
+      "email": "support@skynetsolutions.com",
+      "phone": "4455667788",
+      "address": "Cloud City",
+      "web_url": "https://www.skynetsolutions.com",
+      "status": "INACTIVE"
+    }
   ]
 }
