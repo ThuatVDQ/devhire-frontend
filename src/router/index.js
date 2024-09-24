@@ -3,6 +3,7 @@ import HomeView from '@/views/HomeView.vue'
 import JobsView from '@/views/JobsView.vue'
 import JobDetailView from '@/views/JobDetailView.vue'
 import LoginView from '@/views/LoginView.vue'
+import RegisterView from '@/views/RegisterView.vue'
 import ApplyJob from '@/views/ApplyJob.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -31,6 +32,11 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: LoginView
+    },
+    {
+      path: '/signup',
+      name: 'signup',
+      component: RegisterView
     }
   ]
 })

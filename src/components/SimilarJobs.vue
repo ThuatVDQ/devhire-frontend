@@ -32,6 +32,6 @@ onMounted(async () => {
       </p>
     </div>
     <JobList :jobs="state.jobs" :pagination="false" />
-    <CardExploreJob />
   </div>
+  <CardExploreJob />
 </template>

@@ -1,3 +1,13 @@
+<script setup>
+import { reactive } from 'vue'
+import { RouterLink } from 'vue-router'
+
+const form = reactive({
+  phone: '',
+  password: ''
+})
+</script>
+
 <template>
   <section
     class="h-screen flex items-center justify-center relative overflow-hidden bg-[url('../assets/bg.jpg')] bg-no-repeat bg-center bg-cover"
@@ -9,10 +19,10 @@
           class="relative overflow-hidden bg-white dark:bg-slate-900 shadow-md dark:shadow-gray-800 rounded-md"
         >
           <div class="p-6">
-            <a href="/login" class="flex items-center justify-center">
+            <RouterLink :to="/login/" class="flex items-center justify-center">
               <img src="../assets/logo.svg" alt="logo" class="w-8 h-8" />
               <h1 class="ml-2 text-2xl font-bold text-blue-600">DevHire</h1>
-            </a>
+            </RouterLink>
             <h5 class="my-6 text-xl font-semibold">Login</h5>
             <form action="" class="text-left">
               <div class="grid grid-cols-1">

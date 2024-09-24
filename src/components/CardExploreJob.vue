@@ -18,14 +18,16 @@
               </div>
             </div>
             <div class="lg:col-span-4 md:col-span-5">
-              <div class="ltr:text-right rtl:text-left relative z-1">
+              <div
+                class="relative z-1 flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-2"
+              >
                 <a
                   class="btn bg-emerald-600 hover:bg-emerald-700 border-emerald-600 dark:border-emerald-600 text-white rounded-md border-1 inline-block text-[15px] font-semibold tracking-[.025em] leading-[28px] px-5 py-1"
                   href=""
                   >Apply Now</a
                 >
                 <a
-                  class="btn bg-emerald-600/5 hover:bg-emerald-600 border-emerald-600/10 hover:border-emerald-600 text-emerald-600 hover:text-white rounded-md ms-2 border-1 inline-block text-[15px] font-semibold tracking-[.025em] leading-[28px] px-5 py-1"
+                  class="btn bg-emerald-600/5 hover:bg-emerald-600 border-emerald-600/10 hover:border-emerald-600 text-emerald-600 hover:text-white rounded-md border-1 inline-block text-[15px] font-semibold tracking-[.025em] leading-[28px] px-5 py-1"
                   >Learn More</a
                 >
               </div>
