@@ -1,5 +1,23 @@
 <script setup>
 import CardCompany from './CardCompany.vue'
+import CompanyList from './CompanyList.vue'
+import { reactive, onMounted } from 'vue'
+import axios from 'axios'
+
+const state = reactive({
+  companies: [],
+  isLoading: true
+})
+
+onMounted(async () => {
+  try {
+    const response = await axios.get('http://localhost:8000/companies')
+    state.companies = response.data.slice(0, 8)
+    console.log(response.data)
+  } catch (e) {
+    console.error(e)
+  }
+})
 </script>
 
 <template>
@@ -14,16 +32,7 @@ import CardCompany from './CardCompany.vue'
           reviews on over 30000+ companies worldwide.
         </p>
       </div>
-      <div class="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 mt-8 gap-[30px]">
-        <CardCompany />
-        <CardCompany />
-        <CardCompany />
-        <CardCompany />
-        <CardCompany />
-        <CardCompany />
-        <CardCompany />
-        <CardCompany />
-      </div>
+      <CompanyList :companies="state.companies" :pagination="false" />
     </div>
     <div class="grid md:grid-cols-12 grid-cols-1 mt-6">
       <div class="md:col-span-12 text-center">

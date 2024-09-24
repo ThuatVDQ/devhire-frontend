@@ -11,12 +11,12 @@ defineProps({
 </script>
 
 <template>
-  <div class="container md:mt-24 pb-24">
+  <div class="container md:mt-24">
     <div class="grid lg:grid-cols-2 md:grid-cols-2 grid-cols-1 mt-8 gap-[30px]">
       <CardJob v-for="job in jobs" :key="job.id" :job="job" />
     </div>
-    <div class="grid md:grid-cols-12 grid-cols-1 mt-8">
-      <div v-if="pagination" class="md:col-span-12 text-center">
+    <div v-if="pagination" class="grid md:grid-cols-12 grid-cols-1 mt-8">
+      <div class="md:col-span-12 text-center">
         <nav aria-label="Page navigation example"></nav>
         <ul class="inline-flex items-center -space-x-px">
           <li>
@@ -65,7 +65,7 @@ defineProps({
           </li>
         </ul>
       </div>
-      <div v-else></div>
     </div>
+    <div v-else></div>
   </div>
 </template>

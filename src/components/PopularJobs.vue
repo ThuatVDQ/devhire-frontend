@@ -1,5 +1,22 @@
 <script setup>
-import CardJob from './CardJob.vue'
+import JobList from './JobList.vue'
+import { reactive, onMounted } from 'vue'
+import axios from 'axios'
+
+const state = reactive({
+  jobs: [],
+  isLoading: true
+})
+
+onMounted(async () => {
+  try {
+    const response = await axios.get('http://localhost:8000/jobs')
+    state.jobs = response.data.slice(0, 6)
+    console.log(response.data)
+  } catch (e) {
+    console.error(e)
+  }
+})
 </script>
 
 <template>
@@ -13,14 +30,8 @@ import CardJob from './CardJob.vue'
         reviews on over 30000+ companies worldwide.
       </p>
     </div>
-    <div class="grid lg:grid-cols-2 md:grid-cols-2 grid-cols-1 mt-8 gap-[30px]">
-      <CardJob />
-      <CardJob />
-      <CardJob />
-      <CardJob />
-      <CardJob />
-      <CardJob />
-    </div>
+    <JobList :jobs="state.jobs" :pagination="false" />
+
     <div class="grid md:grid-cols-1 grid-cols-1 mt-8">
       <div class="md:col-span-12 text-center">
         <a

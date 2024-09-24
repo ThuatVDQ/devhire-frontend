@@ -1,18 +1,18 @@
 <script setup>
-// defineProps({
-//   category: {
-//     type: String,
-//     required: true
-//   },
-//   slots: {
-//     type: String,
-//     required: true
-//   },
-//   id: {
-//     type: int,
-//     required: true
-//   }
-// })
+defineProps({
+  category: {
+    type: String,
+    required: true
+  },
+  slots: {
+    type: String,
+    required: true
+  }
+  // id: {
+  //   type: int,
+  //   required: true
+  // }
+})
 </script>
 
 <template>
