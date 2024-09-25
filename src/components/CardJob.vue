@@ -82,7 +82,7 @@ const differenceInDays = computed(() => {
       >
     </div>
     <a
-      class="btn btn-icon rounded-full bg-emerald-600/5 hover:bg-emerald-600 border-emerald-600/10 hover:border-emerald-600 text-emerald-600 hover:text-white absolute top-0 end-0 m-3"
+      class="h-9 w-9 inline-flex items-center justify-center rounded-full bg-emerald-600/5 hover:bg-emerald-600 border-emerald-600/10 hover:border-emerald-600 text-emerald-600 hover:text-white absolute top-0 end-0 m-3"
       href=""
     >
       <i class="pi pi-bookmark"></i>
