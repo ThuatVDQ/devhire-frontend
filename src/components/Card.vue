@@ -1,4 +1,5 @@
 <script setup>
+import { RouterLink } from 'vue-router'
 defineProps({
   title: {
     type: String,
@@ -9,6 +10,10 @@ defineProps({
     required: true
   },
   icon: {
+    type: String,
+    required: true
+  },
+  link: {
     type: String,
     required: true
   }
@@ -28,11 +33,11 @@ defineProps({
       <a class="title h5 text-lg font-semibold hover:text-emerald-600">{{ title }}</a>
       <p class="text-slate-400 mt-3">{{ description }}</p>
       <div class="mt-5">
-        <a
-          href=""
+        <RouterLink
+          :to="`${link}`"
           class="btn btn-link text-emerald-600 hover:text-emerald-600 after:bg-emerald-600 duration-500 ease-in-out inline-flex items-center"
           >Read More <i class="pi pi-arrow-right ms-1"></i
-        ></a>
+        ></RouterLink>
       </div>
     </div>
   </div>

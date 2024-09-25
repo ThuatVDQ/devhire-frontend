@@ -1,5 +1,6 @@
 <script setup>
 import Card from './Card.vue'
+import { RouterLink } from 'vue-router'
 </script>
 
 <template>
@@ -19,16 +20,19 @@ import Card from './Card.vue'
           title="Create Account"
           description="The phrasal sequence of the is now so that many campaign and benefit"
           icon="pi pi-user-plus"
+          link="/register"
         />
         <Card
           title="Complete Your Profile"
           description="The phrasal sequence of the is now so that many campaign and benefit"
           icon="pi pi-verified"
+          link="/profile"
         />
         <Card
           title="Apply Job or Hire"
           description="The phrasal sequence of the is now so that many campaign and benefit"
           icon="pi pi-folder-open"
+          link="/jobs"
         />
       </div>
     </div>
@@ -59,10 +63,11 @@ import Card from './Card.vue'
               </div>
             </div>
             <div class="absolute bottom-2/4 translate-y-2/4 start-0 end-0 text-center">
-              <a
+              <RouterLink
+                to="/about-us"
                 class="lightbox size-20 rounded-full shadow-lg dark:shadow-gray-800 inline-flex items-center justify-center bg-white dark:bg-slate-900 text-emerald-600 dark:text-white"
                 ><i class="pi pi-caret-right text-emerald-500 text-xl"></i
-              ></a>
+              ></RouterLink>
             </div>
           </div>
         </div>
@@ -92,12 +97,12 @@ import Card from './Card.vue'
               </li>
             </ul>
             <div class="mt-6">
-              <a
-                href=""
+              <RouterLink
+                to="/contact"
                 class="btn bg-emerald-600 hover:bg-emerald-700 border-emerald-600 hover:border-emerald-700 text-white mt-2 rounded-md inline-flex items-center px-4 py-2"
               >
                 <i class="pi pi-envelope pr-1"></i>Contact us
-              </a>
+              </RouterLink>
             </div>
           </div>
         </div>

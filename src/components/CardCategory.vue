@@ -1,4 +1,5 @@
 <script setup>
+import { RouterLink } from 'vue-router'
 defineProps({
   category: {
     type: String,
@@ -7,11 +8,11 @@ defineProps({
   slots: {
     type: String,
     required: true
+  },
+  id: {
+    type: String,
+    required: true
   }
-  // id: {
-  //   type: int,
-  //   required: true
-  // }
 })
 </script>
 
@@ -24,12 +25,12 @@ defineProps({
       >{{ slots }} Jobs available</span
     >
     <div class="mt-2">
-      <a
-        href=""
+      <RouterLink
+        :to="`/category/${id}`"
         class="text-emerald-600 dark:text-white/80 group-hover:text-white font-medium items-center inline-flex"
       >
         Explore Jobs <i class="pi pi-arrow-right pl-1"></i>
-      </a>
+      </RouterLink>
     </div>
   </div>
 </template>

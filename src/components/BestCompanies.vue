@@ -1,6 +1,6 @@
 <script setup>
-import CardCompany from './CardCompany.vue'
 import CompanyList from './CompanyList.vue'
+import { RouterLink } from 'vue-router'
 import { reactive, onMounted } from 'vue'
 import axios from 'axios'
 
@@ -36,12 +36,12 @@ onMounted(async () => {
     </div>
     <div class="grid md:grid-cols-12 grid-cols-1 mt-6">
       <div class="md:col-span-12 text-center">
-        <a
-          href=""
+        <RouterLink
+          to="/conpanies"
           class="btn btn-link text-slate-400 hover:text-emerald-600 after:bg-emerald-600 duration-500 ease-in-out inline-flex items-center"
         >
           See More Companies <i class="pi pi-arrow-right pl-1"></i>
-        </a>
+        </RouterLink>
       </div>
     </div>
   </div>

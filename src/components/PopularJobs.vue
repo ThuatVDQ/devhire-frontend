@@ -1,6 +1,7 @@
 <script setup>
 import JobList from './JobList.vue'
 import { reactive, onMounted } from 'vue'
+import { RouterLink } from 'vue-router'
 import axios from 'axios'
 
 const state = reactive({
@@ -34,12 +35,12 @@ onMounted(async () => {
 
     <div class="grid md:grid-cols-1 grid-cols-1 mt-8">
       <div class="md:col-span-12 text-center">
-        <a
-          href=""
+        <RouterLink
+          to="/jobs"
           class="btn btn-link text-slate-400 hover:text-emerald-600 after:bg-emerald-600 duration-500 ease-in-out inline-flex items-center"
         >
           See More Jobs <i class="pi pi-arrow-right pl-1"></i>
-        </a>
+        </RouterLink>
       </div>
     </div>
   </div>
