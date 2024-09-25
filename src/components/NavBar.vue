@@ -1,37 +1,64 @@
 <script setup>
 import { ref } from 'vue'
+import { RouterLink, useRoute } from 'vue-router'
+
 const isMenuOpen = ref(false)
 const toggleMenu = () => {
   this.isMenuOpen = !this.isMenuOpen
+}
+
+const isActiveLink = (routePath) => {
+  const route = useRoute()
+  return routePath === route.path
 }
 </script>
 
 <template>
   <header class="bg-white shadow-lg">
     <nav class="container py-4 flex justify-between items-center">
-      <!-- Logo -->
-      <div class="flex items-center">
+      <RouterLink to="/" class="flex items-center">
         <img src="@/assets/logo.svg" alt="DevHire Logo" class="w-12 h-12" />
-        <h1 class="ml-2 text-2xl font-bold text-blue-600">DevHire</h1>
-      </div>
+        <h1 class="ml-2 text-2xl font-bold text-green-600">DevHire</h1>
+      </RouterLink>
 
-      <!-- Navigation Links -->
       <ul class="hidden md:flex space-x-6 text-gray-600">
-        <li><a href="jobs" class="hover:text-blue-500">Jobs</a></li>
-        <li><a href="#companies" class="hover:text-blue-500">Companies</a></li>
-        <li><a href="#about" class="hover:text-blue-500">About Us</a></li>
-        <li><a href="#contact" class="hover:text-blue-500">Contact</a></li>
+        <li>
+          <RouterLink
+            to="/jobs"
+            :class="[isActiveLink('/jobs') ? 'text-green-600' : 'hover:text-green-600']"
+            >Jobs</RouterLink
+          >
+        </li>
+        <li>
+          <RouterLink
+            to="/companies"
+            :class="[isActiveLink('/companies') ? 'text-green-600' : 'hover:text-green-600']"
+            >Companies</RouterLink
+          >
+        </li>
+        <li>
+          <RouterLink
+            to="/about"
+            :class="[isActiveLink('/about-us') ? 'text-green-600' : 'hover:text-green-600']"
+            >About Us</RouterLink
+          >
+        </li>
+        <li>
+          <RouterLink
+            to="/contact"
+            :class="[isActiveLink('/contact') ? 'text-green-600' : 'hover:text-green-600']"
+            >Contact</RouterLink
+          >
+        </li>
       </ul>
 
-      <!-- Auth Buttons -->
       <div class="hidden md:flex space-x-4">
-        <button class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Login</button>
+        <button class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">Login</button>
         <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200">
           Sign Up
         </button>
       </div>
 
-      <!-- Mobile Menu Icon -->
       <div class="md:hidden">
         <button @click="toggleMenu" class="focus:outline-none">
           <svg
@@ -52,7 +79,6 @@ const toggleMenu = () => {
       </div>
     </nav>
 
-    <!-- Mobile Menu -->
     <div v-if="isMenuOpen" class="md:hidden bg-white shadow-lg">
       <ul class="flex flex-col space-y-4 p-4 text-gray-600">
         <li><a href="#jobs" class="hover:text-blue-500">Jobs</a></li>
