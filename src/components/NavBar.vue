@@ -53,10 +53,15 @@ const isActiveLink = (routePath) => {
       </ul>
 
       <div class="hidden md:flex space-x-4">
-        <button class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">Login</button>
-        <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200">
+        <RouterLink to="/login" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+          >Login</RouterLink
+        >
+        <RouterLink
+          to="/signup"
+          class="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
+        >
           Sign Up
-        </button>
+        </RouterLink>
       </div>
 
       <div class="md:hidden">
@@ -86,12 +91,18 @@ const isActiveLink = (routePath) => {
         <li><a href="#about" class="hover:text-blue-500">About Us</a></li>
         <li><a href="#contact" class="hover:text-blue-500">Contact</a></li>
         <div class="flex space-x-4">
-          <button class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 w-full">
+          <RouterLink
+            to="/login"
+            class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 w-full"
+          >
             Login
-          </button>
-          <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 w-full">
+          </RouterLink>
+          <RouterLink
+            to="/signup"
+            class="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 w-full"
+          >
             Sign Up
-          </button>
+          </RouterLink>
         </div>
       </ul>
     </div>
