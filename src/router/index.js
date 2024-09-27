@@ -8,6 +8,9 @@ import ApplyJob from '@/views/ApplyJob.vue'
 import ProfileView from '@/views/ProfileView.vue'
 import CompanyView from '@/views/CompanyView.vue'
 import AboutUsView from '@/views/AboutUsView.vue'
+import ServiceView from '@/views/ServiceView.vue'
+import PricingView from '@/views/PricingView.vue'
+import ContactView from '@/views/ContactView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -53,9 +56,24 @@ const router = createRouter({
       component: CompanyView
     },
     {
-      path: '/about-us',
+      path: '/about',
       name: 'about-us',
       component: AboutUsView
+    },
+    {
+      path: '/services',
+      name: 'services',
+      component: ServiceView
+    },
+    {
+      path: '/pricing',
+      name: 'pricing',
+      component: PricingView
+    },
+    {
+      path: '/contact',
+      name: 'contact',
+      component: ContactView
     }
   ],
   scrollBehavior(to, from, savedPosition) {

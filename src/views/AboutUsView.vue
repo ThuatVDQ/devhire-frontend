@@ -78,15 +78,26 @@ const faqs = [
             <div class="relative">
               <img
                 class="lg:w-[400px] w-[280px] rounded-md shadow dark:shadow-gray-700"
-                src="../assets/bg.jpg"
+                src="https://jobstack-shreethemes.vercel.app/static/media/ab01.016884c7bf778010e79c.jpg"
+                alt=""
               />
               <div class="absolute top-0 translate-y-2/4 end-0 text-center">
                 <a
-                  datatype="youtube"
+                  href=""
                   class="lightbox size-20 rounded-full shadow-lg dark:shadow-gray-700 inline-flex items-center justify-center bg-white dark:bg-slate-900 text-emerald-600 dark:text-white"
-                  ><i class="pi pi-play"></i
-                ></a>
+                >
+                  <i
+                    class="pi pi-caret-right text-emerald-500 inline-flex items-center justify-center text-2xl"
+                  ></i>
+                </a>
               </div>
+            </div>
+            <div class="absolute md:-end-5 end-0 -bottom-16">
+              <img
+                src="https://jobstack-shreethemes.vercel.app/static/media/ab02.f851a3dde08585493f97.jpg"
+                alt=""
+                class="lg:w-[280px] w-[200px] border-8 border-white dark:border-slate-900 rounded-md shadow dark:shadow-gray-700"
+              />
             </div>
           </div>
         </div>
