@@ -79,12 +79,14 @@ const router = createRouter({
   ],
   scrollBehavior(to, from, savedPosition) {
     if (savedPosition) {
-      //đảm bảo DOM được cập nhật trước khi cuộn lại vị trí cũ
-      nextTick(() => {
-        resolve(savedPosition)
+      // Đảm bảo DOM được cập nhật trước khi cuộn lại vị trí cũ
+      return new Promise((resolve) => {
+        nextTick(() => {
+          resolve(savedPosition)
+        })
       })
     } else {
-      resolve({ top: 0 })
+      return { top: 0 }
     }
   }
 })
