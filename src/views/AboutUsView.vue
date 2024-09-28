@@ -1,6 +1,61 @@
 <script setup>
 import Card from '../components//Card.vue'
 import CardExploreJob from '../components/CardExploreJob.vue'
+
+// Counter data
+const counterItems = [
+  { value: '1,548', suffix: 'K+', label: 'Job Fulfillment' },
+  { value: '25', suffix: '+', label: 'Branches' },
+  { value: '9', suffix: '+', label: 'years experience' }
+]
+
+// Card data
+const cardItems = [
+  {
+    title: '24/7 Support',
+    description: 'Many desktop publishing now use and a search for job',
+    icon: 'pi pi-phone'
+  },
+  {
+    title: 'Tech & Startup Jobs',
+    description: 'Many desktop publishing now use and a search for job',
+    icon: 'pi pi-slack'
+  },
+  {
+    title: 'Quick & Easy',
+    description: 'Many desktop publishing now use and a search for job',
+    icon: 'pi pi-user-plus'
+  },
+  {
+    title: 'Save Time',
+    description: 'Many desktop publishing now use and a search for job',
+    icon: 'pi pi-hourglass'
+  }
+]
+
+// FAQ data
+const faqs = [
+  {
+    question: 'How our Jobstack work?',
+    answer:
+      'Due to its widespread use as filler text for layouts, non-readability is of great importance: human perception is tuned to recognize certain patterns and repetitions in texts.'
+  },
+  {
+    question: 'What is the main process open account?',
+    answer:
+      'Words is random, the reader will not be distracted from making a neutral judgement on the visual impact.'
+  },
+  {
+    question: 'How to make unlimited data entry?',
+    answer:
+      'Furthermore, it is advantageous when the dummy text is relatively realistic so that the layout impression of the final publication is not compromised.'
+  },
+  {
+    question: 'Is DevHire safer to use with my account?',
+    answer:
+      "The most well-known dummy text is the 'Lorem Ipsum', which is said to have originated in the 16th century. Lorem Ipsum is composed in a pseudo-Latin language which more or less corresponds to 'proper' Latin."
+  }
+]
 </script>
 <template>
   <section
@@ -23,15 +78,26 @@ import CardExploreJob from '../components/CardExploreJob.vue'
             <div class="relative">
               <img
                 class="lg:w-[400px] w-[280px] rounded-md shadow dark:shadow-gray-700"
-                src="../assets/bg.jpg"
+                src="https://jobstack-shreethemes.vercel.app/static/media/ab01.016884c7bf778010e79c.jpg"
+                alt=""
               />
               <div class="absolute top-0 translate-y-2/4 end-0 text-center">
                 <a
-                  datatype="youtube"
+                  href=""
                   class="lightbox size-20 rounded-full shadow-lg dark:shadow-gray-700 inline-flex items-center justify-center bg-white dark:bg-slate-900 text-emerald-600 dark:text-white"
-                  ><i class="pi pi-play"></i
-                ></a>
+                >
+                  <i
+                    class="pi pi-caret-right text-emerald-500 inline-flex items-center justify-center text-2xl"
+                  ></i>
+                </a>
               </div>
+            </div>
+            <div class="absolute md:-end-5 end-0 -bottom-16">
+              <img
+                src="https://jobstack-shreethemes.vercel.app/static/media/ab02.f851a3dde08585493f97.jpg"
+                alt=""
+                class="lg:w-[280px] w-[200px] border-8 border-white dark:border-slate-900 rounded-md shadow dark:shadow-gray-700"
+              />
             </div>
           </div>
         </div>
@@ -84,24 +150,11 @@ import CardExploreJob from '../components/CardExploreJob.vue'
       </div>
       <div class="grid lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 mt-8 gap-[30px]">
         <Card
-          title="24/7 Support"
-          description="Many desktop publishing now use and a search for job"
-          icon="pi pi-phone"
-        />
-        <Card
-          title="Tech & Startup Jobs"
-          description="Many desktop publishing now use and a search for job"
-          icon="pi pi-slack"
-        />
-        <Card
-          title="Quick & Easy"
-          description="Many desktop publishing now use and a search for job"
-          icon="pi pi-user-plus"
-        />
-        <Card
-          title="Save Time"
-          description="Many desktop publishing now use and a search for job"
-          icon="pi pi-hourglass"
+          v-for="(card, index) in cardItems"
+          :key="index"
+          :title="card.title"
+          :description="card.description"
+          :icon="card.icon"
         />
       </div>
     </div>
@@ -151,33 +204,15 @@ import CardExploreJob from '../components/CardExploreJob.vue'
       </div>
     </div>
     <div class="container md:mt-24 mt-16">
-      <div class="container">
-        <div class="relative grid md:grid-cols-3 grid-cols-1 items-center gap-[30px] z-1">
-          <div class="counter-box text-center">
-            <h1 class="lg:text-5xl text-4xl font-semibold mb-2 dark:text-white">
-              <span>1,548</span>
-              K+
-            </h1>
-            <h5 class="counter-head text-sm font-semibold text-slate-400 uppercase">
-              Job Fulfillment
-            </h5>
-          </div>
-          <div class="counter-box text-center">
-            <h1 class="lg:text-5xl text-4xl font-semibold mb-2 dark:text-white">
-              <span>25</span>
-              +
-            </h1>
-            <h5 class="counter-head text-sm font-semibold text-slate-400 uppercase">Branches</h5>
-          </div>
-          <div class="counter-box text-center">
-            <h1 class="lg:text-5xl text-4xl font-semibold mb-2 dark:text-white">
-              <span>9</span>
-              +
-            </h1>
-            <h5 class="counter-head text-sm font-semibold text-slate-400 uppercase">
-              years experience
-            </h5>
-          </div>
+      <div class="grid md:grid-cols-3 grid-cols-1 items-center gap-[30px] z-1">
+        <div v-for="(item, index) in counterItems" :key="index" class="counter-box text-center">
+          <h1 class="lg:text-5xl text-4xl font-semibold mb-2 dark:text-white">
+            <span>{{ item.value }}</span
+            >{{ item.suffix }}
+          </h1>
+          <h5 class="counter-head text-sm font-semibold text-slate-400 uppercase">
+            {{ item.label }}
+          </h5>
         </div>
       </div>
     </div>
@@ -192,46 +227,11 @@ import CardExploreJob from '../components/CardExploreJob.vue'
         </p>
       </div>
       <div class="grid md:grid-cols-2 grid-cols-1 mt-8 gap-[30px]">
-        <div class="flex">
+        <div v-for="(faq, index) in faqs" :key="index" class="flex">
           <i class="pi pi-question-circle mr-3 mt-1.5 text-emerald-600"></i>
           <div class="flex-1">
-            <h5 class="mb-2 text-lg font-semibold">How our Jobstack work ?</h5>
-            <p class="text-slate-400">
-              Due to its widespread use as filler text for layouts, non-readability is of great
-              importance: human perception is tuned to recognize certain patterns and repetitions in
-              texts.
-            </p>
-          </div>
-        </div>
-        <div class="flex">
-          <i class="pi pi-question-circle mr-3 mt-1.5 text-emerald-600"></i>
-          <div class="flex-1">
-            <h5 class="mb-2 text-lg font-semibold">What is the main process open account ?</h5>
-            <p class="text-slate-400">
-              words is random, the reader will not be distracted from making a neutral judgement on
-              the visual impact.
-            </p>
-          </div>
-        </div>
-        <div class="flex">
-          <i class="pi pi-question-circle mr-3 mt-1.5 text-emerald-600"></i>
-          <div class="flex-1">
-            <h5 class="mb-2 text-lg font-semibold">How to make unlimited data entry ?</h5>
-            <p class="text-slate-400">
-              Furthermore, it is advantageous when the dummy text is relatively realistic so that
-              the layout impression of the final publication is not compromised.
-            </p>
-          </div>
-        </div>
-        <div class="flex">
-          <i class="pi pi-question-circle mr-3 mt-1.5 text-emerald-600"></i>
-          <div class="flex-1">
-            <h5 class="mb-2 text-lg font-semibold">Is DevHire safer to use with my account ?</h5>
-            <p class="text-slate-400">
-              The most well-known dummy text is the 'Lorem Ipsum', which is said to have originated
-              in the 16th century. Lorem Ipsum is composed in a pseudo-Latin language which more or
-              less corresponds to 'proper' Latin.
-            </p>
+            <h5 class="mb-2 text-lg font-semibold">{{ faq.question }}</h5>
+            <p class="text-slate-400">{{ faq.answer }}</p>
           </div>
         </div>
       </div>
