@@ -8,6 +8,7 @@ import RegisterView from '@/views/RegisterView.vue'
 import ApplyJob from '@/views/ApplyJob.vue'
 import ProfileView from '@/views/ProfileView.vue'
 import CompanyView from '@/views/CompanyView.vue'
+import CompanyDetailView from '@/views/CompanyDetailView.vue'
 import AboutUsView from '@/views/AboutUsView.vue'
 import ServiceView from '@/views/ServiceView.vue'
 import PricingView from '@/views/PricingView.vue'
@@ -55,6 +56,11 @@ const router = createRouter({
       path: '/companies',
       name: 'companies',
       component: CompanyView
+    },
+    {
+      path: '/companies/:id',
+      name: 'company-detail',
+      component: CompanyDetailView
     },
     {
       path: '/about',

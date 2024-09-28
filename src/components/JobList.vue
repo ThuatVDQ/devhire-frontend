@@ -3,6 +3,10 @@ import CardJob from './CardJob.vue'
 
 defineProps({
   jobs: Object,
+  container: {
+    type: String,
+    default: 'container md:mt-24'
+  },
   pagination: {
     type: Boolean,
     default: true
@@ -11,8 +15,8 @@ defineProps({
 </script>
 
 <template>
-  <div class="container md:mt-24">
-    <div class="grid lg:grid-cols-2 md:grid-cols-2 grid-cols-1 mt-8 gap-[30px]">
+  <div :class="`${container}`">
+    <div class="grid lg:grid-cols-2 md:grid-cols-2 grid-cols-1 mt-8 gap-[30px] auto-rows-fr">
       <CardJob v-for="job in jobs" :key="job.id" :job="job" />
     </div>
     <div v-if="pagination" class="grid md:grid-cols-12 grid-cols-1 mt-8">

@@ -1,4 +1,5 @@
 <script setup>
+import { RouterLink } from 'vue-router'
 defineProps({
   company: {
     type: Object,
@@ -15,7 +16,11 @@ defineProps({
       <img src="" alt="" />
     </div>
     <div class="mt-4">
-      <a href="" class="text-lg hover:text-emerald-600 font-semibold">{{ company.name }}</a>
+      <RouterLink
+        :to="`/companies/${company.id}`"
+        class="text-lg hover:text-emerald-600 font-semibold"
+        >{{ company.name }}</RouterLink
+      >
       <p class="text-slate-400 mt-2">{{ company.description }}</p>
     </div>
     <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 flex justify-between">
