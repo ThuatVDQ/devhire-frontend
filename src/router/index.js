@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { nextTick } from 'vue'
 import HomeView from '@/views/HomeView.vue'
 import JobsView from '@/views/JobsView.vue'
 import JobDetailView from '@/views/JobDetailView.vue'
@@ -60,9 +61,12 @@ const router = createRouter({
   ],
   scrollBehavior(to, from, savedPosition) {
     if (savedPosition) {
-      return savedPosition
+      //đảm bảo DOM được cập nhật trước khi cuộn lại vị trí cũ
+      nextTick(() => {
+        resolve(savedPosition)
+      })
     } else {
-      return { top: 0 }
+      resolve({ top: 0 })
     }
   }
 })

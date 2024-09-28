@@ -1,4 +1,5 @@
 <script setup>
+import { RouterLink } from 'vue-router'
 import { computed } from 'vue'
 
 const state = defineProps({
@@ -25,10 +26,10 @@ const differenceInDays = computed(() => {
           <img class="size-8" src="../assets/logo.svg" />
         </div>
         <div class="ms-3">
-          <a
+          <RouterLink
             class="inline-block text-[16px] font-semibold hover:text-emerald-600 transition-all duration-500 me-1"
-            href=""
-            >{{ job.title }}</a
+            :to="`/jobs/${job.id}`"
+            >{{ job.title }}</RouterLink
           >
           <span class="inline-block text-sm text-slate-400">{{ differenceInDays }} days ago</span>
           <div>
