@@ -13,6 +13,7 @@ import AboutUsView from '@/views/AboutUsView.vue'
 import ServiceView from '@/views/ServiceView.vue'
 import PricingView from '@/views/PricingView.vue'
 import ContactView from '@/views/ContactView.vue'
+import NotFoundView from '@/views/NotFoundView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -81,6 +82,11 @@ const router = createRouter({
       path: '/contact',
       name: 'contact',
       component: ContactView
+    },
+    {
+      path: '/:catchAll(.*)',
+      name: 'not-found',
+      component: NotFoundView
     }
   ],
   scrollBehavior(to, from, savedPosition) {
