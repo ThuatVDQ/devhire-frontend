@@ -6,9 +6,27 @@ import axios from 'axios'
 
 const address = reactive({
   countries: [],
-  cities: [],
-  selectedCountry: ''
+  addresses: [{ selectedCountry: '', selectedCity: '', selectedDistrict: '', street: '' }], // Danh sách các địa chỉ
+  cities: []
 })
+
+// Hàm để thêm một địa chỉ mới
+function addAddress() {
+  address.addresses.push({
+    selectedCountry: '',
+    selectedCity: '',
+    selectedDistrict: '',
+    street: ''
+  })
+}
+
+// Hàm để xóa một địa chỉ
+function removeAddress(index) {
+  if (address.addresses.length > 1) {
+    // Đảm bảo có ít nhất 1 địa chỉ
+    address.addresses.splice(index, 1)
+  }
+}
 
 const inf = reactive({
   selectedDate: '',
@@ -26,7 +44,8 @@ const inf = reactive({
 - Possibility of full-time employment upon successful completion of the internship.`,
   experience: '',
   position: 'Intern',
-  slots: 10
+  slots: 10,
+  skills: [] // Array to store multiple skills
 })
 
 const details = reactive({
@@ -34,13 +53,22 @@ const details = reactive({
   title: 'Intern Software Engineer'
 })
 
+// Function to add a new skill
+function addSkill() {
+  inf.skills.push({ name: '' }) // Add an empty skill object to the array
+}
+
+// Function to remove a skill
+function removeSkill(index) {
+  inf.skills.splice(index, 1) // Remove the skill at the specified index
+}
+
 // On component mounted
 onMounted(() => {
-  // Khởi tạo Flatpickr
   flatpickr(document.querySelector('#deadline'), {
-    dateFormat: 'd-m-Y', // Định dạng ngày
+    dateFormat: 'd-m-Y',
     onChange: (selectedDates, dateStr) => {
-      inf.selectedDate = dateStr // Cập nhật dữ liệu khi ngày được chọn
+      inf.selectedDate = dateStr
     }
   })
 
@@ -59,16 +87,15 @@ async function fetchCategories() {
 
 async function fetchCountries() {
   try {
-    const response = await axios.get('https://restcountries.com/v3.1/all') // API để lấy danh sách quốc gia
-    // Sắp xếp danh sách quốc gia theo thứ tự chữ cái
+    const response = await axios.get('https://restcountries.com/v3.1/all')
     address.countries = response.data.sort((a, b) => a.name.common.localeCompare(b.name.common))
   } catch (e) {
     console.error(e)
   }
 }
+
 async function fetchCities(countryCode) {
   try {
-    // Thay thế bằng URL thực tế hoặc dữ liệu tĩnh của bạn
     const response = await axios.get(`https://example.com/api/cities?country=${countryCode}`)
     address.cities = response.data.sort((a, b) => a.name.localeCompare(b.name))
   } catch (e) {
@@ -76,7 +103,7 @@ async function fetchCities(countryCode) {
   }
 }
 
-// Watch for changes in selected country and fetch corresponding cities
+// Watch for changes in selected country
 watch(
   () => address.selectedCountry,
   (newCountryCode) => {
@@ -167,6 +194,33 @@ watch(
                     class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 min-h-[200px]"
                   ></textarea>
                 </div>
+                <div class="col-span-12 ltr:text-left rtl:text-right">
+                  <label class="font-semibold mr-3">Skills</label>
+                  <div
+                    v-for="(skill, index) in inf.skills"
+                    :key="index"
+                    class="flex items-center gap-4 mb-4"
+                  >
+                    <input
+                      v-model="skill.name"
+                      type="text"
+                      class="form-input flex-grow"
+                      placeholder="Skill name"
+                    />
+                    <button
+                      @click="removeSkill(index)"
+                      class="px-3 py-2 bg-red-400 hover:bg-red-600 text-white rounded-lg"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                  <button
+                    @click="addSkill"
+                    class="px-2 py-1 bg-blue-500 hover:bg-blue-700 text-white rounded-md"
+                  >
+                    Add Skill
+                  </button>
+                </div>
                 <div class="md:col-span-6 col-span-12 ltr:text-left rtl:text-right">
                   <label class="font-semibold">Experience</label>
                   <input
@@ -187,17 +241,17 @@ watch(
                 </div>
                 <div class="md:col-span-4 col-span-12 ltr:text-left rtl:text-right">
                   <label class="font-semibold">Slots</label>
-                  <input v-model="inf.slots" type="number" class="form-input" />
+                  <input v-model="inf.slots" type="number" class="form-input h-[44px]" />
                 </div>
                 <div class="md:col-span-4 col-span-12 ltr:text-left rtl:text-right">
                   <label class="font-semibold">Application Deadline</label>
-                  <div class="relative mt-1">
+                  <div class="relative flex items-center h-[44px]">
                     <input
                       type="text"
                       id="deadline"
                       v-model="inf.selectedDate"
                       ref="datepicker"
-                      class="form-input pl-10"
+                      class="form-input h-[44px] pl-10 w-full"
                       placeholder="Select date"
                     />
                     <span
@@ -211,10 +265,18 @@ watch(
               <div class="grid grid-cols-1 mt-8">
                 <h5 class="text-lg font-semibold">Address</h5>
               </div>
-              <div class="grid grid-cols-12 gap-4 mt-4">
+              <div
+                v-for="(addr, index) in address.addresses"
+                :key="index"
+                class="grid grid-cols-12 gap-4 mt-4"
+              >
                 <div class="md:col-span-4 col-span-12 ltr:text-left rtl:text-right">
                   <label class="font-semibold">Country</label>
-                  <select class="custom-select" v-model="address.selectedCountry">
+                  <select
+                    class="custom-select"
+                    v-model="addr.selectedCountry"
+                    @change="fetchCities(addr.selectedCountry)"
+                  >
                     <option
                       v-for="country in address.countries"
                       :key="country.cca3"
@@ -224,21 +286,47 @@ watch(
                     </option>
                   </select>
                 </div>
+
                 <div class="md:col-span-4 col-span-12 ltr:text-left rtl:text-right">
                   <label class="font-semibold">City</label>
-                  <select class="custom-select">
+                  <select class="custom-select" v-model="addr.selectedCity">
                     <option v-for="city in address.cities" :key="city.id" :value="city.id">
                       {{ city.name }}
                     </option>
                   </select>
                 </div>
+
                 <div class="md:col-span-4 col-span-12 ltr:text-left rtl:text-right">
                   <label class="font-semibold">District</label>
-                  <select class="custom-select"></select>
+                  <select class="custom-select" v-model="addr.selectedDistrict">
+                    <!-- Danh sách quận, có thể cập nhật dữ liệu từ API -->
+                  </select>
                 </div>
+
                 <div class="col-span-12 ltr:text-left rtl:text-right">
-                  <label class="font-semibold">Address</label>
-                  <input type="text" class="form-input" placeholder="Address" />
+                  <label class="font-semibold">Street</label>
+                  <input
+                    v-model="addr.street"
+                    type="text"
+                    class="form-input"
+                    placeholder="Street address"
+                  />
+                </div>
+
+                <div class="col-span-12 flex justify-end gap-4">
+                  <button
+                    @click="removeAddress(index)"
+                    class="px-4 py-2 bg-red-500 text-white rounded-md"
+                  >
+                    Remove
+                  </button>
+                  <button
+                    v-if="index === address.addresses.length - 1"
+                    @click="addAddress"
+                    class="px-4 py-2 bg-emerald-600 text-white rounded-md"
+                  >
+                    Add Address
+                  </button>
                 </div>
               </div>
               <div class="grid grid-cols-1 gap-4 mt-4">
