@@ -1,4 +1,5 @@
 <script setup>
+import { RouterLink } from 'vue-router'
 import { computed } from 'vue'
 
 const state = defineProps({
@@ -15,7 +16,7 @@ const differenceInDays = computed(() => {
 
 <template>
   <div
-    class="group relative overflow-hidden bg-white dark:bg-slate-900 shadow hover:shadow-md dark:shadow-gray-700 dark:hover:shadow-gray-700 hover:-mt-2 rounded-md transition-all duration-500 h-fit"
+    class="flex flex-col group relative overflow-hidden bg-white dark:bg-slate-900 shadow hover:shadow-md dark:shadow-gray-700 dark:hover:shadow-gray-700 hover:-mt-2 rounded-md transition-all duration-500"
   >
     <div class="p-6">
       <div class="flex items-center">
@@ -25,10 +26,10 @@ const differenceInDays = computed(() => {
           <img class="size-8" src="../assets/logo.svg" />
         </div>
         <div class="ms-3">
-          <a
+          <RouterLink
             class="inline-block text-[16px] font-semibold hover:text-emerald-600 transition-all duration-500 me-1"
-            href=""
-            >{{ job.title }}</a
+            :to="`/jobs/${job.id}`"
+            >{{ job.title }}</RouterLink
           >
           <span class="inline-block text-sm text-slate-400">{{ differenceInDays }} days ago</span>
           <div>
@@ -58,7 +59,9 @@ const differenceInDays = computed(() => {
         >
       </div>
     </div>
-    <div class="px-6 py-2 bg-slate-50 dark:bg-slate-800 lg:flex justify-between items-center">
+    <div
+      class="px-6 py-2 bg-slate-50 dark:bg-slate-800 lg:flex justify-between items-center mt-auto"
+    >
       <div class="lg:inline-block flex justify-between">
         <span class="inline-block me-1 font-semibold">
           <i class="pi pi-verified text-blue-500 me-1"></i>

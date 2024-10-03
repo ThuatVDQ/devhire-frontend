@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { nextTick } from 'vue'
 import HomeView from '@/views/HomeView.vue'
 import JobsView from '@/views/JobsView.vue'
 import JobDetailView from '@/views/JobDetailView.vue'
@@ -7,10 +8,12 @@ import RegisterView from '@/views/RegisterView.vue'
 import ApplyJob from '@/views/ApplyJob.vue'
 import ProfileView from '@/views/ProfileView.vue'
 import CompanyView from '@/views/CompanyView.vue'
+import CompanyDetailView from '@/views/CompanyDetailView.vue'
 import AboutUsView from '@/views/AboutUsView.vue'
 import ServiceView from '@/views/ServiceView.vue'
 import PricingView from '@/views/PricingView.vue'
 import ContactView from '@/views/ContactView.vue'
+import NotFoundView from '@/views/NotFoundView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -56,6 +59,11 @@ const router = createRouter({
       component: CompanyView
     },
     {
+      path: '/companies/:id',
+      name: 'company-detail',
+      component: CompanyDetailView
+    },
+    {
       path: '/about',
       name: 'about-us',
       component: AboutUsView
@@ -74,11 +82,21 @@ const router = createRouter({
       path: '/contact',
       name: 'contact',
       component: ContactView
+    },
+    {
+      path: '/:catchAll(.*)',
+      name: 'not-found',
+      component: NotFoundView
     }
   ],
   scrollBehavior(to, from, savedPosition) {
     if (savedPosition) {
-      return savedPosition
+      // Đảm bảo DOM được cập nhật trước khi cuộn lại vị trí cũ
+      return new Promise((resolve) => {
+        nextTick(() => {
+          resolve(savedPosition)
+        })
+      })
     } else {
       return { top: 0 }
     }

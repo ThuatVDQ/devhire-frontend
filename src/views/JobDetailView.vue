@@ -1,28 +1,40 @@
 <script setup>
-import { reactive, onMounted } from 'vue'
+import { reactive, onMounted, watch } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import SimilarJobs from '@/components/SimilarJobs.vue'
 import axios from 'axios'
 
 const route = useRoute()
 
-const jobId = route.params.id
-
 const state = reactive({
   job: {},
   isLoading: true
 })
 
-onMounted(async () => {
+const fetchJobData = async (id) => {
+  state.isLoading = true
   try {
-    const response = await axios.get(`http://localhost:8000/jobs/${jobId}`)
+    const response = await axios.get(`http://localhost:8000/jobs/${id}`)
     state.job = response.data
   } catch (e) {
     console.error(e)
   } finally {
     state.isLoading = false
   }
+}
+
+onMounted(() => {
+  fetchJobData(route.params.id)
 })
+
+// Theo dõi sự thay đổi của route.params.id để cập nhật dữ liệu khi id thay đổi
+watch(
+  () => route.params.id,
+  (newId) => {
+    fetchJobData(newId)
+    window.scrollTo(0, 0)
+  }
+)
 </script>
 
 <template>
