@@ -116,15 +116,13 @@ watch(
 )
 </script>
 <template>
-  <section class="relative bg-slate-50 dark:bg-slate-800 lg:py-24 py-16">
+  <section class="relative bg-slate-50 dark:bg-slate-800 lg:py-16 py-16">
     <div class="container">
+      <h1>Post a job</h1>
       <div class="lg:flex justify-center">
-        <div class="lg:w-2/3">
+        <div>
           <div class="p-6 bg-white dark:bg-slate-900 shadow dark:shadow-gray-700 rounded-md">
             <div class="text-left">
-              <div class="grid grid-cols-1">
-                <h5 class="text-lg font-semibold">Job Details:</h5>
-              </div>
               <div class="grid grid-cols-12 gap-4 mt-4">
                 <div class="col-span-12 ltr:text-left rtl:text-right">
                   <label class="font-semibold">Job Title</label>
@@ -346,3 +344,11 @@ watch(
     </div>
   </section>
 </template>
+<style scoped>
+h1 {
+  font-size: 35px; /* Kích thước chữ của h1 */
+  font-weight: bold; /* Chữ đậm */
+  margin-bottom: 20px;
+  color: #333;
+}
+</style>

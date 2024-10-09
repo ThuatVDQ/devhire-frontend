@@ -120,8 +120,5 @@ const pricingPlans = [
         />
       </div>
     </div>
-    <div class="container-fluid md:mt-24 mt-16">
-      <CardExploreJob />
-    </div>
   </section>
 </template>

@@ -24,14 +24,14 @@ const isActiveLink = (routePath) => {
       <ul class="hidden md:flex space-x-6 text-gray-600">
         <li>
           <RouterLink
-            to="/jobs"
+            to="/customer/jobs"
             :class="[isActiveLink('/jobs') ? 'text-green-600' : 'hover:text-green-600']"
             >Jobs</RouterLink
           >
         </li>
         <li>
           <RouterLink
-            to="/companies"
+            to="/customer/companies"
             :class="[isActiveLink('/companies') ? 'text-green-600' : 'hover:text-green-600']"
             >Companies</RouterLink
           >
