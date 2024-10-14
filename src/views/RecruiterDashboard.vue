@@ -31,7 +31,6 @@
       </div>
     </div>
 
-    <!-- Latest job posts or candidates -->
     <div class="latest-jobs">
       <h3 class="latest-title">Latest Job Posts</h3>
       <ul class="job-list">

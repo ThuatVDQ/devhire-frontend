@@ -17,6 +17,7 @@ import NotFoundView from '@/views/NotFoundView.vue'
 import RecruiterView from '@/views/RecruiterView.vue'
 import CustomerView from '@/views/CustomerView.vue'
 import RecruiterDashboard from '@/views/RecruiterDashboard.vue'
+import RecruiterJobs from '@/views/RecruiterJobs.vue'
 
 const routes = [
   {
@@ -118,6 +119,11 @@ const routes = [
         path: 'post-job',
         name: 'recruiter-post-job',
         component: PostJobView
+      },
+      {
+        path: 'jobs',
+        name: 'manage-jobs',
+        component: RecruiterJobs
       },
       {
         path: 'request-quote',

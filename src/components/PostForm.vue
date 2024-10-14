@@ -193,11 +193,20 @@ watch(
                   ></textarea>
                 </div>
                 <div class="col-span-12 ltr:text-left rtl:text-right">
-                  <label class="font-semibold mr-3">Skills</label>
+                  <div class="flex items-center gap-4">
+                    <!-- Label for Skills -->
+                    <label class="font-semibold">Skills</label>
+                    <!-- Add Skill Icon -->
+                    <i
+                      class="pi pi-plus-circle text-green-600 text-3xl font-bold cursor-pointer"
+                      @click="addSkill"
+                      title="Add skill"
+                    ></i>
+                  </div>
                   <div
                     v-for="(skill, index) in inf.skills"
                     :key="index"
-                    class="flex items-center gap-4 mb-4"
+                    class="flex items-center gap-4 mb-4 mt-2"
                   >
                     <input
                       v-model="skill.name"
@@ -205,20 +214,15 @@ watch(
                       class="form-input flex-grow"
                       placeholder="Skill name"
                     />
-                    <button
+                    <!-- Remove Skill Icon -->
+                    <i
+                      class="pi pi-minus-circle text-red-600 text-3xl font-bold cursor-pointer"
                       @click="removeSkill(index)"
-                      class="px-3 py-2 bg-red-400 hover:bg-red-600 text-white rounded-lg"
-                    >
-                      Remove
-                    </button>
+                      title="Remove skill"
+                    ></i>
                   </div>
-                  <button
-                    @click="addSkill"
-                    class="px-2 py-1 bg-blue-500 hover:bg-blue-700 text-white rounded-md"
-                  >
-                    Add Skill
-                  </button>
                 </div>
+
                 <div class="md:col-span-6 col-span-12 ltr:text-left rtl:text-right">
                   <label class="font-semibold">Experience</label>
                   <input
@@ -312,19 +316,17 @@ watch(
                 </div>
 
                 <div class="col-span-12 flex justify-end gap-4">
-                  <button
+                  <i
+                    class="pi pi-minus-circle text-red-600 text-3xl font-bold cursor-pointer"
                     @click="removeAddress(index)"
-                    class="px-4 py-2 bg-red-500 text-white rounded-md"
-                  >
-                    Remove
-                  </button>
-                  <button
+                    title="Remove address"
+                  ></i>
+                  <i
                     v-if="index === address.addresses.length - 1"
+                    class="pi pi-plus-circle text-green-600 text-3xl font-bold cursor-pointer"
                     @click="addAddress"
-                    class="px-4 py-2 bg-emerald-600 text-white rounded-md"
-                  >
-                    Add Address
-                  </button>
+                    title="Add address"
+                  ></i>
                 </div>
               </div>
               <div class="grid grid-cols-1 gap-4 mt-4">
