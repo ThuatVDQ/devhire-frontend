@@ -52,6 +52,7 @@
             <th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase">
               Applications
             </th>
+            <th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase"></th>
           </tr>
         </thead>
         <tbody>
@@ -82,21 +83,34 @@
                 </div>
               </div>
             </td>
-            <td class="py-4 px-6 text-sm text-gray-700">{{ job.category }}</td>
+            <td class="py-4 px-6 text-sm text-gray-700">
+              {{ job.category ? job.category.name : '' }}
+            </td>
             <td class="py-4 px-6 text-sm text-gray-700">{{ job.type }}</td>
             <td class="py-4 px-6 text-sm text-gray-700">
-              {{ job.salary_start }} - {{ job.salary_end }} {{ job.currency }}
+              {{ job.salaryStart }} - {{ job.salaryEnd }} {{ job.currency }}
             </td>
             <td class="py-4 px-6 text-sm text-gray-700">
               <div class="flex items-center justify-start space-x-2">
-                <span>{{ job.apply_number }}</span>
+                <span>{{ job.applyNumber }}</span>
                 <div
                   class="flex items-center space-x-1 cursor-pointer"
                   @click="downloadCVs(job.id)"
+                  :class="{ 'cursor-not-allowed opacity-50': job.applyNumber === 0 }"
+                  :disabled="job.applyNumber === 0"
+                  v-if="job.applyNumber > 0"
                 >
                   <i class="pi pi-download text-gray-500 hover:text-gray-700"></i>
                   <span class="text-sm text-gray-500 hover:text-gray-700">Download CV</span>
                 </div>
+
+                <!-- Nếu applyNumber là 0, hiển thị chỉ báo không thể tải xuống -->
+                <div v-else class="text-sm text-gray-400">No applications</div>
+              </div>
+            </td>
+            <td class="py-4 px-6 text-sm text-gray-700">
+              <div @click="goToEditJob(job.id)" class="cursor-pointer hover:text-blue-500">
+                <i class="pi pi-pencil text-gray-500 hover:text-gray-700"></i>
               </div>
             </td>
           </tr>
@@ -150,7 +164,9 @@
 <script setup>
 import { ref, computed } from 'vue'
 import axios from 'axios'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const jobs = ref([]) // Store job data
 const searchQuery = ref('') // Store search query
 const currentFilter = ref('all') // Store selected filter
@@ -172,11 +188,19 @@ const filters = [
 // Fetch all jobs posted by the recruiter
 async function fetchJobs() {
   try {
-    const response = await axios.get('http://localhost:8000/jobs') // Update with actual endpoint
-    jobs.value = response.data.map((job) => ({
-      ...job,
-      isActive: job.status === 'ACTIVE' // Ensure that isActive is set based on job status from back-end
-    }))
+    const response = await axios.get('http://localhost:8090/api/jobs', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    if (Array.isArray(response.data)) {
+      jobs.value = response.data.map((job) => ({
+        ...job,
+        isActive: job.status === 'ACTIVE'
+      }))
+    } else {
+      console.error('Expected an array but got:', typeof response.data)
+    }
   } catch (e) {
     console.error('Failed to fetch jobs:', e)
   }
@@ -195,7 +219,7 @@ const filteredJobs = computed(() => {
       if (currentFilter.value === 'pending') return job.status === 'PENDING'
       return true
     })
-    .filter((job) => job.title.toLowerCase().includes(searchQuery.value.toLowerCase()))
+    .filter((job) => job.title)
 })
 
 // Computed property for pagination
@@ -250,8 +274,12 @@ async function downloadCVs(jobId) {
     console.error('Failed to download CVs:', e)
   }
 }
-</script>
 
-<style scoped>
-/* Optional: Tailwind should cover most styling, but add custom styles here if needed */
-</style>
+function goToEditJob(jobId) {
+  router.push(`/recruiter/edit-job/${jobId}`)
+}
+
+function goToJobDetail(jobId) {
+  router.push(`/recruiter/job-detail/${jobId}`)
+}
+</script>

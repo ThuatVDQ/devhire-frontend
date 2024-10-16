@@ -18,6 +18,7 @@ import RecruiterView from '@/views/RecruiterView.vue'
 import CustomerView from '@/views/CustomerView.vue'
 import RecruiterDashboard from '@/views/RecruiterDashboard.vue'
 import RecruiterJobs from '@/views/RecruiterJobs.vue'
+import RecruiterJobDetail from '@/views/RecruiterJobDetail.vue'
 
 const routes = [
   {
@@ -124,6 +125,11 @@ const routes = [
         path: 'jobs',
         name: 'manage-jobs',
         component: RecruiterJobs
+      },
+      {
+        path: 'job-detail/:id',
+        name: 'job-detail',
+        component: RecruiterJobDetail
       },
       {
         path: 'request-quote',
