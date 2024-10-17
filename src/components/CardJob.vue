@@ -41,7 +41,7 @@ const differenceInDays = computed(() => {
             <span class="text-sm font-medium inline-block me-1"
               >Salary:
               <span class="text-slate-400"
-                >{{ job.salary_start }} - {{ job.salary_end }} {{ job.currency }}</span
+                >{{ job.salaryStart }} - {{ job.salaryEnd }} {{ job.currency }}</span
               >
             </span>
           </div>

@@ -19,6 +19,9 @@ import CustomerView from '@/views/CustomerView.vue'
 import RecruiterDashboard from '@/views/RecruiterDashboard.vue'
 import RecruiterJobs from '@/views/RecruiterJobs.vue'
 import RecruiterJobDetail from '@/views/RecruiterJobDetail.vue'
+import RecruiterSetting from '@/views/RecruiterSetting.vue'
+import RecruiterChangePassword from '@/views/RecruiterChangePassword.vue'
+import RecruiterProfile from '@/views/RecruiterProfile.vue'
 
 const routes = [
   {
@@ -130,6 +133,23 @@ const routes = [
         path: 'job-detail/:id',
         name: 'job-detail',
         component: RecruiterJobDetail
+      },
+      {
+        path: 'settings',
+        name: 'settings',
+        component: RecruiterSetting,
+        children: [
+          {
+            path: 'change-password',
+            name: 'change-password',
+            component: RecruiterChangePassword
+          },
+          {
+            path: 'profile',
+            name: 'recruiter-profile',
+            component: RecruiterProfile
+          }
+        ]
       },
       {
         path: 'request-quote',

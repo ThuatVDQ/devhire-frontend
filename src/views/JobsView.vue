@@ -12,7 +12,11 @@ const state = reactive({
 
 onMounted(async () => {
   try {
-    const response = await axios.get('http://localhost:8000/jobs')
+    const response = await axios.get('http://localhost:8090/api/jobs', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
     state.jobs = response.data
   } catch (e) {
     console.error(e)
