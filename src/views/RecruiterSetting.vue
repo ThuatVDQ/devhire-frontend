@@ -29,7 +29,7 @@
           </li>
           <li>
             <router-link
-              to="/settings/company"
+              to="/recruiter/settings/company"
               class="flex items-center text-gray-700 hover:text-green-500"
               :class="{ 'text-green-500 font-semibold': $route.path === '/settings/company' }"
             >
