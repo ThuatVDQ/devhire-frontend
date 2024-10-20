@@ -4,7 +4,7 @@ import { RouterLink, useRoute } from 'vue-router'
 
 const isMenuOpen = ref(false)
 const toggleMenu = () => {
-  this.isMenuOpen = !this.isMenuOpen
+  isMenuOpen.value = !isMenuOpen.value
 }
 
 const isActiveLink = (routePath) => {
@@ -86,10 +86,34 @@ const isActiveLink = (routePath) => {
 
     <div v-if="isMenuOpen" class="md:hidden bg-white shadow-lg">
       <ul class="flex flex-col space-y-4 p-4 text-gray-600">
-        <li><a href="#jobs" class="hover:text-blue-500">Jobs</a></li>
-        <li><a href="#companies" class="hover:text-blue-500">Companies</a></li>
-        <li><a href="#about" class="hover:text-blue-500">About Us</a></li>
-        <li><a href="#contact" class="hover:text-blue-500">Contact</a></li>
+        <li>
+          <RouterLink
+            to="/customer/jobs"
+            :class="[isActiveLink('/jobs') ? 'text-blue-500' : 'hover:text-blue-500']"
+            >Jobs</RouterLink
+          >
+        </li>
+        <li>
+          <RouterLink
+            to="/customer/companies"
+            :class="[isActiveLink('/companies') ? 'text-blue-500' : 'hover:text-blue-500']"
+            >Companies</RouterLink
+          >
+        </li>
+        <li>
+          <RouterLink
+            to="/about"
+            :class="[isActiveLink('/about-us') ? 'text-blue-500' : 'hover:text-blue-500']"
+            >About Us</RouterLink
+          >
+        </li>
+        <li>
+          <RouterLink
+            to="/contact"
+            :class="[isActiveLink('/contact') ? 'text-blue-500' : 'hover:text-blue-500']"
+            >Contact</RouterLink
+          >
+        </li>
         <div class="flex space-x-4">
           <RouterLink
             to="/login"
