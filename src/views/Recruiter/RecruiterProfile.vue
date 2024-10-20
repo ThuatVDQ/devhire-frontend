@@ -64,7 +64,7 @@
 </template>
 <script setup>
 import { ref } from 'vue'
-import defaultAvatar from '../assets/avatar-default.jpg'
+import defaultAvatar from '../../assets/avatar-default.jpg'
 
 const avatarSrc = ref('')
 </script>

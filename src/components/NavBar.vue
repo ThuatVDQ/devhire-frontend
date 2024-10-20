@@ -24,14 +24,14 @@ const isActiveLink = (routePath) => {
       <ul class="hidden md:flex space-x-6 text-gray-600">
         <li>
           <RouterLink
-            to="/customer/jobs"
+            to="/jobs"
             :class="[isActiveLink('/jobs') ? 'text-green-600' : 'hover:text-green-600']"
             >Jobs</RouterLink
           >
         </li>
         <li>
           <RouterLink
-            to="/customer/companies"
+            to="/companies"
             :class="[isActiveLink('/companies') ? 'text-green-600' : 'hover:text-green-600']"
             >Companies</RouterLink
           >
@@ -88,14 +88,14 @@ const isActiveLink = (routePath) => {
       <ul class="flex flex-col space-y-4 p-4 text-gray-600">
         <li>
           <RouterLink
-            to="/customer/jobs"
+            to="/jobs"
             :class="[isActiveLink('/jobs') ? 'text-blue-500' : 'hover:text-blue-500']"
             >Jobs</RouterLink
           >
         </li>
         <li>
           <RouterLink
-            to="/customer/companies"
+            to="/companies"
             :class="[isActiveLink('/companies') ? 'text-blue-500' : 'hover:text-blue-500']"
             >Companies</RouterLink
           >

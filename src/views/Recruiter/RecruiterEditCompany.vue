@@ -113,7 +113,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
-import defaultAvatar from '../assets/avatar-default.jpg'
+import defaultAvatar from '../../assets/avatar-default.jpg'
 
 const avatarSrc = ref('')
 const company = ref(null)

@@ -5,7 +5,7 @@ import JobsView from '@/views/JobsView.vue'
 import JobDetailView from '@/views/JobDetailView.vue'
 import LoginView from '@/views/LoginView.vue'
 import RegisterView from '@/views/RegisterView.vue'
-import PostJobView from '@/views/PostJobView.vue'
+import PostJobView from '@/views/Recruiter/PostJobView.vue'
 import ProfileView from '@/views/ProfileView.vue'
 import CompanyView from '@/views/CompanyView.vue'
 import CompanyDetailView from '@/views/CompanyDetailView.vue'
@@ -14,15 +14,15 @@ import ServiceView from '@/views/ServiceView.vue'
 import PricingView from '@/views/PricingView.vue'
 import ContactView from '@/views/ContactView.vue'
 import NotFoundView from '@/views/NotFoundView.vue'
-import RecruiterView from '@/views/RecruiterView.vue'
-import CustomerView from '@/views/CustomerView.vue'
-import RecruiterDashboard from '@/views/RecruiterDashboard.vue'
-import RecruiterJobs from '@/views/RecruiterJobs.vue'
-import RecruiterJobDetail from '@/views/RecruiterJobDetail.vue'
-import RecruiterSetting from '@/views/RecruiterSetting.vue'
-import RecruiterChangePassword from '@/views/RecruiterChangePassword.vue'
-import RecruiterProfile from '@/views/RecruiterProfile.vue'
-import RecruiterEditCompany from '@/views/RecruiterEditCompany.vue'
+import RecruiterView from '@/views/Recruiter/RecruiterView.vue'
+import CustomerView from '@/views/CandidateView.vue'
+import RecruiterDashboard from '@/views/Recruiter/RecruiterDashboard.vue'
+import RecruiterJobs from '@/views/Recruiter/RecruiterJobs.vue'
+import RecruiterJobDetail from '@/views/Recruiter/RecruiterJobDetail.vue'
+import RecruiterSetting from '@/views/Recruiter/RecruiterSetting.vue'
+import RecruiterChangePassword from '@/views/Recruiter/RecruiterChangePassword.vue'
+import RecruiterProfile from '@/views/Recruiter/RecruiterProfile.vue'
+import RecruiterEditCompany from '@/views/Recruiter/RecruiterEditCompany.vue'
 
 const routes = [
   {
@@ -68,39 +68,39 @@ const routes = [
     ]
   },
   {
-    path: '/customer',
+    path: '/candidate',
     component: CustomerView,
     children: [
       {
         path: '',
-        name: 'customer-home',
+        name: 'candidate-home',
         component: HomeView
       },
       {
         path: 'jobs',
-        name: 'customer-jobs',
+        name: 'candidate-jobs',
         component: JobsView
       },
       {
         path: 'jobs/:id',
-        name: 'customer-job-detail',
+        name: 'candidate-job-detail',
         component: JobDetailView,
         props: true
       },
       {
         path: 'profile/:id',
-        name: 'customer-profile',
+        name: 'candidate-profile',
         component: ProfileView,
         props: true
       },
       {
         path: 'companies',
-        name: 'customer-companies',
+        name: 'candidate-companies',
         component: CompanyView
       },
       {
         path: 'companies/:id',
-        name: 'customer-company-detail',
+        name: 'candidate-company-detail',
         component: CompanyDetailView,
         props: true
       }
