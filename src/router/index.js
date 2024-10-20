@@ -15,7 +15,7 @@ import PricingView from '@/views/PricingView.vue'
 import ContactView from '@/views/ContactView.vue'
 import NotFoundView from '@/views/NotFoundView.vue'
 import RecruiterView from '@/views/Recruiter/RecruiterView.vue'
-import CustomerView from '@/views/CandidateView.vue'
+import CandidateView from '@/views/CandidateView.vue'
 import RecruiterDashboard from '@/views/Recruiter/RecruiterDashboard.vue'
 import RecruiterJobs from '@/views/Recruiter/RecruiterJobs.vue'
 import RecruiterJobDetail from '@/views/Recruiter/RecruiterJobDetail.vue'
@@ -28,12 +28,34 @@ const routes = [
   {
     path: '/',
     name: 'main',
-    component: CustomerView,
+    component: CandidateView,
     children: [
       {
         path: '',
         name: 'home',
         component: HomeView
+      },
+      {
+        path: 'jobs',
+        name: 'jobs',
+        component: JobsView
+      },
+      {
+        path: 'jobs/:id',
+        name: 'job-detail',
+        component: JobDetailView,
+        props: true
+      },
+      {
+        path: 'companies',
+        name: 'companies',
+        component: CompanyView
+      },
+      {
+        path: 'companies/:id',
+        name: 'company-detail',
+        component: CompanyDetailView,
+        props: true
       },
       {
         path: 'about',
@@ -59,50 +81,6 @@ const routes = [
         path: 'signup',
         name: 'signup',
         component: RegisterView
-      },
-      {
-        path: ':catchAll(.*)',
-        name: 'not-found',
-        component: NotFoundView
-      }
-    ]
-  },
-  {
-    path: '/candidate',
-    component: CustomerView,
-    children: [
-      {
-        path: '',
-        name: 'candidate-home',
-        component: HomeView
-      },
-      {
-        path: 'jobs',
-        name: 'candidate-jobs',
-        component: JobsView
-      },
-      {
-        path: 'jobs/:id',
-        name: 'candidate-job-detail',
-        component: JobDetailView,
-        props: true
-      },
-      {
-        path: 'profile/:id',
-        name: 'candidate-profile',
-        component: ProfileView,
-        props: true
-      },
-      {
-        path: 'companies',
-        name: 'candidate-companies',
-        component: CompanyView
-      },
-      {
-        path: 'companies/:id',
-        name: 'candidate-company-detail',
-        component: CompanyDetailView,
-        props: true
       }
     ]
   },

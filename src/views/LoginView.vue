@@ -46,7 +46,7 @@ const login = async () => {
     const payload = {
       phone: form.value.phone,
       password: form.value.password,
-      roleId: 3 // roleId có thể được truyền từ đây nếu cần
+      roleId: 3
     }
 
     // Gửi yêu cầu POST tới API đăng nhập
@@ -54,11 +54,13 @@ const login = async () => {
 
     if (response.status === 200 && response.data.token) {
       // Lưu token vào localStorage hoặc store nếu cần
-      localStorage.setItem('authToken', response.data.token)
+      localStorage.setItem('token', response.data.token)
+      router.push('/').then(() => {
+        window.location.href = '/'
+      })
       toastr.success('Login successfully!')
-
-      // router.push('/dashboard')
-      toastr.error('Login failed: ' + (response.data.message || 'Invalid credentials'))
+    } else {
+      toastr.error('Login failed: Invalid credentials')
     }
   } catch (error) {
     console.error('Login failed:', error)
