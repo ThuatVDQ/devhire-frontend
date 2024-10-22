@@ -5,7 +5,7 @@
         <div class="relative inline-block">
           <img
             :src="avatarSrc"
-            @error="avatarSrc = defaultAvatar"
+            @error="avatarSrc = avatarSrc"
             alt="avatar"
             class="w-20 h-20 rounded-full object-cover"
           />
@@ -113,9 +113,9 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
-import defaultAvatar from '../../assets/avatar-default.jpg'
+import defaultAvatar from '../../assets/avatar-default.svg'
 
-const avatarSrc = ref('')
+const avatarSrc = ref(defaultAvatar)
 const company = ref(null)
 
 // Fetch company information from API when component mounts

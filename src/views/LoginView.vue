@@ -44,31 +44,30 @@ const login = async () => {
   isSubmitting.value = true
   try {
     const payload = {
-      phone: form.value.phone,
+      username: form.value.phone,
       password: form.value.password,
-      roleId: 3
+      roleId: 2
     }
 
     // Gửi yêu cầu POST tới API đăng nhập
     const response = await axios.post('http://localhost:8090/api/users/login', payload)
 
     if (response.status === 200 && response.data.token) {
-      // Lưu token vào localStorage hoặc store nếu cần
       localStorage.setItem('token', response.data.token)
-      router.push('/').then(() => {
-        window.location.href = '/'
-      })
+      if (response.data.role_id === 3) {
+        router.push('/').then(() => {
+          window.location.href = '/'
+        })
+      } else if (response.data.role_id === 2) {
+        router.push('/recruiter/dashboard')
+      }
+
       toastr.success('Login successfully!')
     } else {
       toastr.error('Login failed: Invalid credentials')
     }
   } catch (error) {
     console.error('Login failed:', error)
-    if (error.response && error.response.data && error.response.data.message) {
-      toastr.error('Login failed: ' + error.response.data.message)
-    } else {
-      toastr.error('Login failed: Please check your credentials.')
-    }
   } finally {
     isSubmitting.value = false
   }

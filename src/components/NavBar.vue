@@ -1,13 +1,11 @@
 <script setup>
 import { ref } from 'vue'
-import { RouterLink, useRoute } from 'vue-router'
+import { RouterLink, useRoute, useRouter } from 'vue-router'
 
-// Trạng thái kiểm tra đăng nhập
-const isLoggedIn = ref(false) // Mặc định người dùng chưa đăng nhập
+const isLoggedIn = ref(false)
 
-// Kiểm tra localStorage xem người dùng đã đăng nhập hay chưa
 if (localStorage.getItem('token')) {
-  isLoggedIn.value = true // Nếu có token thì coi như đã đăng nhập
+  isLoggedIn.value = true
 }
 
 const isMenuOpen = ref(false)
@@ -15,10 +13,8 @@ const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value
 }
 
-// Toggle profile dropdown với hover
 const isProfileMenuOpen = ref(false)
 
-// Các sự kiện mouseenter và mouseleave để kiểm soát hiển thị dropdown
 const showProfileMenu = () => {
   isProfileMenuOpen.value = true
 }
@@ -32,13 +28,15 @@ const isActiveLink = (routePath) => {
   return routePath === route.path
 }
 
-// Hàm logout
+const router = useRouter()
+
 const logout = () => {
   localStorage.removeItem('token')
   isLoggedIn.value = false
-  window.location.reload()
+  router.push('/login')
 }
 </script>
+
 <template>
   <header class="bg-white shadow-lg">
     <nav class="container py-4 flex justify-between items-center">

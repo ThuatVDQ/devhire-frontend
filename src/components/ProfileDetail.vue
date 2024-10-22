@@ -1,19 +1,133 @@
 <script setup>
-import { reactive, onMounted } from 'vue'
+import { reactive, onMounted, ref } from 'vue'
 import axios from 'axios'
+import Cropper from 'cropperjs'
+import 'cropperjs/dist/cropper.css'
+import defaultAvatar from '../assets/avatar-default.svg'
 
 const data = reactive({
   user: {}
 })
 
+const showPopup = ref(false)
+const selectedImage = ref(null)
+const currentAvatar = ref(defaultAvatar)
+const cropAvatar = ref('')
+const cropper = ref(null)
+
 async function fetchDataUser() {
   try {
-    const response = await axios.get('http://localhost:8000/users/1')
+    const response = await axios.get('http://localhost:8090/api/users/profile', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
     data.user = response.data
-    console.log(data.user)
+    if (data.user.avatar_url) {
+      currentAvatar.value = data.user.avatar_url
+    }
   } catch (e) {
     console.error(e)
   }
+}
+
+const openPopup = () => {
+  showPopup.value = true // Mở popup
+}
+
+const closePopup = () => {
+  showPopup.value = false // Đóng popup
+  if (cropper.value) {
+    cropper.value.destroy() // Giải phóng cropper
+    cropper.value = null // Đặt lại biến
+  }
+}
+
+let cropTimeout // Biến để lưu trữ bộ đếm thời gian
+
+const handleImageUpload = (event) => {
+  const file = event.target.files[0]
+  if (file) {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      selectedImage.value = e.target.result // Lưu hình ảnh đã chọn
+
+      // Nếu cropper đã tồn tại, giải phóng nó
+      if (cropper.value) {
+        cropper.value.destroy()
+      }
+
+      // Tạo một img element để hiển thị trong cropper
+      const imageElement = document.createElement('img')
+      imageElement.src = selectedImage.value
+
+      const cropperContainer = document.querySelector('#cropper-container')
+      cropperContainer.innerHTML = '' // Xóa nội dung cũ
+      cropperContainer.appendChild(imageElement) // Thêm img vào container
+
+      // Khởi tạo cropper
+      cropper.value = new Cropper(imageElement, {
+        aspectRatio: 1,
+        viewMode: 1,
+        autoCropArea: 1,
+        crop: () => {
+          // Hủy bộ đếm thời gian trước đó
+          clearTimeout(cropTimeout)
+
+          // Thiết lập bộ đếm thời gian để cập nhật avatar
+          cropTimeout = setTimeout(() => {
+            cropper.value.getCroppedCanvas().toBlob((blob) => {
+              if (blob) {
+                cropAvatar.value = URL.createObjectURL(blob) // Cập nhật avatar
+              }
+            })
+          }, 200) // Cập nhật sau 300 mili giây
+        }
+      })
+    }
+    reader.readAsDataURL(file)
+  }
+}
+
+const saveImage = () => {
+  if (cropper.value) {
+    cropper.value.getCroppedCanvas().toBlob((blob) => {
+      const formData = new FormData()
+      formData.append('file', blob) // Chỉnh sửa tên tham số thành 'file'
+
+      // Gửi formData đến backend
+      axios
+        .post('http://localhost:8090/api/users/uploadAvatar', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        })
+        .then((response) => {
+          console.log('Image uploaded successfully: aaaaaaaaa', response.data)
+          currentAvatar.value = URL.createObjectURL(blob) // Cập nhật hình đại diện
+        })
+        .catch((error) => {
+          console.error('Error uploading image:', error)
+        })
+
+      closePopup()
+    })
+  }
+}
+
+const fileInput = ref(null) // Khai báo ref cho input file
+
+const changeImage = () => {
+  selectedImage.value = null // Đặt lại selectedImage
+  fileInput.value.click() // Mở hộp thoại chọn file
+}
+
+const removeImage = () => {
+  selectedImage.value = null
+  cropAvatar.value = null
+  const cropperContainer = document.querySelector('#cropper-container')
+  cropperContainer.innerHTML = 'Click to select an image to upload!' // Xóa nội dung container
 }
 
 onMounted(() => {
@@ -22,22 +136,23 @@ onMounted(() => {
 </script>
 
 <template>
-  <section class="bg-slate-50 dark:bg-slate-800 py-8">
+  <section class="bg-gray-200 dark:bg-gray-800 py-8">
     <div class="container">
       <div class="grid md:grid-cols-12 grid-cols-1 gap-[30px]">
         <div class="lg:col-span-4 md:col-span-6">
           <div
-            class="relative md:flex items-center p-6 shadow dark:shadow-gray-700 rounded-md bg-white dark:bg-slate-900"
+            class="relative md:flex items-center shadow dark:shadow-gray-700 rounded-md bg-white dark:bg-slate-900"
           >
             <div class="relative">
               <img
-                :src="data.user.avatar_url"
+                :src="currentAvatar"
                 alt="User Avatar"
-                class="rounded-full size-28 p-4 bg-white dark:bg-slate-900 shadow dark:shadow-gray-700"
+                class="rounded-full size-28 bg-white dark:bg-slate-900 dark:shadow-gray-700"
               />
               <i
                 class="pi pi-camera absolute bottom-0 right-0 p-1 bg-gray-300 rounded-full text-xl cursor-pointer"
                 style="transform: translate(25%, 25%)"
+                @click="openPopup"
               ></i>
             </div>
             <div class="md:ms-4 md:mt-0 mt-6">
@@ -135,6 +250,73 @@ onMounted(() => {
             >
               Save
             </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      v-if="showPopup"
+      class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+    >
+      <div class="bg-white rounded-md shadow-lg w-[900px] flex flex-col">
+        <h2 class="text-xl font-semibold text-center mb-4 bg-emerald-600 text-white p-2 rounded">
+          EDIT AVATAR
+        </h2>
+        <div class="flex">
+          <div class="w-2/3 p-5 flex flex-col items-center">
+            <h3 class="text-lg font-semibold text-center mb-5">Original Image</h3>
+            <div
+              id="cropper-container"
+              class="border-dashed border-2 border-gray-300 rounded-md h-80 flex items-center justify-center relative w-full cursor-pointer"
+              @click="!selectedImage ? $refs.fileInput.click() : null"
+            >
+              <input
+                type="file"
+                accept="image/*"
+                @change="handleImageUpload"
+                class="hidden"
+                ref="fileInput"
+              />
+              <div class="flex items-center justify-center w-full h-full">
+                <span v-if="!selectedImage" class="text-lg"
+                  >Click to select an image to upload!</span
+                >
+                <img
+                  v-if="selectedImage"
+                  :src="selectedImage"
+                  alt="Selected Image"
+                  class="h-full object-cover"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="w-1/3 p-5 flex flex-col items-center">
+            <h3 class="text-lg font-semibold text-center mb-5">Display Avatar</h3>
+            <div
+              class="w-40 h-40 rounded-full overflow-hidden border-2 border-gray-300 flex items-center justify-center mb-4"
+            >
+              <img
+                v-if="cropAvatar"
+                :src="cropAvatar"
+                alt="Current Avatar"
+                class="h-full object-cover"
+              />
+              <div v-else class="h-full flex items-center justify-center">Avatar</div>
+            </div>
+            <div class="flex space-x-2">
+              <button @click="changeImage" class="bg-blue-500 text-white px-4 py-2 rounded-md">
+                Change
+              </button>
+              <button @click="removeImage" class="bg-red-600 text-white px-4 py-2 rounded-md">
+                Delete
+              </button>
+              <button @click="saveImage" class="bg-green-600 text-white px-4 py-2 rounded-md">
+                Save
+              </button>
+            </div>
+
+            <button @click="closePopup" class="text-red-500 mt-2">Close (Do not save)</button>
           </div>
         </div>
       </div>

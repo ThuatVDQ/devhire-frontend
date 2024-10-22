@@ -36,6 +36,11 @@ const routes = [
         component: HomeView
       },
       {
+        path: 'settings',
+        name: 'candidate-ettings',
+        component: ProfileView
+      },
+      {
         path: 'jobs',
         name: 'jobs',
         component: JobsView
@@ -115,7 +120,7 @@ const routes = [
       },
       {
         path: 'settings',
-        name: 'settings',
+        name: 'recruiter-settings',
         component: RecruiterSetting,
         children: [
           {

@@ -3,7 +3,7 @@
     <div class="relative inline-block mb-6">
       <img
         :src="avatarSrc"
-        @error="avatarSrc = defaultAvatar"
+        @error="avatarSrc = avatarSrc"
         alt="avatar"
         class="w-20 h-20 rounded-full object-cover"
       />
@@ -64,7 +64,7 @@
 </template>
 <script setup>
 import { ref } from 'vue'
-import defaultAvatar from '../../assets/avatar-default.jpg'
+import defaultAvatar from '../../assets/avatar-default.svg'
 
-const avatarSrc = ref('')
+const avatarSrc = ref(defaultAvatar)
 </script>
