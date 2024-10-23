@@ -4,6 +4,8 @@ import axios from 'axios'
 import Cropper from 'cropperjs'
 import 'cropperjs/dist/cropper.css'
 import defaultAvatar from '../assets/avatar-default.svg'
+import toastr from 'toastr'
+import 'toastr/build/toastr.min.css'
 
 const data = reactive({
   user: {}
@@ -11,7 +13,7 @@ const data = reactive({
 
 const showPopup = ref(false)
 const selectedImage = ref(null)
-const currentAvatar = ref(defaultAvatar)
+const currentAvatar = ref('')
 const cropAvatar = ref('')
 const cropper = ref(null)
 
@@ -24,7 +26,8 @@ async function fetchDataUser() {
     })
     data.user = response.data
     if (data.user.avatar_url) {
-      currentAvatar.value = data.user.avatar_url
+      currentAvatar.value = `http://localhost:8090/uploads/${data.user.avatar_url}`
+      cropAvatar.value = currentAvatar.value
     }
   } catch (e) {
     console.error(e)
@@ -93,9 +96,8 @@ const saveImage = () => {
   if (cropper.value) {
     cropper.value.getCroppedCanvas().toBlob((blob) => {
       const formData = new FormData()
-      formData.append('file', blob) // Chỉnh sửa tên tham số thành 'file'
+      formData.append('file', blob)
 
-      // Gửi formData đến backend
       axios
         .post('http://localhost:8090/api/users/uploadAvatar', formData, {
           headers: {
@@ -104,15 +106,37 @@ const saveImage = () => {
           }
         })
         .then((response) => {
-          console.log('Image uploaded successfully: aaaaaaaaa', response.data)
-          currentAvatar.value = URL.createObjectURL(blob) // Cập nhật hình đại diện
+          currentAvatar.value = URL.createObjectURL(blob)
+          window.location.reload()
+          toastr.success(response.data)
         })
         .catch((error) => {
-          console.error('Error uploading image:', error)
+          toastr.error('Error uploading image:', error)
         })
 
       closePopup()
     })
+  } else {
+    const formData = new FormData()
+    formData.append('file', null)
+    axios
+      .put(
+        'http://localhost:8090/api/users/deleteAvatar',
+        {},
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        }
+      )
+      .then((response) => {
+        currentAvatar.value = '@/assets/default-avatar.svg'
+        toastr.success(response.data)
+      })
+      .catch((error) => {
+        toastr.error('Error deleting avatar:', error.response.data || error.message)
+      })
   }
 }
 
@@ -127,7 +151,7 @@ const removeImage = () => {
   selectedImage.value = null
   cropAvatar.value = null
   const cropperContainer = document.querySelector('#cropper-container')
-  cropperContainer.innerHTML = 'Click to select an image to upload!' // Xóa nội dung container
+  cropperContainer.innerHTML = 'Click to select an image to upload!'
 }
 
 onMounted(() => {
@@ -141,11 +165,12 @@ onMounted(() => {
       <div class="grid md:grid-cols-12 grid-cols-1 gap-[30px]">
         <div class="lg:col-span-4 md:col-span-6">
           <div
-            class="relative md:flex items-center shadow dark:shadow-gray-700 rounded-md bg-white dark:bg-slate-900"
+            class="relative md:flex items-center p-2 shadow dark:shadow-gray-700 rounded-md bg-white dark:bg-slate-900"
           >
             <div class="relative">
               <img
                 :src="currentAvatar"
+                @error="currentAvatar = defaultAvatar"
                 alt="User Avatar"
                 class="rounded-full size-28 bg-white dark:bg-slate-900 dark:shadow-gray-700"
               />
@@ -299,6 +324,7 @@ onMounted(() => {
               <img
                 v-if="cropAvatar"
                 :src="cropAvatar"
+                @error="cropAvatar = defaultAvatar"
                 alt="Current Avatar"
                 class="h-full object-cover"
               />

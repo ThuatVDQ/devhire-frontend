@@ -1,9 +1,14 @@
 <script setup>
-import { ref } from 'vue'
+import { reactive, ref, onMounted } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
+import axios from 'axios'
+import defaultAvatar from '../assets/avatar-default.svg'
 
+const data = reactive({
+  user: {}
+})
 const isLoggedIn = ref(false)
-
+const avatarUrl = ref('')
 if (localStorage.getItem('token')) {
   isLoggedIn.value = true
 }
@@ -30,11 +35,35 @@ const isActiveLink = (routePath) => {
 
 const router = useRouter()
 
+const fetchUserProfile = async () => {
+  try {
+    const response = await axios.get('http://localhost:8090/api/users/profile', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    data.user = response.data
+    // Gán avatar URL
+    if (response.data.avatar_url) {
+      avatarUrl.value = `http://localhost:8090/uploads/${response.data.avatar_url}`
+    }
+  } catch (error) {
+    console.error('Error fetching user profile:', error)
+  }
+}
+
 const logout = () => {
   localStorage.removeItem('token')
   isLoggedIn.value = false
   router.push('/login')
 }
+
+// Gọi hàm để lấy thông tin người dùng khi component được mounted
+onMounted(() => {
+  if (isLoggedIn.value) {
+    fetchUserProfile()
+  }
+})
 </script>
 
 <template>
@@ -77,56 +106,56 @@ const logout = () => {
       </ul>
 
       <div class="hidden md:flex items-center space-x-4 relative">
-        <!-- Kiểm tra nếu đã đăng nhập -->
         <div v-if="isLoggedIn" class="flex items-center space-x-4 relative">
-          <!-- Icon Notification sử dụng pi pi-bell -->
           <button class="relative">
             <i class="pi pi-bell text-gray-600 text-2xl"></i>
-            <!-- Notification badge -->
             <span
               class="absolute top-0 right-0 inline-block w-2 h-2 bg-red-600 rounded-full"
             ></span>
           </button>
 
-          <!-- Profile picture với dropdown menu -->
           <div
             class="relative flex items-center"
             @mouseenter="showProfileMenu"
             @mouseleave="hideProfileMenu"
           >
             <div class="flex items-center space-x-2">
-              <img src="" alt="Profile" class="w-10 h-10 rounded-full object-cover" />
+              <img
+                :src="avatarUrl"
+                @error="avatarUrl = defaultAvatar"
+                alt="Profile"
+                class="w-10 h-10 rounded-full object-cover"
+              />
               <i
                 :class="isProfileMenuOpen ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"
                 class="text-gray-600"
               ></i>
             </div>
 
-            <!-- Profile dropdown -->
             <div
               v-show="isProfileMenuOpen"
               class="absolute right-0 bg-white border border-gray-200 shadow-lg rounded-lg z-50 profile-dropdown"
               @mouseenter="showProfileMenu"
               @mouseleave="hideProfileMenu"
-              style="min-width: 200px; width: auto; max-width: 300px; margin-top: 0.75rem"
             >
-              <!-- Tạo khoảng không để tránh việc hover qua margin-top -->
               <div
                 class="absolute top-[-1rem] right-0 w-full h-[1rem]"
                 @mouseenter="showProfileMenu"
               ></div>
 
-              <!-- Nội dung dropdown -->
-              <div class="p-4 border-b border-gray-200 flex items-center">
-                <img src="" alt="Profile" class="w-12 h-12 rounded-full object-cover mr-4" />
+              <div class="p-3 border-b border-gray-200 flex items-center">
+                <img
+                  :src="avatarUrl"
+                  @error="avatarUrl = defaultAvatar"
+                  alt="Profile"
+                  class="w-10 h-10 rounded-full object-cover mr-4"
+                />
                 <div>
-                  <h4 class="text-green-600 font-semibold">Hạ Vũ Hoàng</h4>
-                  <p class="text-gray-500 text-sm">Mã ứng viên: <strong>#8735928</strong></p>
-                  <p class="text-gray-500 text-sm">hoanghavuvta09@gmail.com</p>
+                  <h4 class="text-green-600 font-semibold">{{ data.user.full_name }}</h4>
+                  <p class="text-gray-500 text-sm">{{ data.user.email }}</p>
                 </div>
               </div>
 
-              <!-- Các tùy chọn khác -->
               <RouterLink
                 to="/settings"
                 class="px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center"
@@ -168,7 +197,6 @@ const logout = () => {
         </div>
       </div>
 
-      <!-- Hamburger Menu for Mobile -->
       <div class="md:hidden">
         <button @click="toggleMenu" class="focus:outline-none">
           <svg
@@ -221,7 +249,6 @@ const logout = () => {
         </li>
 
         <div class="flex space-x-4">
-          <!-- Hiển thị nút khác nhau tùy thuộc vào trạng thái đăng nhập -->
           <div v-if="isLoggedIn">
             <RouterLink
               to="/profile"
@@ -270,13 +297,10 @@ header {
   font-size: 1rem;
 }
 
-/* Căn chỉnh dropdown để tự điều chỉnh kích thước theo nội dung */
 .profile-dropdown {
   right: 0;
-  top: 95%;
-  min-width: 200px;
-  max-width: 300px;
-  width: auto;
+  top: 110%;
+  width: max-content;
   z-index: 50;
 }
 </style>
