@@ -1,21 +1,18 @@
 <script setup>
 import { reactive, onMounted, ref } from 'vue'
 import axios from 'axios'
-import Cropper from 'cropperjs'
-import 'cropperjs/dist/cropper.css'
 import defaultAvatar from '../assets/avatar-default.svg'
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
+import EditAvatar from '@/components/EditAvatar.vue'
 
 const data = reactive({
   user: {}
 })
 
-const showPopup = ref(false)
-const selectedImage = ref(null)
-const currentAvatar = ref('')
-const cropAvatar = ref('')
-const cropper = ref(null)
+const showAvatarPopup = ref(false)
+const currentAvatar = ref(defaultAvatar)
+const cropAvatar = ref(defaultAvatar)
 
 async function fetchDataUser() {
   try {
@@ -33,130 +30,21 @@ async function fetchDataUser() {
     console.error(e)
   }
 }
-
-const openPopup = () => {
-  showPopup.value = true // Mở popup
-}
-
-const closePopup = () => {
-  showPopup.value = false // Đóng popup
-  if (cropper.value) {
-    cropper.value.destroy() // Giải phóng cropper
-    cropper.value = null // Đặt lại biến
-  }
-}
-
-let cropTimeout // Biến để lưu trữ bộ đếm thời gian
-
-const handleImageUpload = (event) => {
-  const file = event.target.files[0]
-  if (file) {
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      selectedImage.value = e.target.result // Lưu hình ảnh đã chọn
-
-      // Nếu cropper đã tồn tại, giải phóng nó
-      if (cropper.value) {
-        cropper.value.destroy()
-      }
-
-      // Tạo một img element để hiển thị trong cropper
-      const imageElement = document.createElement('img')
-      imageElement.src = selectedImage.value
-
-      const cropperContainer = document.querySelector('#cropper-container')
-      cropperContainer.innerHTML = '' // Xóa nội dung cũ
-      cropperContainer.appendChild(imageElement) // Thêm img vào container
-
-      // Khởi tạo cropper
-      cropper.value = new Cropper(imageElement, {
-        aspectRatio: 1,
-        viewMode: 1,
-        autoCropArea: 1,
-        crop: () => {
-          // Hủy bộ đếm thời gian trước đó
-          clearTimeout(cropTimeout)
-
-          // Thiết lập bộ đếm thời gian để cập nhật avatar
-          cropTimeout = setTimeout(() => {
-            cropper.value.getCroppedCanvas().toBlob((blob) => {
-              if (blob) {
-                cropAvatar.value = URL.createObjectURL(blob) // Cập nhật avatar
-              }
-            })
-          }, 200) // Cập nhật sau 300 mili giây
-        }
-      })
-    }
-    reader.readAsDataURL(file)
-  }
-}
-
-const saveImage = () => {
-  if (cropper.value) {
-    cropper.value.getCroppedCanvas().toBlob((blob) => {
-      const formData = new FormData()
-      formData.append('file', blob)
-
-      axios
-        .post('http://localhost:8090/api/users/uploadAvatar', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
-        })
-        .then((response) => {
-          currentAvatar.value = URL.createObjectURL(blob)
-          window.location.reload()
-          toastr.success(response.data)
-        })
-        .catch((error) => {
-          toastr.error('Error uploading image:', error)
-        })
-
-      closePopup()
-    })
-  } else {
-    const formData = new FormData()
-    formData.append('file', null)
-    axios
-      .put(
-        'http://localhost:8090/api/users/deleteAvatar',
-        {},
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
-        }
-      )
-      .then((response) => {
-        currentAvatar.value = '@/assets/default-avatar.svg'
-        toastr.success(response.data)
-      })
-      .catch((error) => {
-        toastr.error('Error deleting avatar:', error.response.data || error.message)
-      })
-  }
-}
-
-const fileInput = ref(null) // Khai báo ref cho input file
-
-const changeImage = () => {
-  selectedImage.value = null // Đặt lại selectedImage
-  fileInput.value.click() // Mở hộp thoại chọn file
-}
-
-const removeImage = () => {
-  selectedImage.value = null
-  cropAvatar.value = null
-  const cropperContainer = document.querySelector('#cropper-container')
-  cropperContainer.innerHTML = 'Click to select an image to upload!'
-}
-
 onMounted(() => {
   fetchDataUser()
+  const message = sessionStorage.getItem('message')
+
+  if (message) {
+    toastr.success(message)
+
+    // Xóa dữ liệu trong sessionStorage sau khi sử dụng
+    sessionStorage.removeItem('message')
+  }
 })
+
+const openPopup = () => {
+  showAvatarPopup.value = true
+}
 </script>
 
 <template>
@@ -280,72 +168,6 @@ onMounted(() => {
       </div>
     </div>
 
-    <div
-      v-if="showPopup"
-      class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
-    >
-      <div class="bg-white rounded-md shadow-lg w-[900px] flex flex-col">
-        <h2 class="text-xl font-semibold text-center mb-4 bg-emerald-600 text-white p-2 rounded">
-          EDIT AVATAR
-        </h2>
-        <div class="flex">
-          <div class="w-2/3 p-5 flex flex-col items-center">
-            <h3 class="text-lg font-semibold text-center mb-5">Original Image</h3>
-            <div
-              id="cropper-container"
-              class="border-dashed border-2 border-gray-300 rounded-md h-80 flex items-center justify-center relative w-full cursor-pointer"
-              @click="!selectedImage ? $refs.fileInput.click() : null"
-            >
-              <input
-                type="file"
-                accept="image/*"
-                @change="handleImageUpload"
-                class="hidden"
-                ref="fileInput"
-              />
-              <div class="flex items-center justify-center w-full h-full">
-                <span v-if="!selectedImage" class="text-lg"
-                  >Click to select an image to upload!</span
-                >
-                <img
-                  v-if="selectedImage"
-                  :src="selectedImage"
-                  alt="Selected Image"
-                  class="h-full object-cover"
-                />
-              </div>
-            </div>
-          </div>
-          <div class="w-1/3 p-5 flex flex-col items-center">
-            <h3 class="text-lg font-semibold text-center mb-5">Display Avatar</h3>
-            <div
-              class="w-40 h-40 rounded-full overflow-hidden border-2 border-gray-300 flex items-center justify-center mb-4"
-            >
-              <img
-                v-if="cropAvatar"
-                :src="cropAvatar"
-                @error="cropAvatar = defaultAvatar"
-                alt="Current Avatar"
-                class="h-full object-cover"
-              />
-              <div v-else class="h-full flex items-center justify-center">Avatar</div>
-            </div>
-            <div class="flex space-x-2">
-              <button @click="changeImage" class="bg-blue-500 text-white px-4 py-2 rounded-md">
-                Change
-              </button>
-              <button @click="removeImage" class="bg-red-600 text-white px-4 py-2 rounded-md">
-                Delete
-              </button>
-              <button @click="saveImage" class="bg-green-600 text-white px-4 py-2 rounded-md">
-                Save
-              </button>
-            </div>
-
-            <button @click="closePopup" class="text-red-500 mt-2">Close (Do not save)</button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <EditAvatar v-if="showAvatarPopup" :cropAvatar="cropAvatar" />
   </section>
 </template>
