@@ -1,6 +1,13 @@
 <script setup>
 import { RouterLink } from 'vue-router'
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+function applyJob() {
+  router.push(`/jobs/${state.job.id}`)
+}
 
 const state = defineProps({
   job: Object
@@ -28,34 +35,35 @@ const differenceInDays = computed(() => {
         <div class="ms-3">
           <RouterLink
             class="inline-block text-[16px] font-semibold hover:text-emerald-600 transition-all duration-500 me-1"
-            :to="`/jobs/${job.id}`"
-            >{{ job.title }}</RouterLink
+            :to="`/jobs/${state.job.id}`"
+            >{{ state.job.title }}</RouterLink
           >
           <span class="inline-block text-sm text-slate-400">{{ differenceInDays }} days ago</span>
           <div>
             <span
               class="bg-emerald-600/10 inline-block text-emerald-600 text-xs px-2.5 py-0.5 font-semibold rounded-full me-1"
-              >{{ job.type }}</span
+              >{{ state.job.type }}</span
             >
 
             <span class="text-sm font-medium inline-block me-1"
               >Salary:
               <span class="text-slate-400"
-                >{{ job.salaryStart }} - {{ job.salaryEnd }} {{ job.currency }}</span
+                >{{ state.job.salaryStart }} - {{ state.job.salaryEnd }}
+                {{ state.job.currency }}</span
               >
             </span>
           </div>
         </div>
       </div>
-      <p class="text-slate-400 py-3">{{ job.description }}</p>
+      <p class="text-slate-400 py-3">{{ state.job.description }}</p>
       <div>
         <span
           class="bg-slate-100 dark:bg-slate-800 inline-block text-slate-900 dark:text-slate-300 text-xs px-2.5 py-0.5 font-semibold rounded-full me-1"
-          >{{ job.level }}</span
+          >{{ state.job.level }}</span
         >
         <span
           class="bg-slate-100 dark:bg-slate-800 inline-block text-slate-900 dark:text-slate-300 text-xs px-2.5 py-0.5 font-semibold rounded-full me-1"
-          >{{ job.position }}</span
+          >{{ state.job.position }}</span
         >
       </div>
     </div>
@@ -80,13 +88,15 @@ const differenceInDays = computed(() => {
       </div>
       <a
         class="btn btn-sm rounded-md bg-emerald-600 hover:bg-emerald-700 border-emerald-600 hover:border-emerald-700 text-white md:ms-2 w-full lg:w-auto lg:mt-0 mt-4 px-4 py-1"
-        href=""
-        >Apply now</a
+        href="#"
+        @click.prevent="applyJob"
       >
+        Apply now
+      </a>
     </div>
     <a
       class="h-9 w-9 inline-flex items-center justify-center rounded-full bg-emerald-600/5 hover:bg-emerald-600 border-emerald-600/10 hover:border-emerald-600 text-emerald-600 hover:text-white absolute top-0 end-0 m-3"
-      href=""
+      href="javascript:void(0)"
     >
       <i class="pi pi-bookmark"></i>
     </a>

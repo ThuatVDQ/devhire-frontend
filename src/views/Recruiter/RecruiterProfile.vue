@@ -65,8 +65,7 @@
       <button class="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600">Save</button>
     </div>
 
-    <!-- Component EditAvatar hiển thị khi showEditAvatar là true -->
-    <EditAvatar v-if="showAvatarPopup" :cropAvatar="avatarSrc" />
+    <EditAvatar v-if="showAvatarPopup" :cropAvatar="avatarSrc" @close="showAvatarPopup = false" />
   </div>
 </template>
 

@@ -168,6 +168,6 @@ const openPopup = () => {
       </div>
     </div>
 
-    <EditAvatar v-if="showAvatarPopup" :cropAvatar="cropAvatar" />
+    <EditAvatar v-if="showAvatarPopup" :cropAvatar="cropAvatar" @close="showAvatarPopup = false" />
   </section>
 </template>

@@ -1,120 +1,168 @@
 <script setup>
-import { reactive, onMounted, watch } from 'vue'
+import { reactive, onMounted } from 'vue'
 import flatpickr from 'flatpickr'
 import 'flatpickr/dist/flatpickr.css'
 import axios from 'axios'
+import toastr from 'toastr'
+import 'toastr/build/toastr.min.css'
 
 const address = reactive({
-  countries: [],
-  addresses: [{ selectedCountry: '', selectedCity: '', selectedDistrict: '', street: '' }], // Danh sách các địa chỉ
+  addresses: [
+    {
+      selectedCity: '',
+      selectedCityName: '',
+      selectedDistrict: '',
+      selectedDistrictName: '',
+      street: '',
+      districts: []
+    }
+  ],
   cities: []
 })
 
-// Hàm để thêm một địa chỉ mới
 function addAddress() {
   address.addresses.push({
-    selectedCountry: '',
     selectedCity: '',
+    selectedCityName: '',
     selectedDistrict: '',
-    street: ''
+    selectedDistrictName: '',
+    street: '',
+    districts: []
   })
 }
 
-// Hàm để xóa một địa chỉ
 function removeAddress(index) {
   if (address.addresses.length > 1) {
-    // Đảm bảo có ít nhất 1 địa chỉ
     address.addresses.splice(index, 1)
   }
 }
 
 const inf = reactive({
   selectedDate: '',
-  description:
-    'We are looking for a motivated Intern to join our team. You will assist with various tasks, gain hands-on experience, and contribute to ongoing projects. The ideal candidate should be eager to learn, enthusiastic about technology, and ready to take on new challenges.',
-  requirements: `- Currently pursuing a degree in Computer Science or a related field.
-- Basic understanding of programming concepts and languages such as JavaScript or Python.
-- Familiarity with development tools and frameworks is a plus.
-- Strong willingness to learn and adapt to new technologies.
-- Good communication skills and ability to work in a team.`,
-  benefits: `- Opportunity to gain practical experience in a professional environment.
-- Mentorship and guidance from experienced professionals.
-- Flexible working hours and potential for remote work.
-- Exposure to various technologies and development practices.
-- Possibility of full-time employment upon successful completion of the internship.`,
+  description: '',
+  requirements: '',
+  benefits: '',
   experience: '',
-  position: 'Intern',
-  slots: 10,
-  skills: [] // Array to store multiple skills
+  position: '',
+  level: '',
+  salaryStart: 0,
+  salaryEnd: 0,
+  type: '',
+  currency: '',
+  slots: 0,
+  skills: []
 })
 
 const details = reactive({
   categories: [],
-  title: 'Intern Software Engineer'
+  title: '',
+  selectedCategoryId: ''
 })
 
-// Function to add a new skill
 function addSkill() {
-  inf.skills.push({ name: '' }) // Add an empty skill object to the array
+  inf.skills.push({ name: '' })
 }
 
-// Function to remove a skill
 function removeSkill(index) {
-  inf.skills.splice(index, 1) // Remove the skill at the specified index
+  inf.skills.splice(index, 1)
 }
 
-// On component mounted
+async function fetchCities() {
+  try {
+    const response = await axios.get('https://provinces.open-api.vn/api/?depth=2')
+    address.cities = response.data
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+function setDistricts(index) {
+  const selectedCityCode = address.addresses[index].selectedCity
+  const city = address.cities.find((city) => city.code === selectedCityCode)
+  if (city) {
+    address.addresses[index].districts = city.districts
+    address.addresses[index].selectedCityName = city.name // Lưu tên thành phố
+  } else {
+    address.addresses[index].districts = []
+    address.addresses[index].selectedCityName = ''
+  }
+  address.addresses[index].selectedDistrict = ''
+  address.addresses[index].selectedDistrictName = ''
+}
+
+function setDistrictName(index) {
+  const selectedDistrictCode = address.addresses[index].selectedDistrict
+  const district = address.addresses[index].districts.find(
+    (district) => district.code === selectedDistrictCode
+  )
+  address.addresses[index].selectedDistrictName = district ? district.name : ''
+}
+
+async function submitForm() {
+  try {
+    const data = {
+      title: details.title,
+      description: inf.description,
+      salary_start: inf.salaryStart,
+      salary_end: inf.salaryEnd,
+      type: inf.type,
+      currency: inf.currency,
+      experience: inf.experience,
+      position: inf.position,
+      level: inf.level,
+      requirement: inf.requirements,
+      benefit: inf.benefits,
+      deadline: inf.selectedDate,
+      slots: inf.slots,
+      category: {
+        id: details.selectedCategoryId
+      },
+      jobAddresses: address.addresses.map((addr) => ({
+        country: 'Việt Nam',
+        street: addr.street,
+        city: addr.selectedCityName,
+        district: addr.selectedDistrictName
+      })),
+      jobSkills: inf.skills.map((skill) => ({
+        name: skill.name
+      }))
+    }
+
+    const response = await axios.post('http://localhost:8090/api/jobs', data, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+
+    console.log('Form submitted successfully', response.data)
+    toastr.success(response.data, 'Success')
+  } catch (error) {
+    toastr.error(error, 'Error')
+  }
+}
+
 onMounted(() => {
   flatpickr(document.querySelector('#deadline'), {
-    dateFormat: 'd-m-Y',
+    dateFormat: 'Y-m-d',
     onChange: (selectedDates, dateStr) => {
       inf.selectedDate = dateStr
     }
   })
 
   fetchCategories()
-  fetchCountries()
+  fetchCities()
 })
 
 async function fetchCategories() {
   try {
-    const response = await axios.get('http://localhost:8000/categories')
+    const response = await axios.get('http://localhost:8090/api/category')
     details.categories = response.data
   } catch (e) {
     console.error(e)
   }
 }
-
-async function fetchCountries() {
-  try {
-    const response = await axios.get('https://restcountries.com/v3.1/all')
-    address.countries = response.data.sort((a, b) => a.name.common.localeCompare(b.name.common))
-  } catch (e) {
-    console.error(e)
-  }
-}
-
-async function fetchCities(countryCode) {
-  try {
-    const response = await axios.get(`https://example.com/api/cities?country=${countryCode}`)
-    address.cities = response.data.sort((a, b) => a.name.localeCompare(b.name))
-  } catch (e) {
-    console.error(e)
-  }
-}
-
-// Watch for changes in selected country
-watch(
-  () => address.selectedCountry,
-  (newCountryCode) => {
-    if (newCountryCode) {
-      fetchCities(newCountryCode)
-    } else {
-      address.cities = []
-    }
-  }
-)
 </script>
+
 <template>
   <section class="relative bg-slate-50 dark:bg-slate-800 lg:py-16 py-16">
     <div class="container">
@@ -130,7 +178,7 @@ watch(
                 </div>
                 <div class="md:col-span-6 col-span-12 ltr:text-left rtl:text-right">
                   <label class="font-semibold">Categories</label>
-                  <select class="custom-select">
+                  <select v-model="details.selectedCategoryId" class="custom-select">
                     <option
                       v-for="category in details.categories"
                       :key="category.id"
@@ -142,27 +190,38 @@ watch(
                 </div>
                 <div class="md:col-span-6 col-span-12 ltr:text-left rtl:text-right">
                   <label class="font-semibold">Job Type</label>
-                  <select class="custom-select">
-                    <option value="part-time">Part-Time</option>
-                    <option value="full-time">Full-Time</option>
+                  <select v-model="inf.type" class="custom-select">
+                    <option value="PART_TIME">Part-Time</option>
+                    <option value="FULL_TIME">Full-Time</option>
+                    <option value="INTERNSHIP">Internship</option>
                   </select>
                 </div>
                 <div class="md:col-span-4 col-span-12 ltr:text-left rtl:text-right">
                   <label class="font-semibold">Salary:</label>
                   <div class="relative mt-1">
-                    <input type="number" class="form-input h-[38.56px]" placeholder="Min:" />
+                    <input
+                      v-model="inf.salaryStart"
+                      type="number"
+                      class="form-input h-[38.56px]"
+                      placeholder="Min:"
+                    />
                   </div>
                 </div>
                 <div class="md:col-span-4 col-span-12 ltr:text-left rtl:text-right">
                   <label class="font-semibold md:invisible md:block hidden">Max:</label>
                   <div class="relative mt-1">
-                    <input type="number" class="form-input h-[38.56px]" placeholder="Max: " />
+                    <input
+                      v-model="inf.salaryEnd"
+                      type="number"
+                      class="form-input h-[38.56px]"
+                      placeholder="Max: "
+                    />
                   </div>
                 </div>
                 <div class="md:col-span-4 col-span-12 ltr:text-left rtl:text-right">
                   <label class="font-semibold">Currency</label>
-                  <select class="custom-select block w-full p-2.5 mt-1">
-                    <option value="$">$</option>
+                  <select v-model="inf.currency" class="custom-select block w-full p-2.5 mt-1">
+                    <option value="USD">USD</option>
                     <option value="VND">VND</option>
                   </select>
                 </div>
@@ -194,9 +253,7 @@ watch(
                 </div>
                 <div class="col-span-12 ltr:text-left rtl:text-right">
                   <div class="flex items-center gap-4">
-                    <!-- Label for Skills -->
                     <label class="font-semibold">Skills</label>
-                    <!-- Add Skill Icon -->
                     <i
                       class="pi pi-plus-circle text-green-600 text-3xl font-bold cursor-pointer"
                       @click="addSkill"
@@ -214,7 +271,6 @@ watch(
                       class="form-input flex-grow"
                       placeholder="Skill name"
                     />
-                    <!-- Remove Skill Icon -->
                     <i
                       class="pi pi-minus-circle text-red-600 text-3xl font-bold cursor-pointer"
                       @click="removeSkill(index)"
@@ -223,7 +279,7 @@ watch(
                   </div>
                 </div>
 
-                <div class="md:col-span-6 col-span-12 ltr:text-left rtl:text-right">
+                <div class="md:col-span-4 col-span-12 ltr:text-left rtl:text-right">
                   <label class="font-semibold">Experience</label>
                   <input
                     v-model="inf.experience"
@@ -232,7 +288,7 @@ watch(
                     placeholder="Experience"
                   />
                 </div>
-                <div class="md:col-span-6 col-span-12 ltr:text-left rtl:text-right">
+                <div class="md:col-span-4 col-span-12 ltr:text-left rtl:text-right">
                   <label class="font-semibold">Position</label>
                   <input
                     v-model="inf.position"
@@ -240,6 +296,10 @@ watch(
                     class="form-input"
                     placeholder="Position"
                   />
+                </div>
+                <div class="md:col-span-4 col-span-12 ltr:text-left rtl:text-right">
+                  <label class="font-semibold">Level</label>
+                  <input v-model="inf.level" type="text" class="form-input" placeholder="Level" />
                 </div>
                 <div class="md:col-span-4 col-span-12 ltr:text-left rtl:text-right">
                   <label class="font-semibold">Slots</label>
@@ -273,26 +333,13 @@ watch(
                 class="grid grid-cols-12 gap-4 mt-4"
               >
                 <div class="md:col-span-4 col-span-12 ltr:text-left rtl:text-right">
-                  <label class="font-semibold">Country</label>
+                  <label class="font-semibold">City</label>
                   <select
                     class="custom-select"
-                    v-model="addr.selectedCountry"
-                    @change="fetchCities(addr.selectedCountry)"
+                    v-model="addr.selectedCity"
+                    @change="setDistricts(index)"
                   >
-                    <option
-                      v-for="country in address.countries"
-                      :key="country.cca3"
-                      :value="country.cca3"
-                    >
-                      {{ country.name.common }}
-                    </option>
-                  </select>
-                </div>
-
-                <div class="md:col-span-4 col-span-12 ltr:text-left rtl:text-right">
-                  <label class="font-semibold">City</label>
-                  <select class="custom-select" v-model="addr.selectedCity">
-                    <option v-for="city in address.cities" :key="city.id" :value="city.id">
+                    <option v-for="city in address.cities" :key="city.code" :value="city.code">
                       {{ city.name }}
                     </option>
                   </select>
@@ -300,12 +347,22 @@ watch(
 
                 <div class="md:col-span-4 col-span-12 ltr:text-left rtl:text-right">
                   <label class="font-semibold">District</label>
-                  <select class="custom-select" v-model="addr.selectedDistrict">
-                    <!-- Danh sách quận, có thể cập nhật dữ liệu từ API -->
+                  <select
+                    class="custom-select"
+                    v-model="addr.selectedDistrict"
+                    @change="setDistrictName(index)"
+                  >
+                    <option
+                      v-for="district in addr.districts"
+                      :key="district.code"
+                      :value="district.code"
+                    >
+                      {{ district.name }}
+                    </option>
                   </select>
                 </div>
 
-                <div class="col-span-12 ltr:text-left rtl:text-right">
+                <div class="md:col-span-4 col-span-12 ltr:text-left rtl:text-right">
                   <label class="font-semibold">Street</label>
                   <input
                     v-model="addr.street"
@@ -329,11 +386,13 @@ watch(
                   ></i>
                 </div>
               </div>
+
               <div class="grid grid-cols-1 gap-4 mt-4">
                 <div>
                   <button
                     class="px-6 py-2 rounded-md bg-emerald-600 hover:bg-emerald-700 border-emerald-600 hover:border-emerald-700 text-white"
                     type="submit"
+                    @click="submitForm"
                   >
                     Post Now
                   </button>

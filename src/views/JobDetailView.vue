@@ -1,6 +1,6 @@
 <script setup>
-import { reactive, onMounted, watch } from 'vue'
-import { RouterLink, useRoute } from 'vue-router'
+import { reactive, onMounted, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import SimilarJobs from '@/components/SimilarJobs.vue'
 import axios from 'axios'
 
@@ -8,7 +8,13 @@ const route = useRoute()
 
 const state = reactive({
   job: {},
-  isLoading: true
+  isLoading: true,
+  isFormVisible: false,
+  candidate: {
+    name: '',
+    email: '',
+    cv: null
+  }
 })
 
 const fetchJobData = async (id) => {
@@ -23,11 +29,38 @@ const fetchJobData = async (id) => {
   }
 }
 
+const showApplicationForm = () => {
+  state.isFormVisible = true
+}
+
+const closeApplicationForm = () => {
+  state.isFormVisible = false
+}
+
+const handleFileUpload = (event) => {
+  state.candidate.cv = event.target.files[0]
+}
+
+const submitApplication = async () => {
+  try {
+    const formData = new FormData()
+    formData.append('name', state.candidate.name)
+    formData.append('email', state.candidate.email)
+    formData.append('cv', state.candidate.cv)
+
+    await axios.post(`http://localhost:8000/apply`, formData)
+    alert('Application submitted successfully!')
+    closeApplicationForm()
+  } catch (error) {
+    console.error(error)
+    alert('Error submitting application.')
+  }
+}
+
 onMounted(() => {
   fetchJobData(route.params.id)
 })
 
-// Theo dõi sự thay đổi của route.params.id để cập nhật dữ liệu khi id thay đổi
 watch(
   () => route.params.id,
   (newId) => {
@@ -66,80 +99,94 @@ watch(
           <p class="text-slate-400 mt-4">
             {{ state.job.description }}
           </p>
-          <!-- <p class="text-slate-400 mt-4">
-            This means that Lorem Ipsum cannot accurately represent, for example, German, in which
-            all nouns are capitalized. Thus, Lorem Ipsum has only limited suitability as a visual
-            filler for German texts. If the fill text is intended to illustrate the characteristics
-            of different typefaces.
-          </p>
-          <p class="text-slate-400 mt-4">
-            It sometimes makes sense to select texts containing the various letters and symbols
-            specific to the output language.
-          </p> -->
           <h5 class="text-lg font-semibold mt-6">Requirements:</h5>
           <p class="text-slate-400 mt-4">
             {{ state.job.requirement }}
           </p>
-          <!-- <ul class="list-none">
-            <li class="text-slate-400 mt-2 items-center inline-flex">
-              <i></i>Participate in requirements analysis
-            </li>
-            <li class="text-slate-400 mt-2 items-center inline-flex">
-              <i></i>Write clean, scalable code using C# and .NET frameworks
-            </li>
-            <li class="text-slate-400 mt-2 items-center inline-flex">
-              <i></i>Test and deploy applications and systems
-            </li>
-            <li class="text-slate-400 mt-2 items-center inline-flex">
-              <i></i>Revise, update, refactor and debug code
-            </li>
-            <li class="text-slate-400 mt-2 items-center inline-flex">
-              <i></i>Improve existing software
-            </li>
-            <li class="text-slate-400 mt-2 items-center inline-flex">
-              <i></i>Develop documentation throughout the software development life cycle (SDLC)
-            </li>
-            <li class="text-slate-400 mt-2 items-center inline-flex">
-              <i></i>Serve as an expert on applications and provide technical support
-            </li>
-          </ul> -->
           <h5 class="text-lg font-semibold mt-6">Benefit:</h5>
           <p class="text-slate-400 mt-4">
             {{ state.job.benefit }}
           </p>
-          <!-- <ul class="list-none">
-            <li class="text-slate-400 mt-2 items-center inline-flex">
-              <i></i>Proven experience as a .NET Developer or Application Developer
-            </li>
-            <li class="text-slate-400 mt-2 items-center inline-flex">
-              <i></i>good understanding of SQL and Relational Databases, specifically Microsoft SQL
-              Server.
-            </li>
-            <li class="text-slate-400 mt-2 items-center inline-flex">
-              <i></i>Experience designing, developing and creating RESTful web services and APIs
-            </li>
-            <li class="text-slate-400 mt-2 items-center inline-flex">
-              <i></i>Basic know how of Agile process and practices
-            </li>
-            <li class="text-slate-400 mt-2 items-center inline-flex">
-              <i></i>Good understanding of object-oriented programming.
-            </li>
-            <li class="text-slate-400 mt-2 items-center inline-flex">
-              <i></i>Good understanding of concurrent programming.
-            </li>
-            <li class="text-slate-400 mt-2 items-center inline-flex">
-              <i></i>Sound knowledge of application architecture and design.
-            </li>
-            <li class="text-slate-400 mt-2 items-center inline-flex">
-              <i></i>Excellent problem solving and analytical skills
-            </li>
-          </ul> -->
           <div class="mt-5">
-            <a
+            <button
+              @click="showApplicationForm"
               class="py-2 px-4 font-[600] rounded-md bg-emerald-600 hover:bg-emerald-700 border-emerald-600 hover:border-emerald-700 text-white md:ms-2 w-full md:w-auto"
-              href="/job-apply"
-              >Apply Now</a
             >
+              Apply Now
+            </button>
+          </div>
+
+          <!-- Form ứng tuyển -->
+          <!-- Application Form Popup -->
+          <div
+            v-if="state.isFormVisible"
+            class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+          >
+            <div class="bg-white dark:bg-slate-900 p-6 rounded-md shadow-lg w-[500px] max-w-full">
+              <h3 class="text-xl font-semibold mb-4">Ứng tuyển {{ state.job.title }}</h3>
+              <form @submit.prevent="submitApplication">
+                <div class="mb-4">
+                  <label class="block text-sm font-medium">Họ và tên *</label>
+                  <input
+                    type="text"
+                    v-model="state.candidate.name"
+                    class="w-full p-2 border rounded-md"
+                    placeholder="Họ tên hiển thị với NTD"
+                    required
+                  />
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <label class="block text-sm font-medium">Email *</label>
+                    <input
+                      type="email"
+                      v-model="state.candidate.email"
+                      class="w-full p-2 border rounded-md"
+                      placeholder="Email hiển thị với NTD"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium">Số điện thoại *</label>
+                    <input
+                      type="text"
+                      v-model="state.candidate.phone"
+                      class="w-full p-2 border rounded-md"
+                      placeholder="Số điện thoại hiển thị với NTD"
+                      required
+                    />
+                  </div>
+                </div>
+                <div class="mb-4">
+                  <label class="block text-sm font-medium">Tải lên CV *</label>
+                  <input
+                    type="file"
+                    @change="handleFileUpload"
+                    class="w-full p-2 border rounded-md"
+                    accept=".pdf, .doc, .docx"
+                    required
+                  />
+                  <p class="text-xs text-gray-500 mt-1">
+                    Hỗ trợ định dạng .doc, .docx, pdf có kích thước dưới 5MB
+                  </p>
+                </div>
+                <div class="flex gap-4">
+                  <button
+                    type="button"
+                    @click="closeApplicationForm"
+                    class="py-2 px-4 bg-gray-500 text-white rounded-md"
+                  >
+                    Hủy
+                  </button>
+                  <button
+                    type="submit"
+                    class="py-2 px-4 font-[600] rounded-md bg-green-600 hover:bg-green-700 text-white"
+                  >
+                    Nộp hồ sơ ứng tuyển
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
         <div class="lg:col-span-4 md:col-span-6">

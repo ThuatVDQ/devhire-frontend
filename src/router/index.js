@@ -23,6 +23,7 @@ import RecruiterSetting from '@/views/Recruiter/RecruiterSetting.vue'
 import RecruiterChangePassword from '@/views/Recruiter/RecruiterChangePassword.vue'
 import RecruiterProfile from '@/views/Recruiter/RecruiterProfile.vue'
 import RecruiterEditCompany from '@/views/Recruiter/RecruiterEditCompany.vue'
+import ApplyForm from '@/components/ApplyForm.vue'
 
 const routes = [
   {
@@ -115,7 +116,7 @@ const routes = [
       },
       {
         path: 'job-detail/:id',
-        name: 'job-detail',
+        name: 'recruiter-job-detail',
         component: RecruiterJobDetail
       },
       {
