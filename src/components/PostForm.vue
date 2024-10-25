@@ -6,6 +6,11 @@ import axios from 'axios'
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
 
+const errors = reactive({
+  salary: '',
+  slots: ''
+})
+
 const address = reactive({
   addresses: [
     {
@@ -71,6 +76,17 @@ async function fetchCities() {
   try {
     const response = await axios.get('https://provinces.open-api.vn/api/?depth=2')
     address.cities = response.data
+    if (address.cities.length > 0) {
+      address.addresses[0].selectedCity = address.cities[0].code
+      address.addresses[0].selectedCityName = address.cities[0].name
+      address.addresses[0].districts = address.cities[0].districts
+
+      // Nếu có dữ liệu quận/huyện, set giá trị mặc định cho quận/huyện đầu tiên
+      if (address.addresses[0].districts.length > 0) {
+        address.addresses[0].selectedDistrict = address.addresses[0].districts[0].code
+        address.addresses[0].selectedDistrictName = address.addresses[0].districts[0].name
+      }
+    }
   } catch (e) {
     console.error(e)
   }
@@ -98,7 +114,99 @@ function setDistrictName(index) {
   address.addresses[index].selectedDistrictName = district ? district.name : ''
 }
 
+function validateSalary() {
+  if (inf.salaryEnd <= inf.salaryStart) {
+    errors.salary = 'End salary must be greater than start salary.'
+  } else {
+    errors.salary = ''
+  }
+}
+
+function validateSlots() {
+  if (inf.slots <= 0) {
+    errors.slots = 'Slots must be greater than 0.'
+  } else {
+    errors.slots = ''
+  }
+}
+
+function validateForm() {
+  // Khởi tạo một biến để theo dõi xem form có hợp lệ hay không
+  let isValid = true
+
+  // Kiểm tra các trường bắt buộc trong details và inf
+  if (!details.title) {
+    toastr.error('Job title is required.')
+    isValid = false
+  }
+  if (!details.selectedCategoryId) {
+    toastr.error('Category is required.')
+    isValid = false
+  }
+  if (!inf.type) {
+    toastr.error('Job type is required.')
+    isValid = false
+  }
+  if (!inf.currency) {
+    toastr.error('Currency is required.')
+    isValid = false
+  }
+  if (!inf.description) {
+    toastr.error('Description is required.')
+    isValid = false
+  }
+  if (!inf.requirements) {
+    toastr.error('Requirements are required.')
+    isValid = false
+  }
+  if (!inf.benefits) {
+    toastr.error('Benefits are required.')
+    isValid = false
+  }
+  if (!inf.experience) {
+    toastr.error('Experience is required.')
+    isValid = false
+  }
+  if (!inf.position) {
+    toastr.error('Position is required.')
+    isValid = false
+  }
+  if (!inf.level) {
+    toastr.error('Level is required.')
+    isValid = false
+  }
+  if (!inf.salaryStart || !inf.salaryEnd) {
+    toastr.error('Salary range is required.')
+    isValid = false
+  } else if (inf.salaryEnd <= inf.salaryStart) {
+    toastr.error('End salary must be greater than start salary.')
+    isValid = false
+  }
+  if (!inf.selectedDate) {
+    toastr.error('Application deadline is required.')
+    isValid = false
+  }
+  if (inf.slots <= 0) {
+    toastr.error('Number of slots must be greater than 0.')
+    isValid = false
+  }
+
+  // Kiểm tra các địa chỉ trong mảng addresses
+  address.addresses.forEach((addr, index) => {
+    if (!addr.selectedCity || !addr.selectedDistrict || !addr.street) {
+      toastr.error(`Address ${index + 1} is incomplete.`)
+      isValid = false
+    }
+  })
+
+  return isValid
+}
+
 async function submitForm() {
+  if (!validateForm()) {
+    return
+  }
+
   try {
     const data = {
       title: details.title,
@@ -127,17 +235,18 @@ async function submitForm() {
         name: skill.name
       }))
     }
+    console.log(data)
 
     const response = await axios.post('http://localhost:8090/api/jobs', data, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     })
-
     console.log('Form submitted successfully', response.data)
     toastr.success(response.data, 'Success')
   } catch (error) {
-    toastr.error(error, 'Error')
+    console.error()
+    toastr.error(JSON.stringify(error.response.data), 'Error')
   }
 }
 
@@ -151,12 +260,18 @@ onMounted(() => {
 
   fetchCategories()
   fetchCities()
+
+  inf.type = 'FULL_TIME' // Đặt mặc định là Full-Time
+  inf.currency = 'VND'
 })
 
 async function fetchCategories() {
   try {
     const response = await axios.get('http://localhost:8090/api/category')
     details.categories = response.data
+    if (details.categories.length > 0) {
+      details.selectedCategoryId = details.categories[0].id
+    }
   } catch (e) {
     console.error(e)
   }
@@ -204,6 +319,7 @@ async function fetchCategories() {
                       type="number"
                       class="form-input h-[38.56px]"
                       placeholder="Min:"
+                      @input="validateSalary"
                     />
                   </div>
                 </div>
@@ -215,9 +331,14 @@ async function fetchCategories() {
                       type="number"
                       class="form-input h-[38.56px]"
                       placeholder="Max: "
+                      @input="validateSalary"
                     />
+                    <p v-if="errors.salary" class="text-red-500 text-sm mt-1">
+                      {{ errors.salary }}
+                    </p>
                   </div>
                 </div>
+
                 <div class="md:col-span-4 col-span-12 ltr:text-left rtl:text-right">
                   <label class="font-semibold">Currency</label>
                   <select v-model="inf.currency" class="custom-select block w-full p-2.5 mt-1">
@@ -303,8 +424,15 @@ async function fetchCategories() {
                 </div>
                 <div class="md:col-span-4 col-span-12 ltr:text-left rtl:text-right">
                   <label class="font-semibold">Slots</label>
-                  <input v-model="inf.slots" type="number" class="form-input h-[44px]" />
+                  <input
+                    v-model="inf.slots"
+                    type="number"
+                    class="form-input h-[44px]"
+                    @input="validateSlots"
+                  />
+                  <p v-if="errors.slots" class="text-red-500 text-sm mt-1">{{ errors.slots }}</p>
                 </div>
+
                 <div class="md:col-span-4 col-span-12 ltr:text-left rtl:text-right">
                   <label class="font-semibold">Application Deadline</label>
                   <div class="relative flex items-center h-[44px]">
