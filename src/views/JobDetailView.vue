@@ -3,6 +3,8 @@ import { reactive, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import SimilarJobs from '@/components/SimilarJobs.vue'
 import axios from 'axios'
+import toastr from 'toastr'
+import 'toastr/build/toastr.min.css'
 
 const route = useRoute()
 
@@ -13,15 +15,70 @@ const state = reactive({
   candidate: {
     name: '',
     email: '',
+    phone: '',
     cv: null
   }
 })
 
+const formatDate = (dateString) => {
+  if (!dateString) {
+    return '' // Trả về chuỗi rỗng nếu dateString là null hoặc undefined
+  }
+
+  const date = new Date(dateString)
+  return date.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  })
+}
+
+const fetchCandidateData = async () => {
+  try {
+    const response = await axios.get('http://localhost:8090/api/users/profile', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    }) // Đổi URL theo API của bạn
+    state.candidate.name = response.data.full_name
+    state.candidate.email = response.data.email
+    state.candidate.phone = response.data.phone
+    // Nếu có thông tin về CV, bạn có thể xử lý tại đây nếu cần
+  } catch (error) {
+    console.error('Error fetching candidate data:', error)
+  }
+}
+
+const fileInput = ref(null)
+
+const triggerFileUpload = () => {
+  fileInput.value.click()
+}
+
+const handleFileUploadNew = (event) => {
+  state.candidate.cv = event.target.files[0]
+}
+
+const handleFileDrop = (event) => {
+  const file = event.dataTransfer.files[0]
+  if (
+    file &&
+    (file.type === 'application/pdf' ||
+      file.type === 'application/msword' ||
+      file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+  ) {
+    state.candidate.cv = file
+  } else {
+    toastr.error('Invalid file type. Please upload a .pdf, .doc, or .docx file.', 'Error')
+  }
+}
+
 const fetchJobData = async (id) => {
   state.isLoading = true
   try {
-    const response = await axios.get(`http://localhost:8000/jobs/${id}`)
+    const response = await axios.get(`http://localhost:8090/api/jobs/${id}`)
     state.job = response.data
+    console.log(response.data)
   } catch (e) {
     console.error(e)
   } finally {
@@ -37,37 +94,40 @@ const closeApplicationForm = () => {
   state.isFormVisible = false
 }
 
-const handleFileUpload = (event) => {
-  state.candidate.cv = event.target.files[0]
-}
-
 const submitApplication = async () => {
+  const fileInput = document.getElementById('file-upload')
+  if (!fileInput.files.length) {
+    toastr.error('Please upload a file.')
+    fileInput.focus()
+    return
+  }
   try {
-    const formData = new FormData()
-    formData.append('name', state.candidate.name)
-    formData.append('email', state.candidate.email)
-    formData.append('cv', state.candidate.cv)
+    const jobId = route.params.id // Hoặc route.params.id nếu bạn lấy từ route
 
-    await axios.post(`http://localhost:8000/apply`, formData)
-    alert('Application submitted successfully!')
+    const formData = new FormData()
+    formData.append('file', state.candidate.cv)
+
+    // Gửi POST request đến endpoint phù hợp với jobId
+    const response = await axios.post(`http://localhost:8090/api/jobs/${jobId}/apply`, formData, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+
+    toastr.success(response.data, 'Success')
     closeApplicationForm()
   } catch (error) {
     console.error(error)
-    alert('Error submitting application.')
+    toastr.error(error.response.data, 'Error')
   }
 }
 
 onMounted(() => {
   fetchJobData(route.params.id)
+  fileInput.value = document.getElementById('file-upload')
+  fetchCandidateData()
 })
-
-watch(
-  () => route.params.id,
-  (newId) => {
-    fetchJobData(newId)
-    window.scrollTo(0, 0)
-  }
-)
 </script>
 
 <template>
@@ -115,79 +175,6 @@ watch(
               Apply Now
             </button>
           </div>
-
-          <!-- Form ứng tuyển -->
-          <!-- Application Form Popup -->
-          <div
-            v-if="state.isFormVisible"
-            class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
-          >
-            <div class="bg-white dark:bg-slate-900 p-6 rounded-md shadow-lg w-[500px] max-w-full">
-              <h3 class="text-xl font-semibold mb-4">Ứng tuyển {{ state.job.title }}</h3>
-              <form @submit.prevent="submitApplication">
-                <div class="mb-4">
-                  <label class="block text-sm font-medium">Họ và tên *</label>
-                  <input
-                    type="text"
-                    v-model="state.candidate.name"
-                    class="w-full p-2 border rounded-md"
-                    placeholder="Họ tên hiển thị với NTD"
-                    required
-                  />
-                </div>
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <label class="block text-sm font-medium">Email *</label>
-                    <input
-                      type="email"
-                      v-model="state.candidate.email"
-                      class="w-full p-2 border rounded-md"
-                      placeholder="Email hiển thị với NTD"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium">Số điện thoại *</label>
-                    <input
-                      type="text"
-                      v-model="state.candidate.phone"
-                      class="w-full p-2 border rounded-md"
-                      placeholder="Số điện thoại hiển thị với NTD"
-                      required
-                    />
-                  </div>
-                </div>
-                <div class="mb-4">
-                  <label class="block text-sm font-medium">Tải lên CV *</label>
-                  <input
-                    type="file"
-                    @change="handleFileUpload"
-                    class="w-full p-2 border rounded-md"
-                    accept=".pdf, .doc, .docx"
-                    required
-                  />
-                  <p class="text-xs text-gray-500 mt-1">
-                    Hỗ trợ định dạng .doc, .docx, pdf có kích thước dưới 5MB
-                  </p>
-                </div>
-                <div class="flex gap-4">
-                  <button
-                    type="button"
-                    @click="closeApplicationForm"
-                    class="py-2 px-4 bg-gray-500 text-white rounded-md"
-                  >
-                    Hủy
-                  </button>
-                  <button
-                    type="submit"
-                    class="py-2 px-4 font-[600] rounded-md bg-green-600 hover:bg-green-700 text-white"
-                  >
-                    Nộp hồ sơ ứng tuyển
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
         </div>
         <div class="lg:col-span-4 md:col-span-6">
           <div
@@ -201,8 +188,10 @@ watch(
                 <li class="flex items-center">
                   <i class="pi pi-verified"></i>
                   <div class="ms-4">
-                    <p class="font-medium">Employee Type:</p>
-                    <span class="text-emerald-600 font-medium text-sm">{{ state.job.type }}</span>
+                    <p class="font-medium">Position</p>
+                    <span class="text-emerald-600 font-medium text-sm"
+                      >{{ state.job.position }} - {{ state.job.level }}</span
+                    >
                   </div>
                 </li>
                 <li class="flex items-center mt-3">
@@ -216,8 +205,8 @@ watch(
                   <i class="pi pi-desktop"></i>
                   <div class="ms-4">
                     <p class="font-medium">Job Type:</p>
-                    <span class="text-emerald-600 font-medium text-sm"
-                      >{{ state.job.level }} {{ state.job.position }}</span
+                    <span class="text-emerald-600 font-medium text-sm">
+                      {{ state.job.category?.name }} - {{ state.job.position }}</span
                     >
                   </div>
                 </li>
@@ -231,18 +220,11 @@ watch(
                   </div>
                 </li>
                 <li class="flex items-center mt-3">
-                  <i class="pi pi-book"></i>
-                  <div class="ms-4">
-                    <p class="font-medium">Qualifications:</p>
-                    <span class="text-emerald-600 font-medium text-sm">MCA</span>
-                  </div>
-                </li>
-                <li class="flex items-center mt-3">
                   <i class="pi pi-dollar"></i>
                   <div class="ms-4">
                     <p class="font-medium">Salary:</p>
                     <span class="text-emerald-600 font-medium text-sm"
-                      >{{ state.job.salary_start }} - {{ state.job.salary_end }}
+                      >{{ state.job.salaryStart }} - {{ state.job.salaryEnd }}
                       {{ state.job.currency }}</span
                     >
                   </div>
@@ -252,7 +234,7 @@ watch(
                   <div class="ms-4">
                     <p class="font-medium">Date posted:</p>
                     <span class="text-emerald-600 font-medium text-sm">{{
-                      state.job.created_at
+                      formatDate(state.job.deadline)
                     }}</span>
                   </div>
                 </li>
@@ -264,4 +246,102 @@ watch(
     </div>
     <SimilarJobs />
   </section>
+  <div
+    v-if="state.isFormVisible"
+    class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+  >
+    <div
+      class="bg-white dark:bg-slate-900 shadow-lg w-[500px] max-w-full rounded-3xl overflow-hidden"
+    >
+      <h3 class="text-xl font-semibold bg-emerald-600 text-white p-3 rounded-t-3xl">
+        Apply for {{ state.job.title }}
+      </h3>
+      <form @submit.prevent="submitApplication" class="p-6">
+        <div class="mb-6">
+          <label class="block text-sm font-medium mb-2">Upload CV *</label>
+          <div
+            class="flex items-center justify-center border-2 border-dashed border-gray-300 rounded-md p-4 cursor-pointer hover:bg-gray-100"
+            @click="triggerFileUpload"
+            @dragover.prevent
+            @dragenter.prevent
+            @dragleave.prevent
+            @drop.prevent="handleFileDrop"
+          >
+            <input
+              ref="fileInput"
+              id="file-upload"
+              type="file"
+              @change="handleFileUploadNew"
+              class="hidden"
+              accept=".pdf, .doc, .docx"
+            />
+            <span class="text-sm text-gray-500">
+              Drag and drop your file here or click to browse
+            </span>
+          </div>
+          <span
+            class="mt-2 block text-sm font-medium text-blue-600 truncate bg-blue-100 p-2 rounded-md"
+            v-if="state.candidate.cv"
+          >
+            {{ state.candidate.cv.name }}
+          </span>
+          <p class="text-xs text-gray-500 mt-2">
+            Supported formats: .doc, .docx, pdf. Max size: 5MB
+          </p>
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-sm font-medium">Full Name *</label>
+          <input
+            type="text"
+            v-model="state.candidate.name"
+            class="w-full p-2 border rounded-md"
+            placeholder="Full name displayed to employer"
+            required
+            readonly
+          />
+        </div>
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="block text-sm font-medium">Email *</label>
+            <input
+              type="email"
+              v-model="state.candidate.email"
+              class="w-full p-2 border rounded-md"
+              placeholder="Email displayed to employer"
+              required
+              readonly
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium">Phone Number *</label>
+            <input
+              type="text"
+              v-model="state.candidate.phone"
+              class="w-full p-2 border rounded-md"
+              placeholder="Phone number displayed to employer"
+              required
+              readonly
+            />
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-4">
+          <button
+            type="button"
+            @click="closeApplicationForm"
+            class="py-2 px-4 bg-gray-500 text-white rounded-md"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="py-2 px-4 font-[600] rounded-md bg-green-600 hover:bg-green-700 text-white"
+          >
+            Apply
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 </template>
