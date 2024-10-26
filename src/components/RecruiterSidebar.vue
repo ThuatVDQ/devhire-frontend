@@ -32,7 +32,7 @@ export default {
         { name: 'Dashboard', path: '/recruiter/dashboard', icon: 'pi pi-th-large' },
         { name: 'Post Job', path: '/recruiter/post-job', icon: 'pi pi-plus' },
         { name: 'Jobs', path: '/recruiter/jobs', icon: 'pi pi-briefcase' },
-        { name: 'Settings', path: '/recruiter/settings', icon: 'pi pi-cog' },
+        { name: 'Settings', path: '/recruiter/settings/profile', icon: 'pi pi-cog' },
         { name: 'Notifications', path: '/recruiter/notifications', icon: 'pi pi-bell' }
       ]
     }

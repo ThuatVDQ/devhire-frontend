@@ -36,6 +36,12 @@
               <i class="pi pi-briefcase mr-2"></i> Company Information
             </router-link>
           </li>
+          <li
+            @click="logout"
+            class="flex items-center text-gray-700 hover:text-red-500 cursor-pointer"
+          >
+            <i class="pi pi-sign-out mr-2"></i> Logout
+          </li>
         </ul>
       </div>
 
@@ -48,6 +54,14 @@
 </template>
 
 <script setup>
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+import toastr from 'toastr'
+import 'toastr/build/toastr.min.css'
 const $route = useRoute()
+const router = useRouter()
+const logout = () => {
+  localStorage.removeItem('token') // Remove the token from localStorage
+  toastr.success('Logged out successfully')
+  router.push('/login') // Redirect to login page
+}
 </script>
