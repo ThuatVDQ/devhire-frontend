@@ -11,7 +11,6 @@ const form = ref({
   password: ''
 })
 
-// Trạng thái ẩn/hiện mật khẩu
 const showPassword = ref(false)
 
 const togglePasswordVisibility = () => {
@@ -22,11 +21,13 @@ const phoneError = ref('')
 const isSubmitting = ref(false)
 const router = useRouter()
 
-// Kiểm tra tính hợp lệ của số điện thoại
-const validatePhone = () => {
+// Kiểm tra tính hợp lệ của số điện thoại hoặc email
+const validatePhoneOrEmail = () => {
   const phoneRegex = /^[0-9]{10}$/
-  if (!phoneRegex.test(form.value.phone)) {
-    phoneError.value = 'Invalid phone number. Must be 10 digits.'
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+  if (!phoneRegex.test(form.value.phone) && !emailRegex.test(form.value.phone)) {
+    phoneError.value = 'Please enter a valid phone number (10 digits) or email address.'
   } else {
     phoneError.value = ''
   }
@@ -95,13 +96,13 @@ onMounted(() => {})
             <form @submit.prevent="login">
               <div class="grid grid-cols-1">
                 <div class="mb-4 ltr:text-left rtl:text-right">
-                  <label for="phone" class="font-semibold">Phone number:</label>
+                  <label for="phone" class="font-semibold">Phone number or Email address</label>
                   <input
                     v-model="form.phone"
-                    @blur="validatePhone"
+                    @blur="validatePhoneOrEmail"
                     type="text"
                     class="form-input rounded-md"
-                    placeholder="0912345678"
+                    placeholder="0912345678 or example@email.com"
                   />
                   <span v-if="phoneError" class="text-red-500 text-sm">{{ phoneError }}</span>
                 </div>
