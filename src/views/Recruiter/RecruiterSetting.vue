@@ -62,6 +62,6 @@ const router = useRouter()
 const logout = () => {
   localStorage.removeItem('token') // Remove the token from localStorage
   toastr.success('Logged out successfully')
-  router.push('/login') // Redirect to login page
+  router.push('/recruiter/login') // Redirect to login page
 }
 </script>

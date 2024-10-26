@@ -68,7 +68,7 @@ onMounted(() => {
 
 <template>
   <header class="bg-white shadow-lg">
-    <nav class="container py-4 flex justify-between items-center">
+    <nav class="container py-4 flex justify-between items-center mx-0">
       <RouterLink to="/" class="flex items-center">
         <img src="@/assets/logo.svg" alt="DevHire Logo" class="w-12 h-12" />
         <h1 class="ml-2 text-2xl font-bold text-green-600">DevHire</h1>
@@ -181,7 +181,7 @@ onMounted(() => {
           </div>
         </div>
 
-        <div v-else>
+        <div v-else class="gap-4 flex">
           <RouterLink
             to="/login"
             class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
@@ -190,9 +190,15 @@ onMounted(() => {
           </RouterLink>
           <RouterLink
             to="/signup"
-            class="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
+            class="px-4 py-2 bg-gray-300 text-black-700 rounded hover:bg-gray-200"
           >
             Sign Up
+          </RouterLink>
+          <RouterLink
+            to="/recruiter/login"
+            class="px-4 py-2 bg-black text-white rounded hover:bg-black-600"
+          >
+            Recruiter & Find CV
           </RouterLink>
         </div>
       </div>

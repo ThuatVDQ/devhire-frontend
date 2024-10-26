@@ -24,6 +24,8 @@ import RecruiterChangePassword from '@/views/Recruiter/RecruiterChangePassword.v
 import RecruiterProfile from '@/views/Recruiter/RecruiterProfile.vue'
 import RecruiterEditCompany from '@/views/Recruiter/RecruiterEditCompany.vue'
 import ApplyForm from '@/components/ApplyForm.vue'
+import RecruiterLogin from '@/views/Recruiter/RecruiterLogin.vue'
+import RecruiterRegister from '@/views/Recruiter/RecruiterRegister.vue'
 
 const routes = [
   {
@@ -147,6 +149,16 @@ const routes = [
         component: PricingView
       }
     ]
+  },
+  {
+    path: '/recruiter/login',
+    name: 'recruiter-login',
+    component: RecruiterLogin
+  },
+  {
+    path: '/recruiter/signup',
+    name: 'recruiter-signup',
+    component: RecruiterRegister
   }
 ]
 
