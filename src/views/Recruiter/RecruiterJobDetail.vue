@@ -1,143 +1,43 @@
-<template>
-  <div class="container mx-auto p-6">
-    <!-- Back Button -->
-    <button
-      @click="goBack"
-      class="px-4 py-2 mb-4 bg-gray-200 text-gray-600 rounded-lg flex items-center"
-    >
-      <i class="pi pi-arrow-left mr-2"></i>
-      Back
-    </button>
-    <h2 class="text-xl font-semibold mb-4">Candidates</h2>
-
-    <!-- Applications Section -->
-    <div class="bg-white shadow-md rounded-lg">
-      <table class="min-w-full bg-white">
-        <thead class="bg-gray-50">
-          <tr>
-            <th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase">
-              Candidate Name
-            </th>
-            <th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase">
-              Application Date
-            </th>
-            <th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-            <th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase"></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="(application, index) in paginatedApplications"
-            :key="application.id"
-            class="border-b hover:bg-gray-100"
-          >
-            <td class="py-4 px-6 text-sm text-gray-700">{{ application.user.fullName }}</td>
-            <td class="py-4 px-6 text-sm text-gray-700">{{ formatDate(application.createdAt) }}</td>
-            <td class="py-4 px-6 text-sm text-gray-700">{{ application.status }}</td>
-            <td class="py-4 px-6 text-sm text-gray-700">
-              <div
-                class="flex items-center space-x-1 cursor-pointer"
-                @click="downloadCV(application.id)"
-              >
-                <i class="pi pi-download text-gray-500 hover:text-gray-700"></i>
-                <span class="text-sm text-gray-500 hover:text-gray-700">Download CV</span>
-              </div>
-            </td>
-          </tr>
-          <tr v-if="paginatedApplications.length === 0">
-            <td colspan="4" class="py-4 px-6 text-center text-gray-500">No candidates found.</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="flex justify-center mt-6">
-      <!-- Previous Button -->
-      <button
-        @click="prevPage"
-        :disabled="currentPage === 1"
-        class="px-3 py-2 rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300 disabled:opacity-50"
-      >
-        <i class="pi pi-angle-left"></i>
-      </button>
-
-      <!-- Page Numbers -->
-      <div class="flex mx-2 space-x-2">
-        <button
-          v-for="page in totalPages"
-          :key="page"
-          @click="setPage(page)"
-          :class="[
-            'px-3 py-2 rounded-full',
-            currentPage === page ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600'
-          ]"
-          class="px-4 py-2 text-gray-700 rounded hover:bg-gray-400"
-        >
-          {{ page }}
-        </button>
-      </div>
-
-      <!-- Next Button -->
-      <button
-        @click="nextPage"
-        :disabled="currentPage === totalPages"
-        class="px-3 py-2 rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300 disabled:opacity-50"
-      >
-        <i class="pi pi-angle-right"></i>
-      </button>
-    </div>
-  </div>
-</template>
-
 <script setup>
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import axios from 'axios'
 
 // Router
 const router = useRouter()
+const route = useRoute()
 
-// Mock data for testing
-const jobApplications = ref([
-  {
-    id: 1,
-    createdAt: '2024-10-10T14:30:00Z',
-    status: 'IN_PROGRESS',
-    user: { fullName: 'John Doe' }
-  },
-  {
-    id: 2,
-    createdAt: '2024-10-12T09:20:00Z',
-    status: 'APPROVED',
-    user: { fullName: 'Jane Smith' }
-  },
-  {
-    id: 3,
-    createdAt: '2024-10-15T11:45:00Z',
-    status: 'REJECTED',
-    user: { fullName: 'Sam Wilson' }
-  },
-  {
-    id: 4,
-    createdAt: '2024-10-16T11:45:00Z',
-    status: 'IN_PROGRESS',
-    user: { fullName: 'Chris Evans' }
-  },
-  {
-    id: 5,
-    createdAt: '2024-10-17T11:45:00Z',
-    status: 'APPROVED',
-    user: { fullName: 'Scarlett Johansson' }
-  },
-  {
-    id: 6,
-    createdAt: '2024-10-18T11:45:00Z',
-    status: 'IN_PROGRESS',
-    user: { fullName: 'Robert Downey' }
-  }
-])
+// State để lưu danh sách ứng viên và trạng thái tải
+const jobApplications = ref([])
+const isLoading = ref(true) // Biến để theo dõi trạng thái tải dữ liệu
 
 // Pagination settings
 const currentPage = ref(1)
-const itemsPerPage = ref(2)
+const itemsPerPage = ref(5)
+const title = ref('Job Title')
+
+// Hàm gọi API lấy dữ liệu ứng viên cho một công việc cụ thể
+async function fetchJobApplications() {
+  const jobId = route.params.id // Lấy `jobId` từ URL
+  try {
+    const response = await axios.get(`http://localhost:8090/api/job-application/${jobId}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    jobApplications.value = response.data || []
+    title.value = jobApplications.value[0].job_title
+  } catch (error) {
+    console.error('Error fetching job applications:', error)
+  } finally {
+    isLoading.value = false
+  }
+}
+
+// Gọi hàm `fetchJobApplications` khi component được tải
+onMounted(() => {
+  fetchJobApplications()
+})
 
 // Compute total pages based on number of job applications
 const totalPages = computed(() => {
@@ -186,7 +86,102 @@ function goBack() {
 }
 </script>
 
+<template>
+  <div class="container mx-auto py-6 px-30">
+    <!-- Back Button -->
+    <button
+      @click="goBack"
+      class="px-4 py-2 mb-4 bg-gray-200 text-gray-900 rounded-lg flex items-center"
+    >
+      <i class="pi pi-arrow-left mr-2"></i>
+      Back
+    </button>
+    <!-- Centered Title -->
+    <h2 class="text-2xl font-bold text-gray-800 mb-12 text-center">
+      <span> Candidates apply for </span>
+      <span class="text-green-700">{{ title || 'Job Title' }}</span>
+    </h2>
+
+    <!-- Loading State -->
+    <div v-if="isLoading" class="text-center py-4">Loading...</div>
+
+    <!-- Applications Section -->
+    <div v-else class="bg-white shadow-md rounded-lg overflow-hidden">
+      <table class="min-w-full bg-white border-collapse">
+        <thead class="bg-gray-400">
+          <tr>
+            <th class="py-4 px-8 text-left text-sm font-medium text-white uppercase">
+              Candidate Name
+            </th>
+            <th class="py-4 px-8 text-left text-sm font-medium text-white uppercase">
+              Application Date
+            </th>
+            <th class="py-4 px-8 text-left text-sm font-medium text-white uppercase">Status</th>
+            <th class="py-4 px-8 text-left text-sm font-medium text-white uppercase"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="(application, index) in paginatedApplications"
+            :key="application.id"
+            class="border-b hover:bg-gray-100"
+          >
+            <td class="py-4 px-8 text-sm text-gray-700">{{ application.full_name }}</td>
+            <td class="py-4 px-8 text-sm text-gray-700">{{ formatDate(application.applyDate) }}</td>
+            <td class="py-4 px-8 text-sm text-gray-700">{{ application.status }}</td>
+            <td class="py-4 px-8 text-sm text-gray-700">
+              <div
+                class="flex items-center space-x-1 cursor-pointer"
+                @click="downloadCV(application.cv_id)"
+              >
+                <i class="pi pi-download text-gray-500 hover:text-gray-700"></i>
+                <span class="text-sm text-gray-500 hover:text-gray-700">Download CV</span>
+              </div>
+            </td>
+          </tr>
+          <tr v-if="paginatedApplications.length === 0">
+            <td colspan="4" class="py-4 px-6 text-center text-gray-500">No candidates found.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination Controls -->
+    <div class="flex justify-center mt-6">
+      <!-- Previous Button -->
+      <button @click="prevPage" :disabled="currentPage === 1" class="pagination-button">
+        <i class="pi pi-angle-left"></i>
+      </button>
+
+      <!-- Page Numbers -->
+      <div class="flex mx-2 space-x-2">
+        <button
+          v-for="page in totalPages"
+          :key="page"
+          @click="setPage(page)"
+          :class="[
+            'pagination-button',
+            currentPage === page ? 'pagination-active' : 'pagination-inactive'
+          ]"
+        >
+          {{ page }}
+        </button>
+      </div>
+
+      <!-- Next Button -->
+      <button @click="nextPage" :disabled="currentPage === totalPages" class="pagination-button">
+        <i class="pi pi-angle-right"></i>
+      </button>
+    </div>
+  </div>
+</template>
+
 <style scoped>
+/* Centered table layout */
+table {
+  width: 100%;
+}
+
 /* Pagination Button Styles */
 .pagination-button {
   width: 40px;
@@ -195,7 +190,7 @@ function goBack() {
   border: none;
   background-color: #f1f1f1;
   color: #4a4a4a;
-  font-size: 1.2rem;
+  font-size: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -213,5 +208,17 @@ function goBack() {
 
 .pagination-inactive {
   background-color: #f1f1f1;
+}
+
+h2 {
+  font-size: 1.5rem;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+th,
+td {
+  padding: 1rem; /* Increased padding for better readability */
+  font-size: 1rem; /* Larger font size */
 }
 </style>

@@ -11,7 +11,7 @@ import Footer from '@/components/Footer.vue'
     <RecruiterNavBar />
     <div class="recruiter-body">
       <RecruiterSidebar />
-      <div class="recruiter-content">
+      <div class="recruiter-content bg-gray-100">
         <RouterView />
       </div>
     </div>
@@ -35,6 +35,5 @@ import Footer from '@/components/Footer.vue'
   flex: 1;
   height: 100%;
   padding: 20px;
-  background: #f9f9f9;
 }
 </style>

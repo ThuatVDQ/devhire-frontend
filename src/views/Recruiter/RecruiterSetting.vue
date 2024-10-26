@@ -46,7 +46,7 @@
       </div>
 
       <!-- Main content -->
-      <div class="w-2/3 bg-white p-2 shadow-md rounded-lg">
+      <div class="w-2/3 p-2 shadow-md rounded-lg">
         <router-view></router-view>
       </div>
     </div>

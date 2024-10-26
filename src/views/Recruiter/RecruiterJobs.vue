@@ -88,7 +88,7 @@
             </td>
             <td class="py-4 px-6 text-sm text-gray-700">{{ job.type }}</td>
             <td class="py-4 px-6 text-sm text-gray-700">
-              {{ job.salaryStart }} - {{ job.salaryEnd }} {{ job.currency }}
+              {{ job.salary_start }} - {{ job.salary_end }} {{ job.currency }}
             </td>
             <td class="py-4 px-6 text-sm text-gray-700">
               <div class="flex items-center justify-start space-x-2">
@@ -173,7 +173,6 @@ const currentFilter = ref('all') // Store selected filter
 const currentPage = ref(1) // Current page
 const itemsPerPage = ref(5) // Number of items per page
 
-// Define filters (matching your provided image)
 const filters = [
   { id: 'all', label: 'Tất cả', count: null },
   { id: 'top-jobs', label: 'Đang chạy Top Jobs', count: 0 },
@@ -188,7 +187,7 @@ const filters = [
 // Fetch all jobs posted by the recruiter
 async function fetchJobs() {
   try {
-    const response = await axios.get('http://localhost:8090/api/jobs', {
+    const response = await axios.get('http://localhost:8090/api/jobs/company', {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
