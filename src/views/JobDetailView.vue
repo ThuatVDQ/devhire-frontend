@@ -1,10 +1,11 @@
 <script setup>
-import { reactive, onMounted, ref, watch } from 'vue'
+import { reactive, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import SimilarJobs from '@/components/SimilarJobs.vue'
 import axios from 'axios'
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
+import defaultLogo from '../assets/logo.svg'
 
 const route = useRoute()
 
@@ -138,18 +139,22 @@ onMounted(() => {
             class="md:flex items-center p-6 shadow dark:shadow-gray-700 rounded-md bg-white dark:bg-slate-900"
           >
             <img
-              src=""
-              alt=""
-              class="rounded-full size-28 p-4 bg-white dark:bg-slate-900 shadow dark:shadow-gray-700"
+              :src="state.job.company?.logo || defaultLogo"
+              @error="(e) => (e.target.src = defaultLogo)"
+              alt="Logo Company"
+              class="rounded-full size-28 bg-white dark:bg-slate-900 shadow dark:shadow-gray-700"
             />
+
             <div class="md:ms-4 md:mt-0 mt-6">
               <h5 class="text-xl font-semibold">{{ state.job.title }}</h5>
               <div class="mt-2">
                 <span class="text-slate-400 font-medium me-2 inline-flex items-center">
-                  <i class="pi pi-building"></i>Lenovo pvt. ltd .
+                  <i class="pi pi-building mr-2"></i>
+                  {{ state.job.company?.name || 'Dev Hire' }}
                 </span>
                 <span class="text-slate-400 font-medium me-2 inline-flex items-center">
-                  <i class="pi pi-map-marker"></i>Norway,Oslo
+                  <i class="pi pi-map-marker mr-2"></i>
+                  {{ state.job.company?.address || 'Dev Hire' }}
                 </span>
               </div>
             </div>
