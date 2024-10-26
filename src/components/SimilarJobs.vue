@@ -11,9 +11,8 @@ const state = reactive({
 
 onMounted(async () => {
   try {
-    const response = await axios.get('http://localhost:8000/jobs')
-    state.jobs = response.data.slice(0, 4)
-    console.log(response.data)
+    const response = await axios.get('http://localhost:8090/api/jobs')
+    state.jobs = response.data
   } catch (e) {
     console.error(e)
   }

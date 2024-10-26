@@ -43,7 +43,6 @@ const fetchCandidateData = async () => {
     state.candidate.name = response.data.full_name
     state.candidate.email = response.data.email
     state.candidate.phone = response.data.phone
-    // Nếu có thông tin về CV, bạn có thể xử lý tại đây nếu cần
   } catch (error) {
     console.error('Error fetching candidate data:', error)
   }
@@ -78,7 +77,7 @@ const fetchJobData = async (id) => {
   try {
     const response = await axios.get(`http://localhost:8090/api/jobs/${id}`)
     state.job = response.data
-    console.log(response.data)
+    console.log(state.job)
   } catch (e) {
     console.error(e)
   } finally {
@@ -102,7 +101,7 @@ const submitApplication = async () => {
     return
   }
   try {
-    const jobId = route.params.id // Hoặc route.params.id nếu bạn lấy từ route
+    const jobId = route.params.id
 
     const formData = new FormData()
     formData.append('file', state.candidate.cv)
@@ -198,7 +197,18 @@ onMounted(() => {
                   <i class="pi pi-map-marker"></i>
                   <div class="ms-4">
                     <p class="font-medium">Location:</p>
-                    <span class="text-emerald-600 font-medium text-sm">Australia</span>
+                    <span
+                      v-for="(address, index) in state.job.addresses"
+                      :key="index"
+                      class="text-emerald-600 font-medium text-sm"
+                    >
+                      {{
+                        [address.street, address.district, address.city, address.country]
+                          .filter(Boolean)
+                          .join(', ')
+                      }}
+                      <br v-if="index < state.job.addresses.length" />
+                    </span>
                   </div>
                 </li>
                 <li class="flex items-center mt-3">
@@ -206,8 +216,8 @@ onMounted(() => {
                   <div class="ms-4">
                     <p class="font-medium">Job Type:</p>
                     <span class="text-emerald-600 font-medium text-sm">
-                      {{ state.job.category?.name }} - {{ state.job.position }}</span
-                    >
+                      {{ [state.job.category?.name, state.job.type].filter(Boolean).join(' - ') }}
+                    </span>
                   </div>
                 </li>
                 <li class="flex items-center mt-3">
@@ -223,10 +233,13 @@ onMounted(() => {
                   <i class="pi pi-dollar"></i>
                   <div class="ms-4">
                     <p class="font-medium">Salary:</p>
-                    <span class="text-emerald-600 font-medium text-sm"
-                      >{{ state.job.salaryStart }} - {{ state.job.salaryEnd }}
-                      {{ state.job.currency }}</span
-                    >
+                    <span class="text-emerald-600 font-medium text-sm">
+                      {{
+                        state.job.salaryStart && state.job.salaryEnd
+                          ? `${state.job.salaryStart} - ${state.job.salaryEnd} ${state.job.currency}`
+                          : 'Negotiable'
+                      }}
+                    </span>
                   </div>
                 </li>
                 <li class="flex items-center mt-3">
