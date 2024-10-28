@@ -1,6 +1,9 @@
 <script setup>
 import { RouterLink } from 'vue-router'
-defineProps({
+import { watchEffect } from 'vue'
+import defaultLogo from '../assets/logo.svg'
+
+const props = defineProps({
   company: {
     type: Object,
     required: true
@@ -13,7 +16,12 @@ defineProps({
     <div
       class="size-14 flex items-center justify-center bg-white dark:bg-slate-900 shadow-md dark:shadow-gray-700 rounded-md relative -mt-12"
     >
-      <img src="" alt="" />
+      <img
+        :src="company?.logo || defaultLogo"
+        @error="(e) => (e.target.src = defaultLogo)"
+        alt="Logo Company"
+        class="p-2"
+      />
     </div>
     <div class="mt-4">
       <RouterLink
@@ -23,12 +31,11 @@ defineProps({
       >
       <p class="text-slate-400 mt-2">{{ company.description }}</p>
     </div>
-    <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 flex justify-between">
+    <div class="pt-4 border-t border-gray-100 dark:border-gray-700 flex justify-between">
       <span class="text-slate-400 flex items-center">
-        <i class="pi pi-map-marker"></i>
+        <i class="pi pi-map-marker mr-2"></i>
         {{ company.address }}
       </span>
-      <span class="block font-semibold text-emerald-600"> 2 Jobs</span>
     </div>
   </div>
 </template>

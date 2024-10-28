@@ -1,68 +1,97 @@
 <script setup>
 import CardCompany from './CardCompany.vue'
-defineProps({
-  companies: Object,
-  pagination: {
-    type: Boolean,
-    default: true
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
+
+const companies = ref([])
+const currentPage = ref(0)
+const pageSize = ref(8)
+const totalPages = ref(0)
+const isLoading = ref(true)
+
+const fetchData = async (page = 0) => {
+  isLoading.value = true
+  try {
+    const response = await axios.get('http://localhost:8090/api/companies', {
+      params: { page, limit: pageSize.value },
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    companies.value = response.data.companies
+    totalPages.value = response.data.totalPages
+    currentPage.value = page
+  } catch (error) {
+    console.error('Error fetching companies:', error)
+  } finally {
+    isLoading.value = false
   }
+}
+
+const changePage = (page) => {
+  if (page >= 0 && page < totalPages.value) {
+    fetchData(page)
+    scrollToTop()
+  }
+}
+
+onMounted(() => {
+  fetchData(currentPage.value)
 })
+
+const scrollToTop = () => {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth' // Tạo hiệu ứng cuộn mượt
+  })
+}
 </script>
 
 <template>
-  <div class="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 mt-8 gap-[30px]">
-    <CardCompany v-for="company in companies" :key="company.id" :company="company" />
-  </div>
-  <div v-if="pagination" class="grid md:grid-cols-12 grid-cols-1 mt-8">
-    <div class="md:col-span-12 text-center">
-      <nav aria-label="Page navigation example"></nav>
-      <ul class="inline-flex items-center -space-x-px">
-        <li>
-          <a
-            class="size-[40px] inline-flex justify-center items-center text-slate-400 bg-white dark:bg-slate-900 rounded-s-3xl hover:text-white border border-gray-100 dark:border-gray-800 hover:border-emerald-600 dark:hover:border-emerald-600 hover:bg-emerald-600 dark:hover:bg-emerald-600"
-            href=""
-          >
-            <i class="pi pi-angle-left"></i
-          ></a>
-        </li>
-        <li>
-          <a
-            class="size-[40px] inline-flex justify-center items-center text-slate-400 hover:text-white bg-white dark:bg-slate-900 border border-gray-100 dark:border-gray-800 hover:border-emerald-600 dark:hover:border-emerald-600 hover:bg-emerald-600 dark:hover:bg-emerald-600"
-            href=""
-            >1</a
-          >
-        </li>
-        <li>
-          <a
-            class="size-[40px] inline-flex justify-center items-center text-slate-400 hover:text-white bg-white dark:bg-slate-900 border border-gray-100 dark:border-gray-800 hover:border-emerald-600 dark:hover:border-emerald-600 hover:bg-emerald-600 dark:hover:bg-emerald-600"
-            href=""
-            >2</a
-          >
-        </li>
-        <li>
-          <a
-            class="size-[40px] inline-flex justify-center items-center text-slate-400 hover:text-white bg-white dark:bg-slate-900 border border-gray-100 dark:border-gray-800 hover:border-emerald-600 dark:hover:border-emerald-600 hover:bg-emerald-600 dark:hover:bg-emerald-600"
-            href=""
-            >3</a
-          >
-        </li>
-        <li>
-          <a
-            class="size-[40px] inline-flex justify-center items-center text-slate-400 hover:text-white bg-white dark:bg-slate-900 border border-gray-100 dark:border-gray-800 hover:border-emerald-600 dark:hover:border-emerald-600 hover:bg-emerald-600 dark:hover:bg-emerald-600"
-            href=""
-            >4</a
-          >
-        </li>
-        <li>
-          <a
-            class="size-[40px] inline-flex justify-center items-center text-slate-400 bg-white dark:bg-slate-900 rounded-e-3xl hover:text-white border border-gray-100 dark:border-gray-800 hover:border-emerald-600 dark:hover:border-emerald-600 hover:bg-emerald-600 dark:hover:bg-emerald-600"
-            href=""
-          >
-            <i class="pi pi-angle-right"></i
-          ></a>
-        </li>
-      </ul>
+  <div v-if="isLoading">Loading...</div>
+  <div v-else>
+    <div class="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 mt-8 gap-[30px]">
+      <CardCompany v-for="company in companies" :key="company.id" :company="company" />
+    </div>
+
+    <!-- Phân trang -->
+    <div v-if="totalPages > 1" class="grid md:grid-cols-12 grid-cols-1 mt-8">
+      <div class="md:col-span-12 text-center">
+        <nav aria-label="Page navigation example">
+          <ul class="inline-flex items-center -space-x-px">
+            <li>
+              <a
+                href="#"
+                class="size-[40px] inline-flex justify-center items-center text-slate-400 bg-white rounded-s-3xl"
+                @click.prevent="changePage(currentPage - 1)"
+                :class="{ 'opacity-50 pointer-events-none': currentPage <= 0 }"
+              >
+                <i class="pi pi-angle-left"></i>
+              </a>
+            </li>
+            <li v-for="page in totalPages" :key="page">
+              <a
+                href="#"
+                class="size-[40px] inline-flex justify-center items-center"
+                @click.prevent="changePage(page - 1)"
+                :class="{ 'bg-emerald-600 text-white': currentPage === page - 1 }"
+              >
+                {{ page }}
+              </a>
+            </li>
+            <li>
+              <a
+                href="#"
+                class="size-[40px] inline-flex justify-center items-center text-slate-400 bg-white rounded-e-3xl"
+                @click.prevent="changePage(currentPage + 1)"
+                :class="{ 'opacity-50 pointer-events-none': currentPage >= totalPages - 1 }"
+              >
+                <i class="pi pi-angle-right"></i>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
     </div>
   </div>
-  <div v-else></div>
 </template>

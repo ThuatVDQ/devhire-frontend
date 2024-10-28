@@ -2,36 +2,17 @@
 import CompanyList from '@/components/CompanyList.vue'
 import CardExploreJob from '@/components/CardExploreJob.vue'
 import Accordion from '@/components/Accordion.vue'
-import { RouterLink } from 'vue-router'
-import { reactive, onMounted, ref } from 'vue'
-import axios from 'axios'
+import { ref } from 'vue'
 
 const openAccordion = ref(null)
 
 const handleToggleAccordion = (index) => {
   openAccordion.value = openAccordion.value === index ? null : index
 }
-
-const state = reactive({
-  companies: [],
-  isLoading: true
-})
-
-onMounted(async () => {
-  try {
-    const response = await axios.get('http://localhost:8090/api/companies', {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
-    })
-    state.companies = response.data
-    console.log(response.data)
-  } catch (e) {
-    console.error(e)
-  }
-})
 </script>
+
 <template>
+  <!-- Phần header của CompanyView -->
   <section
     class="relative table w-full py-36 bg-[url('../assets/banner.png')] bg-top bg-no-repeat bg-cover"
   >
@@ -47,12 +28,16 @@ onMounted(async () => {
     </div>
   </section>
 
+  <!-- Phần CompanyList -->
   <section class="relative md:py-24 py-16">
     <div class="container">
       <div class="grid grid-cols-1 pb-8">
-        <CompanyList :companies="state.companies" :pagination="true" />
+        <!-- Chỉ hiển thị CompanyList mà không cần truyền props liên quan đến dữ liệu -->
+        <CompanyList />
       </div>
     </div>
+
+    <!-- Các phần nội dung khác của CompanyView -->
     <div class="container md:mt-24 md:pb-16 mt-16">
       <div class="grid md:grid-cols-12 grid-cols-1 items-center gap-[30px]">
         <div class="lg:col-span-5 md:col-span-6">
@@ -94,21 +79,21 @@ onMounted(async () => {
             </p>
             <div class="mt-8">
               <Accordion
-                title="How does it work ?"
+                title="How does it work?"
                 description="There are many variations of passages of Lorem Ipsum available, but the
                       majority have suffered alteration in some form."
                 :isOpen="openAccordion === 0"
                 @toggle="handleToggleAccordion(0)"
               />
               <Accordion
-                title="Do I need a designer to use DevHire ?"
+                title="Do I need a designer to use DevHire?"
                 description="There are many variations of passages of Lorem Ipsum available, but the
                       majority have suffered alteration in some form."
                 :isOpen="openAccordion === 1"
                 @toggle="handleToggleAccordion(1)"
               />
               <Accordion
-                title="What do I need to do to start selling ?"
+                title="What do I need to do to start selling?"
                 description="There are many variations of passages of Lorem Ipsum available, but the
                       majority have suffered alteration in some form."
                 :isOpen="openAccordion === 2"
@@ -119,6 +104,7 @@ onMounted(async () => {
         </div>
       </div>
     </div>
+    <!-- Hiển thị CardExploreJob -->
     <CardExploreJob />
   </section>
 </template>
