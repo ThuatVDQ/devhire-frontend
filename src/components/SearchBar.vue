@@ -1,22 +1,15 @@
 <template>
   <section>
     <div class="container mx-auto py-12">
-      <!-- Tăng khoảng cách dọc -->
       <div class="text-center mb-10">
-        <!-- Tăng khoảng cách dưới -->
         <h3 class="text-4xl md:text-5xl font-bold tracking-wide text-gray-900">Job Vacancies</h3>
-        <!-- Tăng font-size -->
       </div>
 
       <div class="bg-white dark:bg-slate-900 shadow-md rounded-lg p-6 max-w-5xl mx-auto">
-        <!-- Tăng padding và chiều rộng -->
         <form class="flex items-center space-x-6">
-          <!-- Tăng khoảng cách giữa các thành phần -->
           <!-- Search Input -->
           <div class="flex items-center bg-gray-50 dark:bg-gray-700 rounded-lg p-3 w-full max-w-sm">
-            <!-- Tăng padding và kích thước -->
             <i class="pi pi-briefcase text-green-700 mr-4 text-lg"></i>
-            <!-- Tăng kích thước icon -->
             <input
               type="text"
               placeholder="Search..."
@@ -31,7 +24,6 @@
               class="flex items-center bg-gray-50 dark:bg-gray-700 p-3 rounded-lg cursor-pointer"
             >
               <i class="pi pi-map-marker text-green-700 mr-4 text-lg"></i>
-              <!-- Tăng kích thước icon -->
               <span class="text-gray-900 dark:text-white text-lg">
                 {{ selectedCity || 'Select location' }}
               </span>

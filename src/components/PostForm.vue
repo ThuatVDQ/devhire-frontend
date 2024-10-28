@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, onMounted } from 'vue'
+import { reactive, onMounted, computed, ref } from 'vue'
 import flatpickr from 'flatpickr'
 import 'flatpickr/dist/flatpickr.css'
 import axios from 'axios'
@@ -24,6 +24,39 @@ const address = reactive({
   ],
   cities: []
 })
+
+const isCityDropdownOpen = ref(false)
+const searchQuery = ref('')
+
+function toggleCityDropdown() {
+  isCityDropdownOpen.value = !isCityDropdownOpen.value
+}
+
+// Hàm xóa dấu tiếng Việt để tìm kiếm dễ hơn
+function removeVietnameseTones(str) {
+  return str
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/Đ/g, 'D')
+}
+
+// Lọc danh sách thành phố dựa trên chuỗi tìm kiếm `searchQuery`
+const filteredCities = computed(() => {
+  if (!searchQuery.value) return address.cities
+  const search = removeVietnameseTones(searchQuery.value.trim().toLowerCase())
+  return address.cities.filter((city) =>
+    removeVietnameseTones(city.name.toLowerCase()).includes(search)
+  )
+})
+
+// Chọn thành phố và đóng dropdown
+function selectCity(city, index) {
+  address.addresses[index].selectedCity = city.code
+  address.addresses[index].selectedCityName = city.name
+  isCityDropdownOpen.value = false
+  setDistricts(index)
+}
 
 function addAddress() {
   address.addresses.push({
@@ -80,8 +113,6 @@ async function fetchCities() {
       address.addresses[0].selectedCity = address.cities[0].code
       address.addresses[0].selectedCityName = address.cities[0].name
       address.addresses[0].districts = address.cities[0].districts
-
-      // Nếu có dữ liệu quận/huyện, set giá trị mặc định cho quận/huyện đầu tiên
       if (address.addresses[0].districts.length > 0) {
         address.addresses[0].selectedDistrict = address.addresses[0].districts[0].code
         address.addresses[0].selectedDistrictName = address.addresses[0].districts[0].name
@@ -97,7 +128,7 @@ function setDistricts(index) {
   const city = address.cities.find((city) => city.code === selectedCityCode)
   if (city) {
     address.addresses[index].districts = city.districts
-    address.addresses[index].selectedCityName = city.name // Lưu tên thành phố
+    address.addresses[index].selectedCityName = city.name
   } else {
     address.addresses[index].districts = []
     address.addresses[index].selectedCityName = ''
@@ -261,7 +292,7 @@ onMounted(() => {
   fetchCategories()
   fetchCities()
 
-  inf.type = 'FULL_TIME' // Đặt mặc định là Full-Time
+  inf.type = 'FULL_TIME'
   inf.currency = 'VND'
 })
 
@@ -462,21 +493,45 @@ async function fetchCategories() {
               >
                 <div class="md:col-span-4 col-span-12 ltr:text-left rtl:text-right">
                   <label class="font-semibold">City</label>
-                  <select
-                    class="custom-select"
-                    v-model="addr.selectedCity"
-                    @change="setDistricts(index)"
-                  >
-                    <option v-for="city in address.cities" :key="city.code" :value="city.code">
-                      {{ city.name }}
-                    </option>
-                  </select>
+                  <div class="relative w-full">
+                    <div
+                      @click="toggleCityDropdown"
+                      class="flex items-center bg-gray-50 dark:bg-gray-700 p-2 rounded-lg cursor-pointer border border-gray-300 dark:border-gray-600 h-10"
+                    >
+                      <span class="text-gray-900 dark:text-white">
+                        {{ address.addresses[0].selectedCityName || 'Select city' }}
+                      </span>
+                    </div>
+
+                    <div
+                      v-if="isCityDropdownOpen"
+                      class="absolute mt-2 w-full bg-white dark:bg-gray-800 shadow-lg rounded-lg z-10"
+                    >
+                      <input
+                        v-model="searchQuery"
+                        type="text"
+                        placeholder="Search city..."
+                        class="w-full px-5 py-3 border-b border-gray-200 outline-none focus:border-green-500"
+                      />
+
+                      <ul class="max-h-48 overflow-y-auto">
+                        <li
+                          v-for="city in filteredCities"
+                          :key="city.code"
+                          @click="selectCity(city, 0)"
+                          class="px-5 py-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+                        >
+                          {{ city.name }}
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
                 </div>
 
                 <div class="md:col-span-4 col-span-12 ltr:text-left rtl:text-right">
                   <label class="font-semibold">District</label>
                   <select
-                    class="custom-select"
+                    class="custom-select h-10"
                     v-model="addr.selectedDistrict"
                     @change="setDistrictName(index)"
                   >
@@ -495,7 +550,7 @@ async function fetchCategories() {
                   <input
                     v-model="addr.street"
                     type="text"
-                    class="form-input"
+                    class="form-input h-10"
                     placeholder="Street address"
                   />
                 </div>

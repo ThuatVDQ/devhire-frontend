@@ -1,6 +1,6 @@
 <template>
   <div class="container mx-auto p-4">
-    <form @submit.prevent="updateCompanyInfo" class="bg-white rounded-lg" v-if="company">
+    <form @submit.prevent="updateCompanyInfo" class="bg-gray-100 rounded-lg" v-if="company">
       <div class="flex items-center">
         <div class="relative inline-block">
           <img
