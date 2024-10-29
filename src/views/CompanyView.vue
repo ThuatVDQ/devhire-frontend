@@ -32,7 +32,6 @@ const handleToggleAccordion = (index) => {
   <section class="relative md:py-24 py-16">
     <div class="container">
       <div class="grid grid-cols-1 pb-8">
-        <!-- Chỉ hiển thị CompanyList mà không cần truyền props liên quan đến dữ liệu -->
         <CompanyList />
       </div>
     </div>

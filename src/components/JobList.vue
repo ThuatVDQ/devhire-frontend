@@ -1,61 +1,44 @@
 <script setup>
-import { reactive, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import CardJob from './CardJob.vue'
+import axios from 'axios'
 
-const props = defineProps({
-  jobs: {
-    type: Array,
-    required: true
-  },
-  container: {
-    type: String,
-    default: 'container md:mt-24'
-  },
-  pagination: {
-    type: Boolean,
-    default: true
+const jobs = ref([])
+const currentPage = ref(0)
+const pageSize = ref(5) // số lượng công việc trên mỗi trang
+const totalPages = ref(0)
+const isLoading = ref(true)
+
+const fetchData = async (page = 0) => {
+  isLoading.value = true
+  try {
+    const response = await axios.get('http://localhost:8090/api/jobs', {
+      params: { page, limit: pageSize.value },
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    jobs.value = response.data.jobs
+    totalPages.value = response.data.totalPages
+    currentPage.value = page
+  } catch (error) {
+    console.error('Error fetching jobs:', error)
+  } finally {
+    isLoading.value = false
   }
-})
+}
 
-// Thiết lập state cho phân trang
-const state = reactive({
-  currentPage: 1,
-  itemsPerPage: 5 // Số công việc hiển thị trên mỗi trang
-})
-
-// Tính tổng số trang
-const totalPages = computed(() => Math.ceil(props.jobs.length / state.itemsPerPage))
-
-// Lấy các công việc cho trang hiện tại
-const paginatedJobs = computed(() => {
-  const start = (state.currentPage - 1) * state.itemsPerPage
-  const end = start + state.itemsPerPage
-  return props.jobs.slice(start, end)
-})
-
-// Chuyển đến trang trước đó
-const prevPage = () => {
-  if (state.currentPage > 1) {
-    state.currentPage--
+const changePage = (page) => {
+  if (page >= 0 && page < totalPages.value) {
+    fetchData(page)
     scrollToTop()
   }
 }
 
-// Chuyển đến trang kế tiếp
-const nextPage = () => {
-  if (state.currentPage < totalPages.value) {
-    state.currentPage++
-    scrollToTop()
-  }
-}
+onMounted(() => {
+  fetchData(currentPage.value)
+})
 
-// Chuyển đến một trang cụ thể
-const goToPage = (page) => {
-  state.currentPage = page
-  scrollToTop()
-}
-
-// Hàm cuộn lên đầu danh sách công việc
 const scrollToTop = () => {
   window.scrollTo({
     top: 0,
@@ -65,44 +48,46 @@ const scrollToTop = () => {
 </script>
 
 <template>
-  <div :class="`${container}`">
+  <div v-if="isLoading">Loading...</div>
+  <div v-else class="container">
     <div class="grid lg:grid-cols-2 md:grid-cols-2 grid-cols-1 mt-8 gap-[30px] auto-rows-fr">
-      <CardJob v-for="job in paginatedJobs" :key="job.id" :job="job" />
+      <CardJob v-for="job in jobs" :key="job.id" :job="job" />
     </div>
-    <div v-if="pagination && totalPages > 1" class="grid md:grid-cols-12 grid-cols-1 mt-8">
+
+    <!-- Phân trang -->
+    <div v-if="totalPages > 1" class="grid md:grid-cols-12 grid-cols-1 mt-8">
       <div class="md:col-span-12 text-center">
         <nav aria-label="Page navigation example">
           <ul class="inline-flex items-center -space-x-px">
             <li>
-              <button
-                @click="prevPage"
-                :disabled="state.currentPage === 1"
-                class="size-[40px] inline-flex justify-center items-center text-slate-400 bg-white dark:bg-slate-900 rounded-s-3xl hover:text-white border border-gray-100 dark:border-gray-800 hover:border-emerald-600 dark:hover:border-emerald-600 hover:bg-emerald-600 dark:hover:bg-emerald-600"
+              <a
+                href="#"
+                class="size-[40px] inline-flex justify-center items-center text-slate-400 bg-white rounded-s-3xl"
+                @click.prevent="changePage(currentPage - 1)"
+                :class="{ 'opacity-50 pointer-events-none': currentPage <= 0 }"
               >
                 <i class="pi pi-angle-left"></i>
-              </button>
+              </a>
             </li>
             <li v-for="page in totalPages" :key="page">
-              <button
-                @click="goToPage(page)"
-                :class="{
-                  'bg-emerald-600 text-white': page === state.currentPage,
-                  'text-slate-400 hover:text-white bg-white dark:bg-slate-900 border border-gray-100 dark:border-gray-800 hover:border-emerald-600 dark:hover:border-emerald-600 hover:bg-emerald-600 dark:hover:bg-emerald-600':
-                    page !== state.currentPage
-                }"
+              <a
+                href="#"
                 class="size-[40px] inline-flex justify-center items-center"
+                @click.prevent="changePage(page - 1)"
+                :class="{ 'bg-emerald-600 text-white': currentPage === page - 1 }"
               >
                 {{ page }}
-              </button>
+              </a>
             </li>
             <li>
-              <button
-                @click="nextPage"
-                :disabled="state.currentPage === totalPages"
-                class="size-[40px] inline-flex justify-center items-center text-slate-400 bg-white dark:bg-slate-900 rounded-e-3xl hover:text-white border border-gray-100 dark:border-gray-800 hover:border-emerald-600 dark:hover:border-emerald-600 hover:bg-emerald-600 dark:hover:bg-emerald-600"
+              <a
+                href="#"
+                class="size-[40px] inline-flex justify-center items-center text-slate-400 bg-white rounded-e-3xl"
+                @click.prevent="changePage(currentPage + 1)"
+                :class="{ 'opacity-50 pointer-events-none': currentPage >= totalPages - 1 }"
               >
                 <i class="pi pi-angle-right"></i>
-              </button>
+              </a>
             </li>
           </ul>
         </nav>
