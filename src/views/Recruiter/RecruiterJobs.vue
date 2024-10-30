@@ -95,7 +95,7 @@
                 <span>{{ job.applyNumber }}</span>
                 <div
                   class="flex items-center space-x-1 cursor-pointer"
-                  @click="downloadCVs(job.id)"
+                  @click="downloadCVs(job.id, job.title)"
                   :class="{ 'cursor-not-allowed opacity-50': job.applyNumber === 0 }"
                   :disabled="job.applyNumber === 0"
                   v-if="job.applyNumber > 0"
@@ -104,7 +104,6 @@
                   <span class="text-sm text-gray-500 hover:text-gray-700">Download CV</span>
                 </div>
 
-                <!-- Nếu applyNumber là 0, hiển thị chỉ báo không thể tải xuống -->
                 <div v-else class="text-sm text-gray-400">No applications</div>
               </div>
             </td>
@@ -165,6 +164,8 @@
 import { ref, computed } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
+import toastr from 'toastr'
+import 'toastr/build/toastr.min.css'
 
 const router = useRouter()
 const jobs = ref([]) // Store job data
@@ -195,7 +196,7 @@ async function fetchJobs() {
     if (Array.isArray(response.data)) {
       jobs.value = response.data.map((job) => ({
         ...job,
-        isActive: job.status === 'ACTIVE'
+        isActive: job.status === 'OPENING'
       }))
     } else {
       console.error('Expected an array but got:', typeof response.data)
@@ -255,22 +256,44 @@ function setFilter(filterId) {
   currentPage.value = 1 // Reset to first page when changing filter
 }
 
-// Function to download CVs for a specific job
-async function downloadCVs(jobId) {
+async function downloadCVs(jobId, title) {
   try {
-    const response = await axios.get(`http://localhost:8000/recruiter/jobs/${jobId}/download-cvs`, {
-      responseType: 'blob'
-    })
+    const response = await axios.get(
+      `http://localhost:8090/api/job-application/${jobId}/download-cv`,
+      {
+        responseType: 'blob',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      }
+    )
+
     const url = window.URL.createObjectURL(new Blob([response.data]))
     const link = document.createElement('a')
     link.href = url
-    link.setAttribute('download', `cvs_job_${jobId}.zip`)
+
+    const contentDisposition = response.headers['content-disposition']
+
+    let fileName = ``
+    if (contentDisposition && contentDisposition.includes('filename=')) {
+      fileName = contentDisposition.split('filename=')[1].split(';')[0].trim().replace(/"/g, '')
+    }
+    const fileNameWithoutExtension = fileName.split('.').slice(0, -1).join('.')
+    const fileExtension = fileName.split('.').pop()
+    fileName = `${fileNameWithoutExtension}_${title}.${fileExtension}`
+
+    link.setAttribute('download', fileName)
     document.body.appendChild(link)
     link.click()
-    link.remove()
+
     window.URL.revokeObjectURL(url)
-  } catch (e) {
-    console.error('Failed to download CVs:', e)
+    document.body.removeChild(link)
+
+    // Thông báo tải thành công
+    toastr.success('Download successful!')
+  } catch (error) {
+    console.error('Error downloading CVs:', error)
+    toastr.error('Download failed. Please try again.')
   }
 }
 

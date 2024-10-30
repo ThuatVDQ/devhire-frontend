@@ -2,23 +2,23 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
+import toastr from 'toastr'
+import 'toastr/build/toastr.min.css'
 
 // Router
 const router = useRouter()
 const route = useRoute()
 
-// State để lưu danh sách ứng viên và trạng thái tải
 const jobApplications = ref([])
-const isLoading = ref(true) // Biến để theo dõi trạng thái tải dữ liệu
+const isLoading = ref(true)
 
 // Pagination settings
 const currentPage = ref(1)
 const itemsPerPage = ref(5)
 const title = ref('Job Title')
 
-// Hàm gọi API lấy dữ liệu ứng viên cho một công việc cụ thể
 async function fetchJobApplications() {
-  const jobId = route.params.id // Lấy `jobId` từ URL
+  const jobId = route.params.id
   try {
     const response = await axios.get(`http://localhost:8090/api/job-application/${jobId}`, {
       headers: {
@@ -26,25 +26,24 @@ async function fetchJobApplications() {
       }
     })
     jobApplications.value = response.data || []
-    title.value = jobApplications.value[0].job_title
+    if (jobApplications.value.length > 0 && jobApplications.value[0].job_title) {
+      title.value = jobApplications.value[0].job_title
+    }
   } catch (error) {
-    console.error('Error fetching job applications:', error)
+    toastr.error('Error fetching job applications:', error)
   } finally {
     isLoading.value = false
   }
 }
 
-// Gọi hàm `fetchJobApplications` khi component được tải
 onMounted(() => {
   fetchJobApplications()
 })
 
-// Compute total pages based on number of job applications
 const totalPages = computed(() => {
   return Math.ceil(jobApplications.value.length / itemsPerPage.value)
 })
 
-// Get paginated applications
 const paginatedApplications = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage.value
   const end = start + itemsPerPage.value
@@ -68,10 +67,57 @@ function prevPage() {
   }
 }
 
-// Functions to handle button clicks
-function downloadCV(applicationId) {
-  console.log(`Downloading CV for application ID: ${applicationId}`)
-  // Mock downloading CV
+async function downloadCV(cvId) {
+  try {
+    const response = await axios.get(`http://localhost:8090/api/cv/${cvId}/download`, {
+      responseType: 'blob',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+
+    // Tạo một URL từ blob và tự động tải xuống
+    const url = window.URL.createObjectURL(new Blob([response.data]))
+    const link = document.createElement('a')
+    link.href = url
+
+    const contentDisposition = response.headers['content-disposition']
+    console.log('contentDisposition:', contentDisposition)
+
+    let fileName = ``
+    if (contentDisposition && contentDisposition.includes('filename=')) {
+      fileName = contentDisposition.split('filename=')[1].split(';')[0].trim().replace(/"/g, '')
+    }
+    fileName = `${title.value}_${fileName}`
+    link.setAttribute('download', fileName)
+    document.body.appendChild(link)
+    link.click()
+
+    // Xóa URL sau khi hoàn tất tải xuống để giải phóng bộ nhớ
+    window.URL.revokeObjectURL(url)
+    document.body.removeChild(link)
+  } catch (error) {
+    toastr.error('Error downloading CV:', error)
+  }
+}
+
+async function viewCV(cvId) {
+  try {
+    const response = await axios.get(`http://localhost:8090/api/cv/${cvId}/download`, {
+      responseType: 'blob',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+
+    // Tạo URL từ blob và mở trong tab mới
+    const fileURL = window.URL.createObjectURL(
+      new Blob([response.data], { type: 'application/pdf' })
+    )
+    window.open(fileURL, '_blank')
+  } catch (error) {
+    toastr.error('Error viewing CV:', error)
+  }
 }
 
 // Format date utility
@@ -82,7 +128,7 @@ function formatDate(dateString) {
 
 // Back button functionality
 function goBack() {
-  router.back() // Điều hướng quay lại trang trước
+  router.back()
 }
 </script>
 
@@ -137,6 +183,13 @@ function goBack() {
                 <i class="pi pi-download text-gray-500 hover:text-gray-700"></i>
                 <span class="text-sm text-gray-500 hover:text-gray-700">Download CV</span>
               </div>
+              <div
+                @click="viewCV(application.cv_id)"
+                class="flex items-center space-x-1 cursor-pointer mt-2"
+              >
+                <i class="pi pi-eye text-gray-500 hover:text-gray-700"></i>
+                <span class="text-sm text-gray-500 hover:text-gray-700">View CV</span>
+              </div>
             </td>
           </tr>
           <tr v-if="paginatedApplications.length === 0">
@@ -177,7 +230,6 @@ function goBack() {
 </template>
 
 <style scoped>
-/* Centered table layout */
 table {
   width: 100%;
 }
