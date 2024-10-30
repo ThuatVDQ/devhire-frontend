@@ -1,6 +1,5 @@
 <script setup>
 import { RouterLink } from 'vue-router'
-import { watchEffect } from 'vue'
 import defaultLogo from '../assets/logo.svg'
 
 const props = defineProps({
@@ -36,6 +35,7 @@ const props = defineProps({
         <i class="pi pi-map-marker mr-2"></i>
         {{ company.address }}
       </span>
+      <span class="block font-semibold text-emerald-600"> {{ company.totalJob }} Jobs</span>
     </div>
   </div>
 </template>
