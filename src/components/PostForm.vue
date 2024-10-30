@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, onMounted, computed, ref } from 'vue'
+import { reactive, onMounted, computed, ref, onUnmounted } from 'vue'
 import flatpickr from 'flatpickr'
 import 'flatpickr/dist/flatpickr.css'
 import axios from 'axios'
@@ -19,7 +19,8 @@ const address = reactive({
       selectedDistrict: '',
       selectedDistrictName: '',
       street: '',
-      districts: []
+      districts: [],
+      isCityDropdownOpen: false
     }
   ],
   cities: []
@@ -28,9 +29,26 @@ const address = reactive({
 const isCityDropdownOpen = ref(false)
 const searchQuery = ref('')
 
-function toggleCityDropdown() {
-  isCityDropdownOpen.value = !isCityDropdownOpen.value
+function toggleCityDropdown(index) {
+  address.addresses[index].isCityDropdownOpen = !address.addresses[index].isCityDropdownOpen
 }
+
+function handleClickOutside(event) {
+  address.addresses.forEach((addr, index) => {
+    const dropdown = document.querySelector(`.city-dropdown-${index}`)
+    if (dropdown && !dropdown.contains(event.target)) {
+      addr.isCityDropdownOpen = false
+    }
+  })
+}
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
 
 // Hàm xóa dấu tiếng Việt để tìm kiếm dễ hơn
 function removeVietnameseTones(str) {
@@ -65,7 +83,8 @@ function addAddress() {
     selectedDistrict: '',
     selectedDistrictName: '',
     street: '',
-    districts: []
+    districts: [],
+    isCityDropdownOpen: false // Biến riêng để mở dropdown cho từng địa chỉ
   })
 }
 
@@ -133,8 +152,6 @@ function setDistricts(index) {
     address.addresses[index].districts = []
     address.addresses[index].selectedCityName = ''
   }
-  address.addresses[index].selectedDistrict = ''
-  address.addresses[index].selectedDistrictName = ''
 }
 
 function setDistrictName(index) {
@@ -256,13 +273,13 @@ async function submitForm() {
       category: {
         id: details.selectedCategoryId
       },
-      jobAddresses: address.addresses.map((addr) => ({
+      addresses: address.addresses.map((addr) => ({
         country: 'Việt Nam',
         street: addr.street,
         city: addr.selectedCityName,
         district: addr.selectedDistrictName
       })),
-      jobSkills: inf.skills.map((skill) => ({
+      skills: inf.skills.map((skill) => ({
         name: skill.name
       }))
     }
@@ -273,7 +290,6 @@ async function submitForm() {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     })
-    console.log('Form submitted successfully', response.data)
     toastr.success(response.data, 'Success')
   } catch (error) {
     console.error()
@@ -281,16 +297,19 @@ async function submitForm() {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   flatpickr(document.querySelector('#deadline'), {
     dateFormat: 'Y-m-d',
+    minDate: 'today',
     onChange: (selectedDates, dateStr) => {
       inf.selectedDate = dateStr
     }
   })
 
-  fetchCategories()
-  fetchCities()
+  await fetchCategories()
+  await fetchCities()
+  await fetchSkills()
+  await fetchAddresses()
 
   inf.type = 'FULL_TIME'
   inf.currency = 'VND'
@@ -306,6 +325,63 @@ async function fetchCategories() {
   } catch (e) {
     console.error(e)
   }
+}
+
+async function fetchSkills() {
+  try {
+    const response = await axios.get('http://localhost:8090/api/companies/skills', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    inf.skills = response.data.map((skill) => ({ name: skill.name }))
+  } catch (error) {
+    console.error(error)
+    toastr.error('Unable to fetch skills', 'Error')
+  }
+}
+
+async function fetchAddresses() {
+  try {
+    const response = await axios.get('http://localhost:8090/api/companies/addresses', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    address.addresses = response.data.map((addr) => {
+      const cityCode = getCityCode(addr.city)
+      const districtCode = getDistrictCode(addr.city, addr.district)
+
+      return {
+        selectedCity: cityCode,
+        selectedCityName: addr.city,
+        selectedDistrict: districtCode,
+        selectedDistrictName: addr.district,
+        street: addr.street,
+        districts: []
+      }
+    })
+    address.addresses.forEach((addr, index) => {
+      setDistricts(index)
+    })
+  } catch (error) {
+    console.error(error)
+    toastr.error('Unable to fetch addresses', 'Error')
+  }
+}
+
+function getCityCode(cityName) {
+  const city = address.cities.find((city) => city.name === cityName)
+  return city ? city.code : ''
+}
+
+function getDistrictCode(cityName, districtName) {
+  const city = address.cities.find((city) => city.name === cityName)
+  if (city) {
+    const district = city.districts.find((district) => district.name === districtName)
+    return district ? district.code : ''
+  }
+  return ''
 }
 </script>
 
@@ -493,18 +569,18 @@ async function fetchCategories() {
               >
                 <div class="md:col-span-4 col-span-12 ltr:text-left rtl:text-right">
                   <label class="font-semibold">City</label>
-                  <div class="relative w-full">
+                  <div class="relative w-full" :class="`city-dropdown-${index}`">
                     <div
-                      @click="toggleCityDropdown"
+                      @click="toggleCityDropdown(index)"
                       class="flex items-center bg-gray-50 dark:bg-gray-700 p-2 rounded-lg cursor-pointer border border-gray-300 dark:border-gray-600 h-10"
                     >
                       <span class="text-gray-900 dark:text-white">
-                        {{ address.addresses[0].selectedCityName || 'Select city' }}
+                        {{ addr.selectedCityName || 'Select city' }}
                       </span>
                     </div>
 
                     <div
-                      v-if="isCityDropdownOpen"
+                      v-if="addr.isCityDropdownOpen"
                       class="absolute mt-2 w-full bg-white dark:bg-gray-800 shadow-lg rounded-lg z-10"
                     >
                       <input
@@ -518,7 +594,7 @@ async function fetchCategories() {
                         <li
                           v-for="city in filteredCities"
                           :key="city.code"
-                          @click="selectCity(city, 0)"
+                          @click="selectCity(city, index)"
                           class="px-5 py-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
                         >
                           {{ city.name }}
@@ -527,7 +603,6 @@ async function fetchCategories() {
                     </div>
                   </div>
                 </div>
-
                 <div class="md:col-span-4 col-span-12 ltr:text-left rtl:text-right">
                   <label class="font-semibold">District</label>
                   <select
