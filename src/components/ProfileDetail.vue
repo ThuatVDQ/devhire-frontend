@@ -2,7 +2,7 @@
 import { reactive, onMounted, ref } from 'vue'
 import axios from 'axios'
 import defaultAvatar from '../assets/avatar-default.svg'
-import toastr from 'toastr'
+import toastr, { error } from 'toastr'
 import 'toastr/build/toastr.min.css'
 import EditAvatar from '@/components/EditAvatar.vue'
 
@@ -30,14 +30,27 @@ async function fetchDataUser() {
     console.error(e)
   }
 }
+
+const updateUserInf = async () => {
+  try {
+    const response = await axios.put('http://localhost:8090/api/users/updateProfile', data.user, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    toastr.success('User information updated successfully')
+  } catch (e) {
+    toastr.error('Failed to update user details', error.response.data)
+    console.error('Error updating user details:', e)
+  }
+}
+
 onMounted(() => {
   fetchDataUser()
   const message = sessionStorage.getItem('message')
 
   if (message) {
     toastr.success(message)
-
-    // Xóa dữ liệu trong sessionStorage sau khi sử dụng
     sessionStorage.removeItem('message')
   }
 })
@@ -136,15 +149,31 @@ const openPopup = () => {
               v-model="data.user.introduction"
               class="block mb-5 p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 overflow-auto resize-y min-h-[200px]"
             ></textarea>
-            <label class="font-semibold">Name</label>
-            <input type="text" v-model="data.user.full_name" class="form-input mb-5" />
+            <div class="flex space-x-4 mb-5">
+              <!-- Trường Name -->
+              <div class="w-1/2">
+                <label class="font-semibold">Name</label>
+                <input type="text" v-model="data.user.full_name" class="form-input w-full h-10" />
+              </div>
+
+              <!-- Trường Gender -->
+              <div class="w-1/2">
+                <label class="font-semibold">Gender</label>
+                <select v-model="data.user.gender" class="custom-select w-full h-10">
+                  <option value="" disabled>Select Gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
             <label class="font-semibold">Phone</label>
-            <input type="text" v-model="data.user.phone" class="form-input mb-5" />
+            <input type="text" readonly v-model="data.user.phone" class="form-input mb-5" />
             <label class="font-semibold">Email</label>
-            <input type="text" v-model="data.user.email" class="form-input mb-5" />
+            <input type="text" readonly v-model="data.user.email" class="form-input mb-5" />
             <button
               class="px-6 py-2 rounded-md bg-emerald-600 hover:bg-emerald-700 border-emerald-600 hover:border-emerald-700 text-white"
-              type="submit"
+              @click="updateUserInf"
             >
               Save
             </button>

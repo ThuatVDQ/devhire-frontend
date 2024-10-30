@@ -18,7 +18,7 @@
         <label class="block text-gray-700 font-medium mb-1">Full Name</label>
         <input
           type="text"
-          class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
+          class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 h-10"
           placeholder="John Doe"
           v-model="data.user.full_name"
         />
@@ -26,7 +26,7 @@
       <div>
         <label class="block text-gray-700 font-medium mb-1">Gender</label>
         <select
-          class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
+          class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 h-10"
           v-model="data.user.gender"
         >
           <option value="Male">Male</option>
@@ -38,13 +38,13 @@
       <div class="relative">
         <div class="flex justify-between">
           <label class="block text-gray-700 font-medium">Phone Number</label>
-          <button class="text-green-500">Update</button>
         </div>
         <input
           type="text"
           class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
           placeholder="Enter phone number"
           v-model="data.user.phone"
+          readonly
         />
       </div>
       <div>
@@ -54,15 +54,18 @@
           class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
           placeholder="Enter email"
           v-model="data.user.email"
+          readonly
         />
       </div>
     </div>
     <!-- Action buttons -->
     <div class="flex justify-end space-x-4">
-      <button class="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400">
-        Cancel
+      <button
+        class="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600"
+        @click="saveUserDetails"
+      >
+        Save
       </button>
-      <button class="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600">Save</button>
     </div>
 
     <EditAvatar v-if="showAvatarPopup" :cropAvatar="avatarSrc" @close="showAvatarPopup = false" />
@@ -102,6 +105,21 @@ async function fetchDataUser() {
     }
   } catch (e) {
     console.error(e)
+  }
+}
+
+const saveUserDetails = async () => {
+  try {
+    const response = await axios.put('http://localhost:8090/api/users/updateProfile', data.user, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    toastr.success('User details updated successfully')
+    console.log('Update response:', response.data)
+  } catch (e) {
+    toastr.error('Failed to update user details')
+    console.error('Error updating user details:', e)
   }
 }
 
