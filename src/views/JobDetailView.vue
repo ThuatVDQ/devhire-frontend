@@ -64,12 +64,13 @@ const handleFileDrop = (event) => {
   if (
     file &&
     (file.type === 'application/pdf' ||
-      file.type === 'application/msword' ||
-      file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+      file.type === 'image/jpeg' ||
+      file.type === 'image/png' ||
+      file.type === 'image/gif')
   ) {
     state.candidate.cv = file
   } else {
-    toastr.error('Invalid file type. Please upload a .pdf, .doc, or .docx file.', 'Error')
+    toastr.error('Invalid file type. Please upload a .pdf, .jpeg, .png, or .gif file.', 'Error')
   }
 }
 
@@ -291,7 +292,7 @@ onMounted(() => {
               type="file"
               @change="handleFileUploadNew"
               class="hidden"
-              accept=".pdf, .doc, .docx"
+              accept=".pdf, .jpeg, .jpg, .png, .gif"
             />
             <span class="text-sm text-gray-500">
               Drag and drop your file here or click to browse
@@ -303,9 +304,7 @@ onMounted(() => {
           >
             {{ state.candidate.cv.name }}
           </span>
-          <p class="text-xs text-gray-500 mt-2">
-            Supported formats: .doc, .docx, pdf. Max size: 5MB
-          </p>
+          <p class="text-xs text-gray-500 mt-2">Supported formats: pdf, img. Max size: 10MB</p>
         </div>
 
         <div class="mb-4">
