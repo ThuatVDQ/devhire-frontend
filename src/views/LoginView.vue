@@ -47,10 +47,9 @@ const login = async () => {
     const payload = {
       username: form.value.phone,
       password: form.value.password,
-      roleId: 2
+      role_id: 3
     }
 
-    // Gửi yêu cầu POST tới API đăng nhập
     const response = await axios.post('http://localhost:8090/api/users/login', payload)
 
     if (response.status === 200 && response.data.token) {
@@ -68,7 +67,7 @@ const login = async () => {
       toastr.error('Login failed: Invalid credentials')
     }
   } catch (error) {
-    console.error('Login failed:', error)
+    toastr.error('Login failed:', error)
   } finally {
     isSubmitting.value = false
   }
