@@ -241,8 +241,8 @@ onMounted(() => {
                     <p class="font-medium">Salary:</p>
                     <span class="text-emerald-600 font-medium text-sm">
                       {{
-                        state.job.salaryStart && state.job.salaryEnd
-                          ? `${state.job.salaryStart} - ${state.job.salaryEnd} ${state.job.currency}`
+                        state.job.salary_start && state.job.salary_end
+                          ? `${state.job.salary_start} - ${state.job.salary_end} ${state.job.currency}`
                           : 'Negotiable'
                       }}
                     </span>
