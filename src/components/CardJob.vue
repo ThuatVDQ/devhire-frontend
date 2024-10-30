@@ -2,6 +2,7 @@
 import { RouterLink } from 'vue-router'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
+import defaultLogo from '../assets/logo.svg'
 
 const router = useRouter()
 
@@ -15,8 +16,8 @@ const state = defineProps({
 
 const differenceInDays = computed(() => {
   const currentDate = new Date()
-  const createdAt = new Date(state.job.created_at)
-  const differenceInTime = currentDate.getTime() - createdAt.getTime()
+  const deadline = new Date(state.job.deadline)
+  const differenceInTime = deadline.getTime() - currentDate.getTime()
   return Math.floor(differenceInTime / (1000 * 3600 * 24))
 })
 </script>
@@ -30,7 +31,11 @@ const differenceInDays = computed(() => {
         <div
           class="size-14 min-w-[56px] flex items-center justify-center bg-white dark:bg-slate-900 shadow dark:shadow-gray-700 rounded-md"
         >
-          <img class="size-8" src="../assets/logo.svg" />
+          <img
+            class="size-8"
+            :src="state.job.company.logo"
+            @error="state.job.company.logo = defaultLogo"
+          />
         </div>
         <div class="ms-3">
           <RouterLink
@@ -38,7 +43,12 @@ const differenceInDays = computed(() => {
             :to="`/jobs/${state.job.id}`"
             >{{ state.job.title }}</RouterLink
           >
-          <span class="inline-block text-sm text-slate-400">{{ differenceInDays }} days ago</span>
+          <span
+            class="inline-block text-sm text-red-400"
+            style="animation: blink 1s step-start infinite; opacity: 1"
+          >
+            {{ differenceInDays > 0 ? `Remaining ${differenceInDays} days` : 'Expired' }}
+          </span>
           <div>
             <span
               class="bg-emerald-600/10 inline-block text-emerald-600 text-xs px-2.5 py-0.5 font-semibold rounded-full me-1"
@@ -47,10 +57,13 @@ const differenceInDays = computed(() => {
 
             <span class="text-sm font-medium inline-block me-1"
               >Salary:
-              <span class="text-slate-400"
-                >{{ state.job.salaryStart }} - {{ state.job.salaryEnd }}
-                {{ state.job.currency }}</span
-              >
+              <span class="text-slate-400">
+                {{
+                  state.job.salary_start === 0 && state.job.salary_end === 0
+                    ? 'Negotiable'
+                    : `${state.job.salary_start} - ${state.job.salary_end} ${state.job.currency}`
+                }}
+              </span>
             </span>
           </div>
         </div>
@@ -65,25 +78,23 @@ const differenceInDays = computed(() => {
           class="bg-slate-100 dark:bg-slate-800 inline-block text-slate-900 dark:text-slate-300 text-xs px-2.5 py-0.5 font-semibold rounded-full me-1"
           >{{ state.job.position }}</span
         >
+        <template v-if="state.job.skills && state.job.skills.length">
+          <span
+            v-for="(skill, index) in state.job.skills"
+            :key="index"
+            class="bg-blue-100 dark:bg-blue-800 inline-block text-blue-600 dark:text-blue-300 text-xs px-2.5 py-0.5 font-semibold rounded-full me-1"
+          >
+            {{ skill.name }}
+          </span>
+        </template>
       </div>
     </div>
     <div
       class="px-6 py-2 bg-slate-50 dark:bg-slate-800 lg:flex justify-between items-center mt-auto"
     >
       <div class="lg:inline-block flex justify-between">
-        <span class="inline-block me-1 font-semibold">
-          <i class="pi pi-verified text-blue-500 me-1"></i>
-        </span>
-        <ul class="list-none inline-block me-1 text-yellow-400 space-x-0.5">
-          <li class="inline">
-            <i class="pi pi-star-fill text-lg"></i>
-          </li>
-          <li class="inline">
-            <i class="pi pi-star-fill text-lg"></i>
-          </li>
-        </ul>
         <span class="inline-flex items-center me-1 text-slate-400">
-          <i class="pi pi-map-marker"></i>Viet Nam
+          <i class="pi pi-map-marker mr-2"></i>Viet Nam
         </span>
       </div>
       <a
@@ -98,7 +109,14 @@ const differenceInDays = computed(() => {
       class="h-9 w-9 inline-flex items-center justify-center rounded-full bg-emerald-600/5 hover:bg-emerald-600 border-emerald-600/10 hover:border-emerald-600 text-emerald-600 hover:text-white absolute top-0 end-0 m-3"
       href="javascript:void(0)"
     >
-      <i class="pi pi-bookmark"></i>
+      <i class="pi pi-heart"></i>
     </a>
   </div>
 </template>
+<style>
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+</style>
