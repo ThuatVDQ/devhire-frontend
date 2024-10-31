@@ -68,9 +68,9 @@ const fetchFavorites = async (page = 0) => {
 const changePage = (page) => {
   if (page >= 0 && page < totalPages.value) {
     if (props.showFavorites) {
-      fetchFavorites(page) // Gọi fetchFavorites nếu đang ở chế độ yêu thích
+      fetchFavorites(page)
     } else {
-      fetchData(page) // Gọi fetchData nếu không
+      fetchData(page)
     }
     scrollToTop()
   }

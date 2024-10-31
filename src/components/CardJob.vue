@@ -49,7 +49,6 @@ async function favoriteJob() {
         }
       )
       state.job.is_favorite = false
-      emit('removeFavorite', state.job.id)
     }
   } catch (error) {
     console.error('Error toggling favorite status:', error)
@@ -138,11 +137,20 @@ console.log(state.job)
         </span>
       </div>
       <a
-        class="btn btn-sm rounded-md bg-emerald-600 hover:bg-emerald-700 border-emerald-600 hover:border-emerald-700 text-white md:ms-2 w-full lg:w-auto lg:mt-0 mt-4 px-4 py-1"
+        class="btn btn-sm rounded-md md:ms-2 w-full lg:w-auto lg:mt-0 mt-4 px-4 py-1 flex items-center justify-center"
+        :class="{
+          'bg-gray-400 text-white cursor-default': state.job.apply_status !== null,
+          'bg-emerald-600 hover:bg-emerald-700 border-emerald-600 hover:border-emerald-700 text-white':
+            state.job.apply_status === null
+        }"
         href="#"
         @click.prevent="applyJob"
       >
-        Apply now
+        <span v-if="state.job.apply_status === null">Apply now</span>
+        <span v-else>
+          Applied
+          <i class="pi pi-check ml-2"></i>
+        </span>
       </a>
     </div>
     <a
