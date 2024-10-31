@@ -83,6 +83,14 @@
               </ul>
             </div>
           </div>
+          <div class="flex items-center space-x-2">
+            <span class="text-gray-900 dark:text-white text-lg">Favorited</span>
+            <i
+              :class="showFavorites ? 'pi pi-heart-fill text-red-500' : 'pi pi-heart text-gray-500'"
+              class="cursor-pointer text-lg"
+              @click="toggleShowFavorites"
+            ></i>
+          </div>
 
           <!-- Submit Button -->
           <button
@@ -98,7 +106,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed, defineProps, defineEmits } from 'vue'
 import axios from 'axios'
 
 // State for cities, job types, and selected values
@@ -115,6 +123,16 @@ const searchQuery = ref('')
 // Refs for dropdown elements
 const locationDropdown = ref(null)
 const jobTypeDropdown = ref(null)
+
+const props = defineProps({
+  showFavorites: Boolean
+})
+
+const emit = defineEmits(['toggle-favorites'])
+
+const toggleShowFavorites = () => {
+  emit('toggle-favorites', !props.showFavorites)
+}
 
 // Fetch cities data on component mount
 onMounted(async () => {
@@ -151,6 +169,7 @@ const handleClickOutside = (event) => {
 // Attach and detach the click event listener
 onMounted(() => {
   window.addEventListener('click', handleClickOutside)
+  console.log(props.showFavorites)
 })
 
 onBeforeUnmount(() => {

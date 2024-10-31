@@ -1,4 +1,5 @@
 <script setup>
+import axios from 'axios'
 import { RouterLink } from 'vue-router'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
@@ -20,6 +21,20 @@ const differenceInDays = computed(() => {
   const differenceInTime = deadline.getTime() - currentDate.getTime()
   return Math.floor(differenceInTime / (1000 * 3600 * 24))
 })
+
+async function favoriteJob() {
+  try {
+    const response = await axios.post(`http://localhost:8090/api/jobs/${state.job.id}/like`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    console.log('Job added to favorites:', response.data)
+  } catch (error) {
+    console.error('Error adding job to favorites:', error)
+  }
+}
+console.log(state.job)
 </script>
 
 <template>
@@ -106,8 +121,12 @@ const differenceInDays = computed(() => {
       </a>
     </div>
     <a
-      class="h-9 w-9 inline-flex items-center justify-center rounded-full bg-emerald-600/5 hover:bg-emerald-600 border-emerald-600/10 hover:border-emerald-600 text-emerald-600 hover:text-white absolute top-0 end-0 m-3"
-      href="javascript:void(0)"
+      :class="[
+        'h-9 w-9 inline-flex items-center justify-center rounded-full hover:bg-emerald-600 border-emerald-600/10 hover:border-emerald-600 absolute top-0 end-0 m-3',
+        job.isFavorited ? 'bg-emerald-600 text-white' : 'bg-emerald-600/5 text-emerald-600'
+      ]"
+      href=""
+      @click.prevent="favoriteJob"
     >
       <i class="pi pi-heart"></i>
     </a>
