@@ -77,9 +77,13 @@ const handleFileDrop = (event) => {
 const fetchJobData = async (id) => {
   state.isLoading = true
   try {
-    const response = await axios.get(`http://localhost:8090/api/jobs/${id}`)
+    const response = await axios.get(`http://localhost:8090/api/jobs/${id}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
     state.job = response.data
-    console.log(state.job)
+    console.log(JSON.stringify(response.data))
   } catch (e) {
     console.error(e)
   } finally {
@@ -133,6 +137,9 @@ onMounted(() => {
 
 <template>
   <section class="bg-slate-50 dark:bg-slate-800 md:pb-24 pb-16">
+    <div v-if="state.isLoading" class="spinner-container">
+      <div class="spinner"></div>
+    </div>
     <div class="container mt-10">
       <div class="grid md:grid-cols-12 grid-cols-1 gap-[30px]">
         <div class="lg:col-span-8 md:col-span-6">
@@ -160,6 +167,15 @@ onMounted(() => {
               </div>
             </div>
           </div>
+          <div class="mt-5">
+            <button
+              @click="showApplicationForm"
+              class="py-2 px-4 font-[600] rounded-md bg-emerald-600 hover:bg-emerald-700 border-emerald-600 hover:border-emerald-700 text-white w-full md:w-auto"
+            >
+              <i v-if="state.job.apply_status" class="pi pi-replay mr-2"></i>
+              {{ state.job.apply_status ? 'Reapply' : 'Apply Now' }}
+            </button>
+          </div>
           <h5 class="text-lg font-semibold mt-6">Job Description:</h5>
           <p class="text-slate-400 mt-4">
             {{ state.job.description }}
@@ -172,14 +188,6 @@ onMounted(() => {
           <p class="text-slate-400 mt-4">
             {{ state.job.benefit }}
           </p>
-          <div class="mt-5">
-            <button
-              @click="showApplicationForm"
-              class="py-2 px-4 font-[600] rounded-md bg-emerald-600 hover:bg-emerald-700 border-emerald-600 hover:border-emerald-700 text-white md:ms-2 w-full md:w-auto"
-            >
-              Apply Now
-            </button>
-          </div>
         </div>
         <div class="lg:col-span-4 md:col-span-6">
           <div
@@ -362,3 +370,26 @@ onMounted(() => {
     </div>
   </div>
 </template>
+<style scoped>
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 5px solid rgba(0, 0, 0, 0.1);
+  border-top-color: #4caf50;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+</style>
