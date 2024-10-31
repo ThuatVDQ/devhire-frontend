@@ -157,7 +157,16 @@ const handleSubmit = async () => {
 
   try {
     if (isCompanyExist.value) {
-      const response = await axios.put('YOUR_API_UPDATE_ENDPOINT', company.value)
+      const response = await axios.put(
+        'http://localhost:8090/api/companies/updateCompany',
+        company.value,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        }
+      )
+      toastr.success('Created company successfully', 'Success')
       console.log('Company Info Updated:', response.data)
     } else {
       const response = await axios.post('http://localhost:8090/api/companies', company.value, {
@@ -165,7 +174,7 @@ const handleSubmit = async () => {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
       })
-      toastr.success('Created company successfully', 'Success')
+      toastr.success('Updated company successfully', 'Success')
     }
   } catch (error) {
     if (error.response && Array.isArray(error.response.data)) {

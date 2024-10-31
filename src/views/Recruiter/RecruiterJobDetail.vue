@@ -67,7 +67,7 @@ function prevPage() {
   }
 }
 
-async function downloadCV(cvId) {
+async function downloadCV(cvId, candidateName) {
   try {
     const response = await axios.get(`http://localhost:8090/api/cv/${cvId}/download`, {
       responseType: 'blob',
@@ -76,7 +76,6 @@ async function downloadCV(cvId) {
       }
     })
 
-    // Tạo một URL từ blob và tự động tải xuống
     const url = window.URL.createObjectURL(new Blob([response.data]))
     const link = document.createElement('a')
     link.href = url
@@ -88,7 +87,8 @@ async function downloadCV(cvId) {
     if (contentDisposition && contentDisposition.includes('filename=')) {
       fileName = contentDisposition.split('filename=')[1].split(';')[0].trim().replace(/"/g, '')
     }
-    fileName = `${title.value}_${fileName}`
+    const fileExtension = fileName.split('.').pop()
+    fileName = `${title.value}_${candidateName}.${fileExtension}`
     link.setAttribute('download', fileName)
     document.body.appendChild(link)
     link.click()
@@ -178,7 +178,7 @@ function goBack() {
             <td class="py-4 px-8 text-sm text-gray-700">
               <div
                 class="flex items-center space-x-1 cursor-pointer"
-                @click="downloadCV(application.cv_id)"
+                @click="downloadCV(application.cv_id, application.full_name)"
               >
                 <i class="pi pi-download text-gray-500 hover:text-gray-700"></i>
                 <span class="text-sm text-gray-500 hover:text-gray-700">Download CV</span>

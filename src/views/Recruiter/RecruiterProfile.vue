@@ -116,10 +116,9 @@ const saveUserDetails = async () => {
       }
     })
     toastr.success('User details updated successfully')
-    console.log('Update response:', response.data)
-  } catch (e) {
-    toastr.error('Failed to update user details')
-    console.error('Error updating user details:', e)
+  } catch (error) {
+    console.log(error)
+    toastr.error(error.response.data, 'Error')
   }
 }
 
