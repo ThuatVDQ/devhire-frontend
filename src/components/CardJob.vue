@@ -15,6 +15,8 @@ const state = defineProps({
   job: Object
 })
 
+const emit = defineEmits(['removeFavorite'])
+
 const differenceInDays = computed(() => {
   const currentDate = new Date()
   const deadline = new Date(state.job.deadline)
@@ -24,14 +26,33 @@ const differenceInDays = computed(() => {
 
 async function favoriteJob() {
   try {
-    const response = await axios.post(`http://localhost:8090/api/jobs/${state.job.id}/like`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
-    })
-    console.log('Job added to favorites:', response.data)
+    if (!state.job.is_favorite) {
+      await axios.post(
+        `http://localhost:8090/api/jobs/${state.job.id}/like`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        }
+      )
+      state.job.is_favorite = true
+    } else {
+      await axios.delete(
+        `http://localhost:8090/api/favorite-job/remove`,
+
+        {
+          params: { jobId: state.job.id },
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        }
+      )
+      state.job.is_favorite = false
+      emit('removeFavorite', state.job.id)
+    }
   } catch (error) {
-    console.error('Error adding job to favorites:', error)
+    console.error('Error toggling favorite status:', error)
   }
 }
 console.log(state.job)
@@ -123,7 +144,7 @@ console.log(state.job)
     <a
       :class="[
         'h-9 w-9 inline-flex items-center justify-center rounded-full hover:bg-emerald-600 border-emerald-600/10 hover:border-emerald-600 absolute top-0 end-0 m-3',
-        job.isFavorited ? 'bg-emerald-600 text-white' : 'bg-emerald-600/5 text-emerald-600'
+        job.is_favorite ? 'bg-emerald-600 text-white' : 'bg-emerald-600/5 text-emerald-600'
       ]"
       href=""
       @click.prevent="favoriteJob"
