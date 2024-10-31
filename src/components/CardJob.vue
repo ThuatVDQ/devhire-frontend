@@ -129,8 +129,12 @@ console.log(state.job)
       class="px-6 py-2 bg-slate-50 dark:bg-slate-800 lg:flex justify-between items-center mt-auto"
     >
       <div class="lg:inline-block flex justify-between">
-        <span class="inline-flex items-center me-1 text-slate-400">
-          <i class="pi pi-map-marker mr-2"></i>Viet Nam
+        <span
+          v-for="(address, index) in state.job.addresses"
+          :key="index"
+          class="inline-flex items-center me-1 text-slate-400"
+        >
+          <i class="pi pi-map-marker mr-2"></i>{{ address.city }}
         </span>
       </div>
       <a
