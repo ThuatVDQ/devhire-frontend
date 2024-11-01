@@ -337,7 +337,6 @@ async function fetchSkills() {
     inf.skills = response.data.map((skill) => ({ name: skill.name }))
   } catch (error) {
     console.error(error)
-    toastr.error('Unable to fetch skills', 'Error')
   }
 }
 
@@ -348,25 +347,52 @@ async function fetchAddresses() {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     })
-    address.addresses = response.data.map((addr) => {
-      const cityCode = getCityCode(addr.city)
-      const districtCode = getDistrictCode(addr.city, addr.district)
 
-      return {
-        selectedCity: cityCode,
-        selectedCityName: addr.city,
-        selectedDistrict: districtCode,
-        selectedDistrictName: addr.district,
-        street: addr.street,
-        districts: []
-      }
-    })
-    address.addresses.forEach((addr, index) => {
-      setDistricts(index)
-    })
+    if (response.status === 204 || response.data.length === 0) {
+      // Nếu không có dữ liệu, thêm một mục địa chỉ trống để phần nhập địa chỉ hiển thị
+      address.addresses = [
+        {
+          selectedCity: '',
+          selectedCityName: '',
+          selectedDistrict: '',
+          selectedDistrictName: '',
+          street: '',
+          districts: [],
+          isCityDropdownOpen: false
+        }
+      ]
+    } else {
+      address.addresses = response.data.map((addr) => {
+        const cityCode = getCityCode(addr.city)
+        const districtCode = getDistrictCode(addr.city, addr.district)
+
+        return {
+          selectedCity: cityCode,
+          selectedCityName: addr.city,
+          selectedDistrict: districtCode,
+          selectedDistrictName: addr.district,
+          street: addr.street,
+          districts: []
+        }
+      })
+      address.addresses.forEach((addr, index) => {
+        setDistricts(index)
+      })
+    }
   } catch (error) {
     console.error(error)
-    toastr.error('Unable to fetch addresses', 'Error')
+    // Nếu xảy ra lỗi, thêm một địa chỉ trống để người dùng có thể nhập mới
+    address.addresses = [
+      {
+        selectedCity: '',
+        selectedCityName: '',
+        selectedDistrict: '',
+        selectedDistrictName: '',
+        street: '',
+        districts: [],
+        isCityDropdownOpen: false
+      }
+    ]
   }
 }
 

@@ -102,7 +102,7 @@ const register = async () => {
     }
   } catch (error) {
     console.error('Registration failed:', error)
-    toastr.error('Registration failed. Please try again.')
+    toastr.error(error.response.data, 'Error')
   } finally {
     isSubmitting.value = false
   }

@@ -1,10 +1,11 @@
 <script setup>
-import JobList from '@/components/JobList.vue'
 import CompanyList from '@/components/CompanyList.vue'
 import CardExploreJob from '@/components/CardExploreJob.vue'
-import { RouterLink, useRoute } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { reactive, onMounted, watch } from 'vue'
 import axios from 'axios'
+import defaultLogo from '../assets/logo.svg'
+import CardJob from '@/components/CardJob.vue'
 
 const route = useRoute()
 
@@ -15,21 +16,25 @@ const state = reactive({
   isLoading: true
 })
 
-const fetchJobs = async () => {
+const fetchCompanies = async () => {
   try {
-    const response = await axios.get('http://localhost:8000/jobs')
-    state.jobs = response.data.slice(0, 2)
-    console.log('Jobs fetched:', response.data)
+    const response = await axios.get('http://localhost:8090/api/companies')
+    state.companies = response.data
+    console.log('Companies fetched:', response.data)
   } catch (error) {
-    console.error('Failed to fetch jobs:', error)
+    console.error('Failed to fetch companies:', error)
   }
 }
 
-const fetchCompanies = async () => {
+const fetchJobsByCompany = async () => {
   try {
-    const response = await axios.get('http://localhost:8000/companies')
-    state.companies = response.data.slice(0, 4)
-    console.log('Companies fetched:', response.data)
+    const response = await axios.get('http://localhost:8090/api/jobs/company/' + route.params.id, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    state.jobs = response.data
+    console.log('jobs fetched:', response.data)
   } catch (error) {
     console.error('Failed to fetch companies:', error)
   }
@@ -37,8 +42,9 @@ const fetchCompanies = async () => {
 
 const fetchCompanyData = async (id) => {
   try {
-    const response = await axios.get(`http://localhost:8000/companies/${id}`)
+    const response = await axios.get(`http://localhost:8090/api/companies/${id}`)
     state.company = response.data
+    console.log('Company:', response.data)
   } catch (e) {
     console.error(e)
   }
@@ -46,10 +52,10 @@ const fetchCompanyData = async (id) => {
 
 onMounted(async () => {
   state.isLoading = true
-  await fetchJobs()
   await fetchCompanies()
   fetchCompanyData(route.params.id)
   state.isLoading = false
+  fetchJobsByCompany()
 })
 
 // Theo dõi sự thay đổi của route.params.id để cập nhật dữ liệu khi id thay đổi
@@ -76,9 +82,10 @@ watch(
         >
           <div class="flex items-center">
             <img
-              src=""
+              :src="company?.logo || defaultLogo"
+              @error="(e) => (e.target.src = defaultLogo)"
               alt="logo-company"
-              class="size-20 p-3 shadow dark:shadow-gray-700 rounded-md bg-slate-50 dark:bg-slate-800"
+              class="size-20 shadow dark:shadow-gray-700 rounded-md bg-slate-50 dark:bg-slate-800"
             />
             <div class="ms-4">
               <h5 class="text-xl font-bold">{{ state.company.name }}</h5>
@@ -94,18 +101,6 @@ watch(
               </div>
             </div>
           </div>
-          <div class="md:mt-0 mt-4">
-            <RouterLink
-              to="/"
-              class="py-3 px-6 bg-emerald-600 hover:bg-emerald-700 border-emerald-600 dark:border-emerald-600 text-white rounded-md"
-              >Follow</RouterLink
-            >
-            <RouterLink
-              to="/"
-              class="py-3 px-6 bg-emerald-600/5 hover:bg-emerald-600 border-emerald-600/10 hover:border-emerald-600 text-emerald-600 hover:text-white rounded-md ms-1"
-              >See jobs</RouterLink
-            >
-          </div>
         </div>
       </div>
     </div>
@@ -117,7 +112,9 @@ watch(
             {{ state.company.description }}
           </p>
           <h5 class="text-xl font-semibold mt-6">Vacancies:</h5>
-          <JobList :jobs="state.jobs" :pagination="true" container="" />
+          <div class="grid lg:grid-cols-2 grid-cols-1 gap-6 mt-6">
+            <CardJob v-for="job in state.jobs" :key="job.id" :job="job" />
+          </div>
         </div>
         <div class="lg:col-span-4 md:col-span-5">
           <div
@@ -150,7 +147,7 @@ watch(
               </li>
               <li class="flex justify-between mt-2">
                 <span class="text-slate-400 font-medium">Website:</span
-                ><span class="font-medium">{{ state.company.web_url }}</span>
+                ><span class="font-medium ml-2 break-all">{{ state.company.web_url }}</span>
               </li>
             </ul>
           </div>

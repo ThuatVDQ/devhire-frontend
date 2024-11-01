@@ -29,6 +29,7 @@ async function fetchJobApplications() {
     if (jobApplications.value.length > 0 && jobApplications.value[0].job_title) {
       title.value = jobApplications.value[0].job_title
     }
+    console.log('Job applications:', jobApplications.value)
   } catch (error) {
     toastr.error('Error fetching job applications:', error)
   } finally {
@@ -96,6 +97,8 @@ async function downloadCV(cvId, candidateName) {
     // Xóa URL sau khi hoàn tất tải xuống để giải phóng bộ nhớ
     window.URL.revokeObjectURL(url)
     document.body.removeChild(link)
+
+    updateApplicationStatus(cvId, 'seen')
   } catch (error) {
     toastr.error('Error downloading CV:', error)
   }
@@ -138,9 +141,17 @@ async function viewCV(cvId) {
     } else {
       toastr.error('Unsupported file type')
     }
+    updateApplicationStatus(cvId, 'seen')
   } catch (error) {
     toastr.error('Error viewing CV:', error)
   }
+}
+
+async function updateApplicationStatus(applicationId, newStatus) {
+  try {
+    await axios.post(`http://localhost:8090/api/job-application/${applicationId}/${newStatus}`, {})
+    fetchJobApplications()
+  } catch (error) {}
 }
 
 // Format date utility
@@ -165,6 +176,7 @@ function goBack() {
       <i class="pi pi-arrow-left mr-2"></i>
       Back
     </button>
+
     <!-- Centered Title -->
     <h2 class="text-2xl font-bold text-gray-800 mb-12 text-center">
       <span> Candidates apply for </span>
@@ -186,6 +198,7 @@ function goBack() {
               Application Date
             </th>
             <th class="py-4 px-8 text-left text-sm font-medium text-white uppercase">Status</th>
+            <th class="py-4 px-8 text-left text-sm font-medium text-white uppercase"></th>
             <th class="py-4 px-8 text-left text-sm font-medium text-white uppercase"></th>
           </tr>
         </thead>
@@ -214,9 +227,23 @@ function goBack() {
                 <span class="text-sm text-gray-500 hover:text-gray-700">View CV</span>
               </div>
             </td>
+            <td class="py-4 px-8 text-sm text-gray-700">
+              <button
+                @click="updateApplicationStatus(application.id, 'accept')"
+                class="px-4 py-2 mr-2 bg-green-600 text-white rounded-lg"
+              >
+                Accept
+              </button>
+              <button
+                @click="updateApplicationStatus(application.id, 'reject')"
+                class="px-4 py-2 bg-red-600 text-white rounded-lg"
+              >
+                Reject
+              </button>
+            </td>
           </tr>
           <tr v-if="paginatedApplications.length === 0">
-            <td colspan="4" class="py-4 px-6 text-center text-gray-500">No candidates found.</td>
+            <td colspan="5" class="py-4 px-6 text-center text-gray-500">No candidates found.</td>
           </tr>
         </tbody>
       </table>
