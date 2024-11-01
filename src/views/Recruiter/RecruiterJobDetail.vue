@@ -110,11 +110,34 @@ async function viewCV(cvId) {
       }
     })
 
-    // Tạo URL từ blob và mở trong tab mới
-    const fileURL = window.URL.createObjectURL(
-      new Blob([response.data], { type: 'application/pdf' })
-    )
-    window.open(fileURL, '_blank')
+    const contentDisposition = response.headers['content-disposition']
+    let fileName = ''
+    if (contentDisposition && contentDisposition.includes('filename=')) {
+      fileName = contentDisposition.split('filename=')[1].split(';')[0].trim().replace(/"/g, '')
+    }
+    const fileExtension = fileName.split('.').pop().toLowerCase()
+
+    const blob = new Blob([response.data])
+    const fileURL = window.URL.createObjectURL(blob)
+
+    if (fileExtension === 'pdf') {
+      const fileURL = window.URL.createObjectURL(
+        new Blob([response.data], { type: 'application/pdf' })
+      )
+      window.open(fileURL, '_blank')
+    } else if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
+      const imageWindow = window.open('', '_blank')
+      imageWindow.document.write(
+        `<html>
+          <head><title>${fileName}</title></head>
+          <body style="margin:0">
+            <img src="${fileURL}" alt="CV Image" style="width:100%;height:auto;">
+          </body>
+        </html>`
+      )
+    } else {
+      toastr.error('Unsupported file type')
+    }
   } catch (error) {
     toastr.error('Error viewing CV:', error)
   }

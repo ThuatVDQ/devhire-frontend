@@ -92,13 +92,13 @@
             </td>
             <td class="py-4 px-6 text-sm text-gray-700">
               <div class="flex items-center justify-start space-x-2">
-                <span>{{ job.applyNumber }}</span>
+                <span>{{ job.apply_number }}</span>
                 <div
                   class="flex items-center space-x-1 cursor-pointer"
                   @click="downloadCVs(job.id, job.title)"
-                  :class="{ 'cursor-not-allowed opacity-50': job.applyNumber === 0 }"
-                  :disabled="job.applyNumber === 0"
-                  v-if="job.applyNumber > 0"
+                  :class="{ 'cursor-not-allowed opacity-50': job.apply_number === 0 }"
+                  :disabled="job.apply_number === 0"
+                  v-if="job.apply_number > 0"
                 >
                   <i class="pi pi-download text-gray-500 hover:text-gray-700"></i>
                   <span class="text-sm text-gray-500 hover:text-gray-700">Download CV</span>
