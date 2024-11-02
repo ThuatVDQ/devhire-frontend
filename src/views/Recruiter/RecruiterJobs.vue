@@ -201,6 +201,7 @@ async function fetchJobs() {
     } else {
       console.error('Expected an array but got:', typeof response.data)
     }
+    console.log('Fetched jobs:', jobs.value)
   } catch (e) {
     console.error('Failed to fetch jobs:', e)
   }
@@ -289,12 +290,19 @@ async function downloadCVs(jobId, title) {
     window.URL.revokeObjectURL(url)
     document.body.removeChild(link)
 
-    // Thông báo tải thành công
     toastr.success('Download successful!')
+    updateApplicationStatus(jobId, 'seen-all')
   } catch (error) {
     console.error('Error downloading CVs:', error)
     toastr.error('Download failed. Please try again.')
   }
+}
+
+async function updateApplicationStatus(jobId, newStatus) {
+  try {
+    await axios.post(`http://localhost:8090/api/job-application/${jobId}/${newStatus}`, {})
+    fetchJobs()
+  } catch (error) {}
 }
 
 function goToEditJob(jobId) {

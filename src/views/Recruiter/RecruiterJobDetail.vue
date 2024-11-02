@@ -151,7 +151,9 @@ async function updateApplicationStatus(applicationId, newStatus) {
   try {
     await axios.post(`http://localhost:8090/api/job-application/${applicationId}/${newStatus}`, {})
     fetchJobApplications()
-  } catch (error) {}
+  } catch (error) {
+    console.error('Error updating application status:', error)
+  }
 }
 
 // Format date utility
@@ -230,13 +232,23 @@ function goBack() {
             <td class="py-4 px-8 text-sm text-gray-700">
               <button
                 @click="updateApplicationStatus(application.id, 'accept')"
-                class="px-4 py-2 mr-2 bg-green-600 text-white rounded-lg"
+                :disabled="application.status !== 'SEEN'"
+                :class="{
+                  'bg-gray-300': application.status !== 'SEEN',
+                  'bg-green-600 ': application.status === 'SEEN'
+                }"
+                class="px-4 py-2 mr-2 text-white rounded-lg"
               >
                 Accept
               </button>
               <button
                 @click="updateApplicationStatus(application.id, 'reject')"
-                class="px-4 py-2 bg-red-600 text-white rounded-lg"
+                :disabled="application.status !== 'SEEN'"
+                :class="{
+                  'bg-gray-300 ': application.status !== 'SEEN',
+                  'bg-red-600 ': application.status === 'SEEN'
+                }"
+                class="px-4 py-2 text-white rounded-lg"
               >
                 Reject
               </button>
