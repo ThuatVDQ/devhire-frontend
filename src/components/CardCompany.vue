@@ -8,6 +8,20 @@ const props = defineProps({
     required: true
   }
 })
+function truncateDescription(description) {
+  const sentences = description.split('. ')
+  let truncated = sentences[0] + '. ' // Đảm bảo có ít nhất một câu
+  let index = 1
+
+  // Thêm các câu tiếp theo cho đến khi đạt giới hạn 150 ký tự
+  while (index < sentences.length && truncated.length + sentences[index].length + 2 <= 150) {
+    truncated += sentences[index] + '. '
+    index++
+  }
+
+  // Nếu đã rút gọn, thêm dấu ba chấm
+  return truncated.trim() + (truncated.length < description.length ? '...' : '')
+}
 </script>
 
 <template>
@@ -28,7 +42,9 @@ const props = defineProps({
         class="text-lg hover:text-emerald-600 font-semibold"
         >{{ company.name }}</RouterLink
       >
-      <p class="text-slate-400 mt-2">{{ company.description }}</p>
+      <p class="text-slate-400 mt-2">
+        {{ truncateDescription(company.description) }}
+      </p>
     </div>
     <div class="pt-4 border-t border-gray-100 dark:border-gray-700 flex justify-between">
       <span class="text-slate-400 flex items-center">

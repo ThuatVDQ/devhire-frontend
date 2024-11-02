@@ -291,6 +291,9 @@ async function submitForm() {
       }
     })
     toastr.success(response.data, 'Success')
+    setTimeout(() => {
+      window.location.href = '/recruiter/jobs'
+    }, 1000)
   } catch (error) {
     console.error()
     toastr.error(JSON.stringify(error.response.data), 'Error')
