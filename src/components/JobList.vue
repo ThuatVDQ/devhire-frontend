@@ -10,12 +10,11 @@ const totalPages = ref(0)
 const isLoading = ref(true)
 
 const props = defineProps({
-  showFavorites: Boolean,
   searchCriteria: Object
 })
 
+// Fetch data mặc định khi không có search
 const fetchData = async (page = 0) => {
-  console.log('aa')
   isLoading.value = true
   try {
     const response = await axios.get('http://localhost:8090/api/jobs', {
@@ -34,28 +33,7 @@ const fetchData = async (page = 0) => {
   }
 }
 
-const fetchFavorites = async (page = 0) => {
-  isLoading.value = true
-  try {
-    const response = await axios.get('http://localhost:8090/api/favorite-job/favorite', {
-      params: { page, limit: pageSize.value },
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
-    })
-    jobs.value = response.data.jobs.map((job) => ({
-      ...job,
-      is_favorite: true
-    }))
-    totalPages.value = response.data.totalPages
-    currentPage.value = page
-  } catch (error) {
-    console.error('Error fetching favorite jobs:', error)
-  } finally {
-    isLoading.value = false
-  }
-}
-
+// Fetch data cho tìm kiếm
 const fetchSearchData = async (page = 0, criteria = {}) => {
   isLoading.value = true
   try {
@@ -81,31 +59,20 @@ const fetchSearchData = async (page = 0, criteria = {}) => {
   }
 }
 
-watch(
-  () => props.showFavorites,
-  (newValue) => {
-    if (newValue) {
-      fetchFavorites(currentPage.value)
-    } else {
-      fetchData(currentPage.value)
-    }
-  }
-)
-
+// Theo dõi searchCriteria để gọi API tìm kiếm khi criteria thay đổi
 watch(
   () => props.searchCriteria,
   (newCriteria) => {
-    console.log('newCriteria', newCriteria)
+    currentPage.value = 0
     fetchSearchData(currentPage.value, newCriteria)
   },
   { immediate: true }
 )
 
+// Thay đổi trang
 const changePage = (page) => {
   if (page >= 0 && page < totalPages.value) {
-    if (props.showFavorites) {
-      fetchFavorites(page)
-    } else if (props.searchCriteria) {
+    if (props.searchCriteria) {
       fetchSearchData(page, props.searchCriteria)
     } else {
       fetchData(page)
@@ -113,6 +80,7 @@ const changePage = (page) => {
     scrollToTop()
   }
 }
+
 onMounted(() => {
   fetchData(currentPage.value)
 })
@@ -122,13 +90,6 @@ const scrollToTop = () => {
     top: 0,
     behavior: 'smooth'
   })
-}
-
-function handleRemoveFavorite(jobId) {
-  const index = jobs.value.findIndex((job) => job.id === jobId)
-  if (index !== -1) {
-    jobs.value.splice(index, 1)
-  }
 }
 </script>
 
@@ -143,12 +104,7 @@ function handleRemoveFavorite(jobId) {
 
     <div v-else class="container">
       <div class="grid lg:grid-cols-2 md:grid-cols-2 grid-cols-1 mt-8 gap-[30px] auto-rows-fr">
-        <CardJob
-          v-for="job in jobs"
-          :key="job.id"
-          :job="job"
-          @removeFavorite="handleRemoveFavorite"
-        />
+        <CardJob v-for="job in jobs" :key="job.id" :job="job" />
       </div>
 
       <!-- Phân trang -->
@@ -193,6 +149,7 @@ function handleRemoveFavorite(jobId) {
     </div>
   </div>
 </template>
+
 <style scoped>
 .spinner-container {
   display: flex;

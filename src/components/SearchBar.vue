@@ -25,9 +25,16 @@
               class="flex items-center bg-gray-50 dark:bg-gray-700 p-3 rounded-lg cursor-pointer"
             >
               <i class="pi pi-map-marker text-green-700 mr-4 text-lg"></i>
-              <span class="text-gray-900 dark:text-white text-lg">
+              <span class="text-gray-900 dark:text-white text-lg flex-1">
                 {{ selectedCity || 'Select location' }}
               </span>
+              <button
+                v-if="selectedCity"
+                @click.stop="clearLocation"
+                class="text-gray-500 hover:text-red-500"
+              >
+                ✕
+              </button>
             </div>
 
             <!-- Location Dropdown List -->
@@ -41,7 +48,6 @@
                 placeholder="Search location..."
                 class="w-full px-5 py-3 border-b border-gray-200 outline-none focus:border-green-500 text-lg"
               />
-
               <ul class="max-h-48 overflow-y-auto">
                 <li
                   v-for="city in filteredCities"
@@ -62,9 +68,16 @@
               class="flex items-center justify-between bg-gray-50 dark:bg-gray-700 p-3 rounded-lg cursor-pointer"
             >
               <i class="pi pi-briefcase text-green-700 mr-4 text-lg"></i>
-              <span class="text-gray-900 dark:text-white text-lg w-full">
+              <span class="text-gray-900 dark:text-white text-lg flex-1">
                 {{ selectedJobType || 'Select job type' }}
               </span>
+              <button
+                v-if="selectedJobType"
+                @click.stop="clearJobType"
+                class="text-gray-500 hover:text-red-500"
+              >
+                ✕
+              </button>
             </div>
 
             <!-- Job Type Dropdown List -->
@@ -84,22 +97,8 @@
               </ul>
             </div>
           </div>
-          <div class="flex items-center space-x-2">
-            <span class="text-gray-900 dark:text-white text-lg">Favorited</span>
-            <i
-              :class="showFavorites ? 'pi pi-heart-fill text-red-500' : 'pi pi-heart text-gray-500'"
-              class="cursor-pointer text-lg"
-              @click="toggleShowFavorites"
-            ></i>
-          </div>
 
           <!-- Submit Button -->
-          <button
-            @click="handleSearch"
-            class="bg-green-600 text-white font-semibold py-3 px-8 rounded-lg hover:bg-green-700 transition duration-300 text-lg"
-          >
-            Search
-          </button>
         </form>
       </div>
     </div>
@@ -107,12 +106,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, computed, defineProps, defineEmits } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed, defineEmits, watch } from 'vue'
 import axios from 'axios'
 
 // State for cities, job types, and selected values
 const cities = ref([])
-const jobTypes = ref(['Full-time', 'Part-time', 'Internship'])
+const jobTypes = ref(['Full_Time', 'Part_Time', 'Internship'])
 const keyword = ref('')
 const selectedCity = ref('')
 const selectedJobType = ref('')
@@ -126,15 +125,7 @@ const searchQuery = ref('')
 const locationDropdown = ref(null)
 const jobTypeDropdown = ref(null)
 
-const props = defineProps({
-  showFavorites: Boolean
-})
-
-const emit = defineEmits(['toggle-favorites'], ['search'])
-
-const toggleShowFavorites = () => {
-  emit('toggle-favorites', !props.showFavorites)
-}
+const emit = defineEmits(['search'])
 
 // Fetch cities data on component mount
 onMounted(async () => {
@@ -207,14 +198,23 @@ const selectJobType = (type) => {
   isJobTypeDropdownOpen.value = false
 }
 
-const handleSearch = (e) => {
-  e.preventDefault()
+// Clear selected location
+const clearLocation = () => {
+  selectedCity.value = ''
+}
+
+// Clear selected job type
+const clearJobType = () => {
+  selectedJobType.value = ''
+}
+
+watch([keyword, selectedCity, selectedJobType], () => {
   emit('search', {
     keyword: keyword.value,
     location: selectedCity.value,
     type: selectedJobType.value
   })
-}
+})
 </script>
 
 <style scoped>
