@@ -11,6 +11,7 @@
           <div class="flex items-center bg-gray-50 dark:bg-gray-700 rounded-lg p-3 w-full max-w-sm">
             <i class="pi pi-briefcase text-green-700 mr-4 text-lg"></i>
             <input
+              v-model="keyword"
               type="text"
               placeholder="Search..."
               class="w-full bg-transparent border-none outline-none text-gray-900 dark:text-white text-lg"
@@ -94,7 +95,7 @@
 
           <!-- Submit Button -->
           <button
-            type="submit"
+            @click="handleSearch"
             class="bg-green-600 text-white font-semibold py-3 px-8 rounded-lg hover:bg-green-700 transition duration-300 text-lg"
           >
             Search
@@ -111,8 +112,9 @@ import axios from 'axios'
 
 // State for cities, job types, and selected values
 const cities = ref([])
-const selectedCity = ref('')
 const jobTypes = ref(['Full-time', 'Part-time', 'Internship'])
+const keyword = ref('')
+const selectedCity = ref('')
 const selectedJobType = ref('')
 
 // Separate states for dropdown visibility
@@ -128,7 +130,7 @@ const props = defineProps({
   showFavorites: Boolean
 })
 
-const emit = defineEmits(['toggle-favorites'])
+const emit = defineEmits(['toggle-favorites'], ['search'])
 
 const toggleShowFavorites = () => {
   emit('toggle-favorites', !props.showFavorites)
@@ -169,7 +171,6 @@ const handleClickOutside = (event) => {
 // Attach and detach the click event listener
 onMounted(() => {
   window.addEventListener('click', handleClickOutside)
-  console.log(props.showFavorites)
 })
 
 onBeforeUnmount(() => {
@@ -204,6 +205,15 @@ const selectCity = (cityName) => {
 const selectJobType = (type) => {
   selectedJobType.value = type
   isJobTypeDropdownOpen.value = false
+}
+
+const handleSearch = (e) => {
+  e.preventDefault()
+  emit('search', {
+    keyword: keyword.value,
+    location: selectedCity.value,
+    type: selectedJobType.value
+  })
 }
 </script>
 

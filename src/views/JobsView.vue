@@ -8,10 +8,24 @@ const showFavorites = ref(false)
 const toggleFavorites = (value) => {
   showFavorites.value = value
 }
+
+const searchCriteria = ref({
+  keyword: '',
+  location: '',
+  type: ''
+})
+
+const handleSearch = (criteria) => {
+  searchCriteria.value = criteria
+}
 </script>
 
 <template>
-  <SearchBar :showFavorites="showFavorites" @toggle-favorites="toggleFavorites" />
-  <JobList :showFavorites="showFavorites" />
+  <SearchBar
+    :showFavorites="showFavorites"
+    @toggle-favorites="toggleFavorites"
+    @search="handleSearch"
+  />
+  <JobList :showFavorites="showFavorites" :searchCriteria="searchCriteria" />
   <FeatureSection />
 </template>

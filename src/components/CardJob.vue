@@ -54,7 +54,6 @@ async function favoriteJob() {
     console.error('Error toggling favorite status:', error)
   }
 }
-console.log(state.job)
 </script>
 
 <template>

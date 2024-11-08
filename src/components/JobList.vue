@@ -10,21 +10,12 @@ const totalPages = ref(0)
 const isLoading = ref(true)
 
 const props = defineProps({
-  showFavorites: Boolean
+  showFavorites: Boolean,
+  searchCriteria: Object
 })
 
-watch(
-  () => props.showFavorites,
-  (newValue) => {
-    if (newValue) {
-      fetchFavorites(currentPage.value) // Gọi fetchFavorites nếu showFavorites là true
-    } else {
-      fetchData(currentPage.value) // Gọi fetchData nếu showFavorites là false
-    }
-  }
-)
-
 const fetchData = async (page = 0) => {
+  console.log('aa')
   isLoading.value = true
   try {
     const response = await axios.get('http://localhost:8090/api/jobs', {
@@ -65,10 +56,57 @@ const fetchFavorites = async (page = 0) => {
   }
 }
 
+const fetchSearchData = async (page = 0, criteria = {}) => {
+  isLoading.value = true
+  try {
+    const response = await axios.get('http://localhost:8090/api/jobs/search', {
+      params: {
+        page,
+        limit: pageSize.value,
+        keyword: criteria.keyword,
+        location: criteria.location,
+        jobType: criteria.type
+      },
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    jobs.value = response.data.jobs
+    totalPages.value = response.data.totalPages
+    currentPage.value = page
+  } catch (error) {
+    console.error('Error fetching search jobs:', error)
+  } finally {
+    isLoading.value = false
+  }
+}
+
+watch(
+  () => props.showFavorites,
+  (newValue) => {
+    if (newValue) {
+      fetchFavorites(currentPage.value)
+    } else {
+      fetchData(currentPage.value)
+    }
+  }
+)
+
+watch(
+  () => props.searchCriteria,
+  (newCriteria) => {
+    console.log('newCriteria', newCriteria)
+    fetchSearchData(currentPage.value, newCriteria)
+  },
+  { immediate: true }
+)
+
 const changePage = (page) => {
   if (page >= 0 && page < totalPages.value) {
     if (props.showFavorites) {
       fetchFavorites(page)
+    } else if (props.searchCriteria) {
+      fetchSearchData(page, props.searchCriteria)
     } else {
       fetchData(page)
     }
