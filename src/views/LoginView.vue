@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import VerifyCodeView from './VerifyCodeView.vue'
 import { useRouter } from 'vue-router'
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
@@ -12,6 +13,26 @@ const form = ref({
 })
 
 const showPassword = ref(false)
+const showVerifyPopup = ref(false)
+
+const openVerifyPopup = async () => {
+  try {
+    const response = await axios.post(
+      'http://localhost:8090/api/users/resend?email=' + form.value.phone
+    )
+
+    if (response.status === 200) {
+      showVerifyPopup.value = true
+    }
+  } catch (error) {
+    toastr.error('Failed to send verification code. Please try again.')
+  }
+}
+
+function onVerified() {
+  toastr.success('Enable successful!')
+  showVerifyPopup.value = false
+}
 
 const togglePasswordVisibility = () => {
   showPassword.value = !showPassword.value
@@ -54,6 +75,7 @@ const login = async () => {
 
     if (response.status === 200 && response.data.token) {
       localStorage.setItem('token', response.data.token)
+      console.log(response.data)
       if (response.data.role_id === 3) {
         router.push('/').then(() => {
           window.location.href = '/'
@@ -61,13 +83,13 @@ const login = async () => {
       } else if (response.data.role_id === 2) {
         router.push('/recruiter/dashboard')
       }
-
       toastr.success('Login successfully!')
     } else {
       toastr.error('Login failed: Invalid credentials')
     }
   } catch (error) {
-    toastr.error('Login failed:', error)
+    console.error(error)
+    toastr.error(error.response.data.message, 'Error')
   } finally {
     isSubmitting.value = false
   }
@@ -149,6 +171,12 @@ onMounted(() => {})
                     :disabled="!canSubmit || isSubmitting"
                   />
                 </div>
+
+                <div class="mb-4 text-center">
+                  <button @click="openVerifyPopup" type="button" class="text-blue-500 underline">
+                    Enable Account
+                  </button>
+                </div>
                 <div class="text-center">
                   <span class="text-slate-400 me-2">Don't have an account?</span>
                   <router-link to="/signup" class="text-black dark:text-white font-bold"
@@ -162,4 +190,11 @@ onMounted(() => {})
       </div>
     </div>
   </section>
+
+  <VerifyCodeView
+    :show="showVerifyPopup"
+    :email="form.phone"
+    @close="showVerifyPopup = false"
+    @verified="onVerified"
+  />
 </template>

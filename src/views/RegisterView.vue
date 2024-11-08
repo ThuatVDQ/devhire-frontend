@@ -1,11 +1,15 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
+import VerifyCodeView from './VerifyCodeView.vue'
 import axios from 'axios'
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
+
+// Biến mới để điều khiển popup
+const showVerificationPopup = ref(false)
 
 const name = ref('')
 const phone = ref('')
@@ -97,8 +101,7 @@ const register = async () => {
     const response = await axios.post('http://localhost:8090/api/users/signup', payload)
 
     if (response.status === 200 || response.status === 201) {
-      toastr.success('Registration successful!')
-      router.push('/login')
+      showVerificationPopup.value = true
     }
   } catch (error) {
     console.error('Registration failed:', error)
@@ -106,6 +109,16 @@ const register = async () => {
   } finally {
     isSubmitting.value = false
   }
+}
+
+function closePopup() {
+  showVerificationPopup.value = false
+}
+
+function onVerified() {
+  toastr.success('Verification successful!')
+  showVerificationPopup.value = false
+  router.push('/login')
 }
 </script>
 
@@ -231,4 +244,10 @@ const register = async () => {
       </div>
     </div>
   </section>
+  <VerifyCodeView
+    :show="showVerificationPopup"
+    :email="email"
+    @close="closePopup"
+    @verified="onVerified"
+  />
 </template>
