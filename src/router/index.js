@@ -26,6 +26,7 @@ import RecruiterEditCompany from '@/views/Recruiter/RecruiterEditCompany.vue'
 import ApplyForm from '@/components/ApplyForm.vue'
 import RecruiterLogin from '@/views/Recruiter/RecruiterLogin.vue'
 import RecruiterRegister from '@/views/Recruiter/RecruiterRegister.vue'
+import FavoriteJobsView from '@/views/FavoriteJobsView.vue'
 
 const routes = [
   {
@@ -53,6 +54,11 @@ const routes = [
         name: 'job-detail',
         component: JobDetailView,
         props: true
+      },
+      {
+        path: 'favorite-jobs',
+        name: 'favorite-jobs',
+        component: FavoriteJobsView
       },
       {
         path: 'companies',
