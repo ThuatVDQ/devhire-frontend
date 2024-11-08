@@ -75,13 +75,47 @@ onMounted(() => {
       </RouterLink>
 
       <ul class="hidden md:flex space-x-6 text-gray-600">
-        <li>
+        <li class="relative group">
           <RouterLink
             to="/jobs"
             :class="[isActiveLink('/jobs') ? 'text-green-600' : 'hover:text-green-600']"
-            >Jobs</RouterLink
+            class="inline-flex items-center"
           >
+            Jobs
+          </RouterLink>
+          <div class="absolute inset-x-0 top-full h-2"></div>
+          <!-- Dropdown Menu for Jobs -->
+          <ul
+            class="absolute top-full mt-2 bg-white dark:bg-gray-800 shadow-lg rounded-lg z-50 opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-opacity duration-200 p-3"
+            style="left: 20%; transform: translateX(-20%); width: 400px"
+          >
+            <li
+              class="flex items-center px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+            >
+              <RouterLink to="/jobs" class="flex items-center w-full">
+                <i class="pi pi-search text-green-600 mr-6"></i>
+                <span class="text-gray-700 dark:text-gray-300">Search Jobs</span>
+              </RouterLink>
+            </li>
+            <li
+              class="flex items-center px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+            >
+              <RouterLink to="/applied-jobs" class="flex items-center w-full">
+                <i class="pi pi-briefcase text-green-600 mr-6"></i>
+                <span class="text-gray-700 dark:text-gray-300">Applied Jobs </span>
+              </RouterLink>
+            </li>
+            <li
+              class="flex items-center px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+            >
+              <RouterLink to="/favorite-jobs" class="flex items-center w-full">
+                <i class="pi pi-heart text-green-600 mr-6"></i>
+                <span class="text-gray-700 dark:text-gray-300">Favorite Jobs</span>
+              </RouterLink>
+            </li>
+          </ul>
         </li>
+
         <li>
           <RouterLink
             to="/companies"
@@ -134,7 +168,7 @@ onMounted(() => {
 
             <div
               v-show="isProfileMenuOpen"
-              class="absolute right-0 bg-white border border-gray-200 shadow-lg rounded-lg z-50 profile-dropdown"
+              class="absolute right-0 bg-white border border-gray-200 shadow-lg rounded-lg z-50 profile-dropdown p-4"
               @mouseenter="showProfileMenu"
               @mouseleave="hideProfileMenu"
             >
@@ -143,7 +177,7 @@ onMounted(() => {
                 @mouseenter="showProfileMenu"
               ></div>
 
-              <div class="p-3 border-b border-gray-200 flex items-center">
+              <div class="px-3 pb-4 border-b border-gray-200 flex items-center">
                 <img
                   :src="avatarUrl"
                   @error="avatarUrl = defaultAvatar"
@@ -158,23 +192,23 @@ onMounted(() => {
 
               <RouterLink
                 to="/settings"
-                class="px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center"
+                class="px-4 py-3 text-gray-700 hover:bg-gray-100 flex items-center"
               >
-                <i class="pi pi-cog mr-2"></i>
+                <i class="pi pi-cog mr-5"></i>
                 Settings
               </RouterLink>
               <RouterLink
                 to="/change-password"
-                class="px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center"
+                class="px-4 py-3 text-gray-700 hover:bg-gray-100 flex items-center"
               >
-                <i class="pi pi-lock mr-2"></i>
+                <i class="pi pi-lock mr-5"></i>
                 Change Password
               </RouterLink>
               <button
                 @click="logout"
-                class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center hover:text-red-500"
+                class="w-full text-left px-4 py-3 text-gray-700 hover:bg-gray-100 flex items-center hover:text-red-500"
               >
-                <i class="pi pi-sign-out mr-2"></i>
+                <i class="pi pi-sign-out mr-5"></i>
                 Logout
               </button>
             </div>
@@ -308,5 +342,6 @@ header {
   top: 110%;
   width: max-content;
   z-index: 50;
+  width: 300px;
 }
 </style>
