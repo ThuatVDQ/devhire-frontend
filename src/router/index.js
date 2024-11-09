@@ -28,6 +28,7 @@ import RecruiterLogin from '@/views/Recruiter/RecruiterLogin.vue'
 import RecruiterRegister from '@/views/Recruiter/RecruiterRegister.vue'
 import FavoriteJobsView from '@/views/FavoriteJobsView.vue'
 import ChangePasswordView from '@/views/ChangePasswordView.vue'
+import AppliedJobsView from '@/views/AppliedJobsView.vue'
 
 const routes = [
   {
@@ -60,6 +61,11 @@ const routes = [
         path: 'favorite-jobs',
         name: 'favorite-jobs',
         component: FavoriteJobsView
+      },
+      {
+        path: 'applied-jobs',
+        name: 'applied-jobs',
+        component: AppliedJobsView
       },
       {
         path: 'companies',
