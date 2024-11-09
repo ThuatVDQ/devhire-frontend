@@ -174,7 +174,7 @@ onMounted(() => {
               class="py-2 px-4 font-[600] rounded-md bg-emerald-600 hover:bg-emerald-700 border-emerald-600 hover:border-emerald-700 text-white w-full md:w-auto"
             >
               <i v-if="state.job.apply_status" class="pi pi-replay mr-2"></i>
-              {{ state.job.apply_status ? 'Reapply' : 'Apply Now' }}
+              {{ state.job.apply_status ? 'Applied' : 'Apply Now' }}
             </button>
           </div>
           <h5 class="text-lg font-semibold mt-6">Job Description:</h5>

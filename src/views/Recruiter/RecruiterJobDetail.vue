@@ -1,6 +1,8 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import EmailTemplatePopup from '@/components/EmailTemplatePopup.vue'
+import { emailTemplates } from '@/data/emailTemplates.js'
 import axios from 'axios'
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
@@ -16,6 +18,18 @@ const isLoading = ref(true)
 const currentPage = ref(1)
 const itemsPerPage = ref(5)
 const title = ref('Job Title')
+
+const isEmailPopupVisible = ref(false)
+const selectedApplication = ref(null)
+
+function openEmailTemplatePopup(application) {
+  selectedApplication.value = application
+  isEmailPopupVisible.value = true
+}
+
+function closeEmailTemplatePopup() {
+  isEmailPopupVisible.value = false
+}
 
 async function fetchJobApplications() {
   const jobId = route.params.id
@@ -197,7 +211,7 @@ function goBack() {
               </div>
             </td>
             <td class="py-4 px-8 text-sm text-gray-700">
-              <button
+              <!-- <button
                 @click="updateApplicationStatus(application.id, 'accept')"
                 :disabled="application.status !== 'SEEN'"
                 :class="{
@@ -205,6 +219,12 @@ function goBack() {
                   'bg-green-600 ': application.status === 'SEEN'
                 }"
                 class="px-4 py-2 mr-2 text-white rounded-lg"
+              >
+                Accept
+              </button> -->
+              <button
+                @click="openEmailTemplatePopup(application)"
+                class="px-4 py-2 text-white bg-green-600 rounded-lg"
               >
                 Accept
               </button>
@@ -256,6 +276,12 @@ function goBack() {
       </button>
     </div>
   </div>
+  <EmailTemplatePopup
+    v-if="isEmailPopupVisible"
+    :application="selectedApplication"
+    @templateSelected="handleTemplateSelected"
+    @close="closeEmailTemplatePopup"
+  />
 </template>
 
 <style scoped>
