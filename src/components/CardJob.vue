@@ -64,20 +64,39 @@ async function favoriteJob() {
     console.error('Error toggling favorite status:', error)
   }
 }
+
+const applyStatusMessage = computed(() => {
+  switch (state.job.apply_status) {
+    case 'IN_PROGRESS':
+      return 'Application Processing'
+    case 'SEEN':
+      return 'Recruiter viewed application'
+    case 'REJECTED':
+      return 'Application not suitable'
+    case 'ACCEPTED':
+      return 'Application accepted'
+  }
+})
+
+function openCV() {
+  const baseUrl = 'http://localhost:8090/uploads/' // Change this base URL as needed
+  const fullUrl = `${baseUrl}${state.job.cv_url}`
+  window.open(fullUrl, '_blank')
+}
 </script>
 
 <template>
   <div
     class="flex flex-col group relative overflow-hidden bg-white dark:bg-slate-900 shadow hover:shadow-md dark:shadow-gray-700 dark:hover:shadow-gray-700 hover:-mt-2 rounded-md transition-all duration-500"
   >
-    <div class="p-6">
+    <div class="px-6 pt-6 pb-2">
       <div class="flex items-center">
         <div
           class="flex items-center justify-center w-14 h-14 bg-white dark:bg-slate-900 shadow dark:shadow-gray-700 rounded-full overflow-hidden"
         >
           <img class="w-full h-full object-cover" :src="logoSource" alt="Company Logo" />
         </div>
-        <div class="ms-3">
+        <div class="ms-3 ml-6">
           <RouterLink
             class="inline-block text-[16px] font-semibold hover:text-emerald-600 transition-all duration-500 me-1"
             :to="`/jobs/${state.job.id}`"
@@ -90,6 +109,21 @@ async function favoriteJob() {
             {{ differenceInDays > 0 ? `Remaining ${differenceInDays} days` : 'Expired' }}
           </span>
           <div>
+            <span class="text-gray-400">{{ state.job.company.name }}</span>
+          </div>
+          <div>
+            <span v-if="state.job.date_applied" class="text-gray-600">
+              Application period:
+              {{
+                new Date(state.job.date_applied).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric'
+                })
+              }}
+            </span>
+          </div>
+          <div class="mt-1">
             <span
               class="bg-emerald-600/10 inline-block text-emerald-600 text-xs px-2.5 py-0.5 font-semibold rounded-full me-1"
               >{{ state.job.type }}</span
@@ -106,9 +140,18 @@ async function favoriteJob() {
               </span>
             </span>
           </div>
+          <div class="mt-1">
+            <span class="text-gray-400">{{ applyStatusMessage }}</span>
+            <span
+              v-if="state.job.cv_url"
+              class="text-emerald-500 underline ml-2 cursor-pointer"
+              @click="openCV"
+            >
+              CV Uploaded
+            </span>
+          </div>
         </div>
       </div>
-      <p class="text-slate-400 py-3">{{ state.job.description }}</p>
       <div>
         <span
           class="bg-slate-100 dark:bg-slate-800 inline-block text-slate-900 dark:text-slate-300 text-xs px-2.5 py-0.5 font-semibold rounded-full me-1"
@@ -159,6 +202,7 @@ async function favoriteJob() {
       </a>
     </div>
     <a
+      v-if="job.is_favorite !== null"
       :class="[
         'h-9 w-9 inline-flex items-center justify-center rounded-full hover:bg-emerald-600 border-emerald-600/10 hover:border-emerald-600 absolute top-0 end-0 m-3',
         job.is_favorite ? 'bg-emerald-600 text-white' : 'bg-emerald-600/5 text-emerald-600'

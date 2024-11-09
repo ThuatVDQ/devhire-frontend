@@ -20,9 +20,15 @@ const fetchData = async (page = 0) => {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     })
-    jobs.value = response.data.jobs
+    jobs.value = response.data.jobs.map((job) => {
+      return {
+        ...job,
+        is_favorite: null
+      }
+    })
     totalPages.value = response.data.totalPages
     currentPage.value = page
+    console.log('Favorite jobs:', jobs.value)
   } catch (error) {
     console.error('Error fetching favorite jobs:', error)
   } finally {

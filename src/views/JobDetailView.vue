@@ -83,7 +83,8 @@ const fetchJobData = async (id) => {
       }
     })
     state.job = response.data
-    console.log(JSON.stringify(response.data))
+    if (state.job.company.logo)
+      state.job.company.logo = `http://localhost:8090/uploads/${state.job.company.logo}`
   } catch (e) {
     console.error(e)
   } finally {

@@ -104,47 +104,14 @@ async function downloadCV(cvId, candidateName) {
   }
 }
 
-async function viewCV(cvId) {
-  try {
-    const response = await axios.get(`http://localhost:8090/api/cv/${cvId}/download`, {
-      responseType: 'blob',
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
-    })
-
-    const contentDisposition = response.headers['content-disposition']
-    let fileName = ''
-    if (contentDisposition && contentDisposition.includes('filename=')) {
-      fileName = contentDisposition.split('filename=')[1].split(';')[0].trim().replace(/"/g, '')
-    }
-    const fileExtension = fileName.split('.').pop().toLowerCase()
-
-    const blob = new Blob([response.data])
-    const fileURL = window.URL.createObjectURL(blob)
-
-    if (fileExtension === 'pdf') {
-      const fileURL = window.URL.createObjectURL(
-        new Blob([response.data], { type: 'application/pdf' })
-      )
-      window.open(fileURL, '_blank')
-    } else if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
-      const imageWindow = window.open('', '_blank')
-      imageWindow.document.write(
-        `<html>
-          <head><title>${fileName}</title></head>
-          <body style="margin:0">
-            <img src="${fileURL}" alt="CV Image" style="width:100%;height:auto;">
-          </body>
-        </html>`
-      )
-    } else {
-      toastr.error('Unsupported file type')
-    }
-    updateApplicationStatus(cvId, 'seen')
-  } catch (error) {
-    toastr.error('Error viewing CV:', error)
+async function viewCV(cv_url) {
+  if (!cv_url) {
+    toastr.error('No CV available for this candidate')
+    return
   }
+  const baseUrl = 'http://localhost:8090/uploads/' // Change this base URL as needed
+  const fullUrl = `${baseUrl}${cv_url}`
+  window.open(fullUrl, '_blank')
 }
 
 async function updateApplicationStatus(applicationId, newStatus) {
@@ -222,7 +189,7 @@ function goBack() {
                 <span class="text-sm text-gray-500 hover:text-gray-700">Download CV</span>
               </div>
               <div
-                @click="viewCV(application.cv_id)"
+                @click="viewCV(application.cv_url)"
                 class="flex items-center space-x-1 cursor-pointer mt-2"
               >
                 <i class="pi pi-eye text-gray-500 hover:text-gray-700"></i>
