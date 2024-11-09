@@ -16,6 +16,10 @@ const showPassword = ref(false)
 const showVerifyPopup = ref(false)
 
 const openVerifyPopup = async () => {
+  if (!form.value.phone) {
+    toastr.error('Please enter your email address.')
+    return
+  }
   try {
     const response = await axios.post(
       'http://localhost:8090/api/users/resend?email=' + form.value.phone
@@ -25,7 +29,7 @@ const openVerifyPopup = async () => {
       showVerifyPopup.value = true
     }
   } catch (error) {
-    toastr.error('Failed to send verification code. Please try again.')
+    toastr.error(error.response.data, 'Error')
   }
 }
 
@@ -42,13 +46,12 @@ const phoneError = ref('')
 const isSubmitting = ref(false)
 const router = useRouter()
 
-// Kiểm tra tính hợp lệ của số điện thoại hoặc email
-const validatePhoneOrEmail = () => {
-  const phoneRegex = /^[0-9]{10}$/
+// Kiểm tra tính hợp lệ của email
+const validateEmail = () => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-  if (!phoneRegex.test(form.value.phone) && !emailRegex.test(form.value.phone)) {
-    phoneError.value = 'Please enter a valid phone number (10 digits) or email address.'
+  if (!emailRegex.test(form.value.phone)) {
+    phoneError.value = 'Please enter a valid email address.'
   } else {
     phoneError.value = ''
   }
@@ -76,13 +79,9 @@ const login = async () => {
     if (response.status === 200 && response.data.token) {
       localStorage.setItem('token', response.data.token)
       console.log(response.data)
-      if (response.data.role_id === 3) {
-        router.push('/').then(() => {
-          window.location.href = '/'
-        })
-      } else if (response.data.role_id === 2) {
-        router.push('/recruiter/dashboard')
-      }
+      router.push('/').then(() => {
+        window.location.href = '/'
+      })
       toastr.success('Login successfully!')
     } else {
       toastr.error('Login failed: Invalid credentials')
@@ -117,13 +116,13 @@ onMounted(() => {})
             <form @submit.prevent="login">
               <div class="grid grid-cols-1">
                 <div class="mb-4 ltr:text-left rtl:text-right">
-                  <label for="phone" class="font-semibold">Phone number or Email address</label>
+                  <label for="phone" class="font-semibold">Email address</label>
                   <input
                     v-model="form.phone"
                     @blur="validatePhoneOrEmail"
                     type="text"
                     class="form-input rounded-md"
-                    placeholder="0912345678 or example@email.com"
+                    placeholder="example@email.com"
                   />
                   <span v-if="phoneError" class="text-red-500 text-sm">{{ phoneError }}</span>
                 </div>

@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
+import VerifyCodeView from './../VerifyCodeView.vue'
 import axios from 'axios'
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
@@ -8,6 +9,8 @@ import logo from '../../assets/logo.svg'
 
 const router = useRouter()
 
+const showVerificationPopup = ref(false)
+
 const name = ref('')
 const phone = ref('')
 const email = ref('')
@@ -15,7 +18,6 @@ const password = ref('')
 const confirmPassword = ref('')
 const showPassword = ref(false)
 const showConfirmPassword = ref(false)
-const phoneError = ref('')
 const emailError = ref('')
 const nameError = ref('')
 const termsAccepted = ref(false)
@@ -47,15 +49,6 @@ const toggleConfirmPassword = () => {
   showConfirmPassword.value = !showConfirmPassword.value
 }
 
-const validatePhone = () => {
-  const phoneRegex = /^[0-9]{10}$/
-  if (!phoneRegex.test(phone.value)) {
-    phoneError.value = 'Invalid phone number. Must be 10 digits.'
-  } else {
-    phoneError.value = ''
-  }
-}
-
 const validateEmail = () => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   if (!emailRegex.test(email.value)) {
@@ -68,11 +61,9 @@ const validateEmail = () => {
 const canSubmit = computed(() => {
   return (
     name.value &&
-    phone.value &&
     email.value &&
     password.value &&
     confirmPassword.value &&
-    !phoneError.value &&
     !emailError.value &&
     !passwordMismatchError.value &&
     termsAccepted.value
@@ -98,15 +89,24 @@ const register = async () => {
     const response = await axios.post('http://localhost:8090/api/users/signup', payload)
 
     if (response.status === 200 || response.status === 201) {
-      toastr.success('Registration successful!')
-      router.push('/recruiter/login')
+      showVerificationPopup.value = true
     }
   } catch (error) {
     console.error('Registration failed:', error)
-    toastr.error('Registration failed. Please try again.')
+    toastr.error(error.response.data, 'Error')
   } finally {
     isSubmitting.value = false
   }
+}
+
+function closePopup() {
+  showVerificationPopup.value = false
+}
+
+function onVerified() {
+  toastr.success('Verification successful!')
+  showVerificationPopup.value = false
+  router.push('/recruiter/login')
 }
 </script>
 
@@ -129,7 +129,9 @@ const register = async () => {
             <form @submit.prevent="register">
               <div class="grid grid-cols-1">
                 <div class="mb-4 ltr:text-left rtl:text-right">
-                  <label for="name" class="font-semibold">Your name:</label>
+                  <label for="name" class="font-semibold"
+                    >Your name <span class="text-red-500">*</span></label
+                  >
                   <input
                     v-model="name"
                     type="text"
@@ -146,12 +148,12 @@ const register = async () => {
                     type="tel"
                     class="form-input rounded-md"
                     placeholder="0912345678"
-                    @blur="validatePhone"
                   />
-                  <span v-if="phoneError" class="text-red-500 text-sm">{{ phoneError }}</span>
                 </div>
                 <div class="mb-4 ltr:text-left rtl:text-right">
-                  <label for="email" class="font-semibold">Email:</label>
+                  <label for="email" class="font-semibold"
+                    >Email <span class="text-red-500">*</span></label
+                  >
                   <input
                     v-model="email"
                     type="email"
@@ -162,7 +164,9 @@ const register = async () => {
                   <span v-if="emailError" class="text-red-500 text-sm">{{ emailError }}</span>
                 </div>
                 <div class="mb-4 ltr:text-left rtl:text-right">
-                  <label for="password" class="font-semibold">Password:</label>
+                  <label for="password" class="font-semibold"
+                    >Password <span class="text-red-500">*</span></label
+                  >
                   <div class="flex items-center relative">
                     <input
                       v-model="password"
@@ -176,7 +180,9 @@ const register = async () => {
                   </div>
                 </div>
                 <div class="mb-4 ltr:text-left rtl:text-right">
-                  <label for="confirmPassword" class="font-semibold">Confirm password:</label>
+                  <label for="confirmPassword" class="font-semibold"
+                    >Confirm password <span class="text-red-500">*</span></label
+                  >
                   <div class="flex items-center relative">
                     <input
                       v-model="confirmPassword"
@@ -232,4 +238,10 @@ const register = async () => {
       </div>
     </div>
   </section>
+  <VerifyCodeView
+    :show="showVerificationPopup"
+    :email="email"
+    @close="closePopup"
+    @verified="onVerified"
+  />
 </template>

@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import VerifyCodeView from './../VerifyCodeView.vue'
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
 import axios from 'axios'
@@ -13,6 +14,30 @@ const form = ref({
 })
 
 const showPassword = ref(false)
+const showVerifyPopup = ref(false)
+
+const openVerifyPopup = async () => {
+  if (!form.value.phone) {
+    toastr.error('Please enter your email address.')
+    return
+  }
+  try {
+    const response = await axios.post(
+      'http://localhost:8090/api/users/resend?email=' + form.value.phone
+    )
+
+    if (response.status === 200) {
+      showVerifyPopup.value = true
+    }
+  } catch (error) {
+    toastr.error(error.response.data, 'Error')
+  }
+}
+
+function onVerified() {
+  toastr.success('Enable successful!')
+  showVerifyPopup.value = false
+}
 
 const togglePasswordVisibility = () => {
   showPassword.value = !showPassword.value
@@ -22,13 +47,12 @@ const phoneError = ref('')
 const isSubmitting = ref(false)
 const router = useRouter()
 
-// Kiểm tra tính hợp lệ của số điện thoại hoặc email
-const validatePhoneOrEmail = () => {
-  const phoneRegex = /^[0-9]{10}$/
+// Kiểm tra tính hợp lệ của email
+const validateEmail = () => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-  if (!phoneRegex.test(form.value.phone) && !emailRegex.test(form.value.phone)) {
-    phoneError.value = 'Please enter a valid phone number (10 digits) or email address.'
+  if (!emailRegex.test(form.value.phone)) {
+    phoneError.value = 'Please enter a valid email address.'
   } else {
     phoneError.value = ''
   }
@@ -55,14 +79,7 @@ const login = async () => {
 
     if (response.status === 200 && response.data.token) {
       localStorage.setItem('token', response.data.token)
-      if (response.data.role_id === 3) {
-        router.push('/').then(() => {
-          window.location.href = '/'
-        })
-      } else if (response.data.role_id === 2) {
-        router.push('/recruiter/dashboard')
-      }
-
+      router.push('/recruiter/dashboard')
       toastr.success('Login successfully!')
     } else {
       toastr.error('Login failed: Invalid credentials')
@@ -97,13 +114,13 @@ onMounted(() => {})
             <form @submit.prevent="login">
               <div class="grid grid-cols-1">
                 <div class="mb-4 ltr:text-left rtl:text-right">
-                  <label for="phone" class="font-semibold">Phone number or Email address</label>
+                  <label for="phone" class="font-semibold">Email address</label>
                   <input
                     v-model="form.phone"
                     @blur="validatePhoneOrEmail"
                     type="text"
                     class="form-input rounded-md"
-                    placeholder="0912345678 or example@email.com"
+                    placeholder="example@email.com"
                   />
                   <span v-if="phoneError" class="text-red-500 text-sm">{{ phoneError }}</span>
                 </div>
@@ -151,6 +168,11 @@ onMounted(() => {})
                     :disabled="!canSubmit || isSubmitting"
                   />
                 </div>
+                <div class="mb-4 text-center">
+                  <button @click="openVerifyPopup" type="button" class="text-blue-500 underline">
+                    Enable Account
+                  </button>
+                </div>
                 <div class="text-center">
                   <span class="text-slate-400 me-2">Don't have an account?</span>
                   <router-link to="/recruiter/signup" class="text-black dark:text-white font-bold"
@@ -164,4 +186,11 @@ onMounted(() => {})
       </div>
     </div>
   </section>
+
+  <VerifyCodeView
+    :show="showVerifyPopup"
+    :email="form.phone"
+    @close="showVerifyPopup = false"
+    @verified="onVerified"
+  />
 </template>

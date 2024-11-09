@@ -18,7 +18,6 @@ const password = ref('')
 const confirmPassword = ref('')
 const showPassword = ref(false)
 const showConfirmPassword = ref(false)
-const phoneError = ref('')
 const emailError = ref('')
 const nameError = ref('')
 const termsAccepted = ref(false)
@@ -50,15 +49,6 @@ const toggleConfirmPassword = () => {
   showConfirmPassword.value = !showConfirmPassword.value
 }
 
-const validatePhone = () => {
-  const phoneRegex = /^[0-9]{10}$/
-  if (!phoneRegex.test(phone.value)) {
-    phoneError.value = 'Invalid phone number. Must be 10 digits.'
-  } else {
-    phoneError.value = ''
-  }
-}
-
 const validateEmail = () => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   if (!emailRegex.test(email.value)) {
@@ -71,11 +61,9 @@ const validateEmail = () => {
 const canSubmit = computed(() => {
   return (
     name.value &&
-    phone.value &&
     email.value &&
     password.value &&
     confirmPassword.value &&
-    !phoneError.value &&
     !emailError.value &&
     !passwordMismatchError.value &&
     termsAccepted.value
@@ -141,7 +129,9 @@ function onVerified() {
             <form @submit.prevent="register">
               <div class="grid grid-cols-1">
                 <div class="mb-4 ltr:text-left rtl:text-right">
-                  <label for="name" class="font-semibold">Your name:</label>
+                  <label for="name" class="font-semibold"
+                    >Your name <span class="text-red-500">*</span></label
+                  >
                   <input
                     v-model="name"
                     type="text"
@@ -152,18 +142,18 @@ function onVerified() {
                   <span v-if="nameError" class="text-red-500 text-sm">{{ nameError }}</span>
                 </div>
                 <div class="mb-4 ltr:text-left rtl:text-right">
-                  <label for="phone" class="font-semibold">Phone number:</label>
+                  <label for="phone" class="font-semibold">Phone number</label>
                   <input
                     v-model="phone"
                     type="tel"
                     class="form-input rounded-md"
                     placeholder="0912345678"
-                    @blur="validatePhone"
                   />
-                  <span v-if="phoneError" class="text-red-500 text-sm">{{ phoneError }}</span>
                 </div>
                 <div class="mb-4 ltr:text-left rtl:text-right">
-                  <label for="email" class="font-semibold">Email:</label>
+                  <label for="email" class="font-semibold"
+                    >Email <span class="text-red-500">*</span></label
+                  >
                   <input
                     v-model="email"
                     type="email"
@@ -174,7 +164,9 @@ function onVerified() {
                   <span v-if="emailError" class="text-red-500 text-sm">{{ emailError }}</span>
                 </div>
                 <div class="mb-4 ltr:text-left rtl:text-right">
-                  <label for="password" class="font-semibold">Password:</label>
+                  <label for="password" class="font-semibold"
+                    >Password <span class="text-red-500">*</span></label
+                  >
                   <div class="flex items-center relative">
                     <input
                       v-model="password"
@@ -188,7 +180,9 @@ function onVerified() {
                   </div>
                 </div>
                 <div class="mb-4 ltr:text-left rtl:text-right">
-                  <label for="confirmPassword" class="font-semibold">Confirm password:</label>
+                  <label for="confirmPassword" class="font-semibold"
+                    >Confirm password <span class="text-red-500">*</span></label
+                  >
                   <div class="flex items-center relative">
                     <input
                       v-model="confirmPassword"

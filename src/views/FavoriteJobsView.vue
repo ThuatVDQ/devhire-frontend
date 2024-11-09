@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import { RouterLink } from 'vue-router'
 import axios from 'axios'
 import CardJob from '@/components/CardJob.vue'
 import icon_sad from '@/assets/icon-sad.png'
@@ -60,7 +61,7 @@ const scrollToTop = () => {
       </p>
     </div>
 
-    <div v-if="jobs.length === 0 && !isLoading" class="">
+    <div v-if="jobs.length === 0 && !isLoading">
       <div class="bg-white rounded-b-lg p-8 text-center">
         <img
           :src="icon_sad"
@@ -69,11 +70,12 @@ const scrollToTop = () => {
           style="width: 300px; height: auto"
         />
         <p class="text-gray-700">You haven't favorite any jobs!</p>
-        <button
-          class="mt-4 bg-green-600 text-white font-semibold px-6 py-2 rounded-lg hover:bg-green-700 transition"
+        <RouterLink
+          to="/jobs"
+          class="mt-4 bg-green-600 text-white font-semibold px-6 py-2 rounded-lg hover:bg-green-700 transition inline-block"
         >
           Find Jobs Now
-        </button>
+        </RouterLink>
       </div>
     </div>
 
@@ -123,13 +125,4 @@ const scrollToTop = () => {
       </div>
     </div>
   </div>
-  <!-- <div class="bg-white rounded-b-lg p-8 text-center">
-      <img src="" alt="Empty Saved Jobs" class="mx-auto mb-4" style="width: 150px; height: auto" />
-      <p class="text-gray-700">You haven't saved any jobs!</p>
-      <button
-        class="mt-4 bg-green-600 text-white font-semibold px-6 py-2 rounded-lg hover:bg-green-700 transition"
-      >
-        Find Jobs Now
-      </button>
-    </div> -->
 </template>
