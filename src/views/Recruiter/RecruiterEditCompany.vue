@@ -4,7 +4,7 @@
       <p class="text-red-700 text-lg">There is currently no registered company in the system.</p>
       <button
         @click="isSigningUp = true"
-        class="mt-4 bg-green-500 text-white font-bold py-2 px-4 rounded"
+        class="mt-4 bg-emerald-600 text-white font-bold py-2 px-4 rounded"
       >
         Sign Up
       </button>
@@ -108,7 +108,7 @@
           rows="4"
         ></textarea>
       </div>
-      <button type="submit" class="mt-4 bg-green-500 text-white font-bold py-2 px-4 rounded">
+      <button type="submit" class="mt-4 bg-emerald-600 text-white font-bold py-2 px-4 rounded">
         {{ isCompanyExist ? 'Save' : 'Sign Up' }}
       </button>
     </form>

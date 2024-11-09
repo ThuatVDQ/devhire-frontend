@@ -85,8 +85,7 @@ const login = async () => {
       toastr.error('Login failed: Invalid credentials')
     }
   } catch (error) {
-    toastr.error('Login failed:', error.response.data.message)
-    console.error(error.response.data.message)
+    toastr.error(error.response.data.message)
   } finally {
     isSubmitting.value = false
   }

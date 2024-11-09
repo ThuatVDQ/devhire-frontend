@@ -27,6 +27,7 @@ import ApplyForm from '@/components/ApplyForm.vue'
 import RecruiterLogin from '@/views/Recruiter/RecruiterLogin.vue'
 import RecruiterRegister from '@/views/Recruiter/RecruiterRegister.vue'
 import FavoriteJobsView from '@/views/FavoriteJobsView.vue'
+import ChangePasswordView from '@/views/ChangePasswordView.vue'
 
 const routes = [
   {
@@ -92,6 +93,11 @@ const routes = [
         component: LoginView
       },
       {
+        path: 'change-password',
+        name: 'change-password',
+        component: ChangePasswordView
+      },
+      {
         path: 'signup',
         name: 'signup',
         component: RegisterView
@@ -134,7 +140,7 @@ const routes = [
         children: [
           {
             path: 'change-password',
-            name: 'change-password',
+            name: 'recruiter-change-password',
             component: RecruiterChangePassword
           },
           {

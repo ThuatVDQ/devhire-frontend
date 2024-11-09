@@ -4,43 +4,43 @@
 
     <div class="flex justify-center">
       <!-- Sidebar -->
-      <div class="w-1/6 bg-gray-50 p-2 rounded-lg">
-        <ul class="space-y-4">
+      <div class="w-1/4 bg-gray-50 p-5 rounded-lg">
+        <ul class="space-y-6">
           <li>
-            <router-link
-              to="/recruiter/settings/change-password"
-              class="flex items-center text-gray-700 hover:text-green-500"
-              :class="{
-                'text-green-500 font-semibold':
-                  $route.path === '/recruiter/settings/change-password'
-              }"
-            >
-              <i class="pi pi-lock mr-2"></i> Change Password
-            </router-link>
+            <RouterLink to="/recruiter/settings/change-password" v-slot="{ isActive }">
+              <div
+                class="flex items-center text-gray-700 hover:text-emerald-500"
+                :class="{ 'text-green-500 font-semibold': isActive }"
+              >
+                <i class="pi pi-lock mr-4"></i> Change Password
+              </div>
+            </RouterLink>
           </li>
           <li>
-            <router-link
-              to="/recruiter/settings/profile"
-              class="flex items-center text-gray-700 hover:text-green-500"
-              :class="{ 'text-green-500 font-semibold': $route.path === '/settings/personal' }"
-            >
-              <i class="pi pi-user mr-2"></i> Personal Information
-            </router-link>
+            <RouterLink to="/recruiter/settings/profile" v-slot="{ isActive }">
+              <div
+                class="flex items-center text-gray-700 hover:text-emerald-500"
+                :class="{ 'text-green-500 font-semibold': isActive }"
+              >
+                <i class="pi pi-user mr-4"></i> Personal Information
+              </div>
+            </RouterLink>
           </li>
           <li>
-            <router-link
-              to="/recruiter/settings/company"
-              class="flex items-center text-gray-700 hover:text-green-500"
-              :class="{ 'text-green-500 font-semibold': $route.path === '/settings/company' }"
-            >
-              <i class="pi pi-briefcase mr-2"></i> Company Information
-            </router-link>
+            <RouterLink to="/recruiter/settings/company" v-slot="{ isActive }">
+              <div
+                class="flex items-center text-gray-700 hover:text-emerald-500"
+                :class="{ 'text-green-500 font-semibold': isActive }"
+              >
+                <i class="pi pi-briefcase mr-4"></i> Company Information
+              </div>
+            </RouterLink>
           </li>
           <li
             @click="logout"
             class="flex items-center text-gray-700 hover:text-red-500 cursor-pointer"
           >
-            <i class="pi pi-sign-out mr-2"></i> Logout
+            <i class="pi pi-sign-out mr-4"></i> Logout
           </li>
         </ul>
       </div>
@@ -54,10 +54,10 @@
 </template>
 
 <script setup>
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter, RouterLink } from 'vue-router'
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
-const $route = useRoute()
+
 const router = useRouter()
 const logout = () => {
   localStorage.removeItem('token') // Remove the token from localStorage
