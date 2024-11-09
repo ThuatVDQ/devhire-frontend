@@ -1,7 +1,7 @@
 <script setup>
 import axios from 'axios'
 import { RouterLink } from 'vue-router'
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import defaultLogo from '../assets/logo.svg'
 
@@ -13,6 +13,16 @@ function applyJob() {
 
 const state = defineProps({
   job: Object
+})
+
+const logoSource = computed(() => {
+  const logo = state.job.company.logo
+
+  if (logo) {
+    return `http://localhost:8090/uploads/${logo}`
+  } else {
+    return defaultLogo
+  }
 })
 
 const emit = defineEmits(['removeFavorite'])
@@ -63,13 +73,9 @@ async function favoriteJob() {
     <div class="p-6">
       <div class="flex items-center">
         <div
-          class="size-14 min-w-[56px] flex items-center justify-center bg-white dark:bg-slate-900 shadow dark:shadow-gray-700 rounded-md"
+          class="flex items-center justify-center w-14 h-14 bg-white dark:bg-slate-900 shadow dark:shadow-gray-700 rounded-full overflow-hidden"
         >
-          <img
-            class="size-8"
-            :src="state.job.company.logo"
-            @error="state.job.company.logo = defaultLogo"
-          />
+          <img class="w-full h-full object-cover" :src="logoSource" alt="Company Logo" />
         </div>
         <div class="ms-3">
           <RouterLink

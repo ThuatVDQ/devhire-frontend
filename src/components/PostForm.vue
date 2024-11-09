@@ -337,6 +337,10 @@ async function fetchSkills() {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     })
+    if (response.status === 204 || response.data.length === 0) {
+      inf.skills = [{ name: '' }]
+      return
+    }
     inf.skills = response.data.map((skill) => ({ name: skill.name }))
   } catch (error) {
     console.error(error)
