@@ -14,10 +14,17 @@
     <form v-else @submit.prevent="handleSubmit" class="bg-gray-100 rounded-lg p-4">
       <div class="flex items-center">
         <div class="relative inline-block">
-          <img :src="avatarSrc" alt="avatar" class="w-20 h-20 rounded-full object-cover" />
-          <button class="absolute bottom-0 right-0 p-1 rounded-full">
-            <i class="pi pi-camera"></i>
-          </button>
+          <img
+            :src="currentAvatar"
+            @error="currentAvatar = defaultAvatar"
+            alt="avatar"
+            class="w-20 h-20 rounded-full object-cover"
+          />
+          <i
+            class="pi pi-camera absolute bottom-0 right-0 p-1 bg-gray-300 rounded-full text-xl cursor-pointer"
+            style="transform: translate(25%, 25%)"
+            @click="openPopup"
+          ></i>
         </div>
         <div class="relative ml-4 w-1/2 items-center">
           <input
@@ -113,6 +120,13 @@
       </button>
     </form>
   </div>
+
+  <EditAvatar
+    v-if="showAvatarPopup"
+    :cropAvatar="cropAvatar"
+    @close="showAvatarPopup = false"
+    :isLogoCompany="true"
+  />
 </template>
 
 <script setup>
@@ -121,12 +135,16 @@ import axios from 'axios'
 import defaultAvatar from '../../assets/logo.svg'
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
+import EditAvatar from '../../components/EditAvatar.vue'
 
-const avatarSrc = ref(defaultAvatar)
 const company = ref({})
 const isCompanyExist = ref(false)
 const isSigningUp = ref(false)
 const errors = ref({})
+
+const showAvatarPopup = ref(false)
+const currentAvatar = ref(defaultAvatar)
+const cropAvatar = ref(defaultAvatar)
 
 const validateForm = () => {
   errors.value = {}
@@ -197,7 +215,10 @@ const fetchCompanyInfo = async () => {
     })
     company.value = response.data
     isCompanyExist.value = true
-    console.log(company.value)
+    if (company.value.logo) {
+      currentAvatar.value = `http://localhost:8090/uploads/${company.value.logo}`
+      cropAvatar.value = currentAvatar.value
+    }
   } catch (error) {
     if (error.response && error.response.status === 404) {
       isCompanyExist.value = false
@@ -208,5 +229,17 @@ const fetchCompanyInfo = async () => {
 }
 
 // Fetch data on component mount
-onMounted(fetchCompanyInfo)
+onMounted(() => {
+  fetchCompanyInfo()
+  const message = sessionStorage.getItem('message')
+
+  if (message) {
+    toastr.success(message)
+    sessionStorage.removeItem('message')
+  }
+})
+
+const openPopup = () => {
+  showAvatarPopup.value = true
+}
 </script>

@@ -86,6 +86,10 @@ const props = defineProps({
   cropAvatar: {
     type: String,
     required: true
+  },
+  isLogoCompany: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -135,21 +139,38 @@ const saveImage = () => {
     cropper.value.getCroppedCanvas().toBlob((blob) => {
       const formData = new FormData()
       formData.append('file', blob)
-
-      axios
-        .post('http://localhost:8090/api/users/uploadAvatar', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
-        })
-        .then((response) => {
-          sessionStorage.setItem('message', response.data)
-          window.location.reload()
-        })
-        .catch((error) => {
-          toastr.error('Error uploading avatar:', error)
-        })
+      if (!props.isLogoCompany)
+        axios
+          .post('http://localhost:8090/api/users/uploadAvatar', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
+          })
+          .then((response) => {
+            sessionStorage.setItem('message', response.data)
+            window.location.reload()
+          })
+          .catch((error) => {
+            toastr.error('Error uploading avatar:', error)
+          })
+      else {
+        axios
+          .put('http://localhost:8090/api/companies/upload-logo', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
+          })
+          .then((response) => {
+            sessionStorage.setItem('message', response.data)
+            window.location.reload()
+          })
+          .catch((error) => {
+            console.log(error)
+            toastr.error('Error uploading logo:', error)
+          })
+      }
     })
   } else {
     axios
