@@ -31,6 +31,43 @@ function closeEmailTemplatePopup() {
   isEmailPopupVisible.value = false
 }
 
+async function handleTemplateSelected({ subject, body }) {
+  try {
+    await updateApplicationStatus(selectedApplication.value.id, 'accept')
+
+    await sendEmail(selectedApplication.value, subject, body)
+  } catch (error) {
+    toastr.error('Failed to accept application or send email. Please try again.')
+    console.error(error)
+  } finally {
+    closeEmailTemplatePopup()
+  }
+}
+
+async function sendEmail(application, subject, body) {
+  try {
+    const formattedBody = body.replace(/\n/g, '<br>')
+    const response = await axios.post(
+      'http://localhost:8090/api/job-application/send-email',
+      {
+        name: application.full_name,
+        subject: subject,
+        email: application.email,
+        content: formattedBody
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      }
+    )
+    toastr.success(response.data, 'Success')
+  } catch (error) {
+    toastr.error('Failed to send email:', error)
+    console.error('Failed to send email:', error)
+  }
+}
+
 async function fetchJobApplications() {
   const jobId = route.params.id
   try {
@@ -43,7 +80,6 @@ async function fetchJobApplications() {
     if (jobApplications.value.length > 0 && jobApplications.value[0].job_title) {
       title.value = jobApplications.value[0].job_title
     }
-    console.log('Job applications:', jobApplications.value)
   } catch (error) {
     toastr.error('Error fetching job applications:', error)
   } finally {
@@ -118,7 +154,7 @@ async function downloadCV(cvId, candidateName) {
   }
 }
 
-async function viewCV(cv_url) {
+async function viewCV(cv_url, id) {
   if (!cv_url) {
     toastr.error('No CV available for this candidate')
     return
@@ -126,6 +162,7 @@ async function viewCV(cv_url) {
   const baseUrl = 'http://localhost:8090/uploads/' // Change this base URL as needed
   const fullUrl = `${baseUrl}${cv_url}`
   window.open(fullUrl, '_blank')
+  updateApplicationStatus(id, 'seen')
 }
 
 async function updateApplicationStatus(applicationId, newStatus) {
@@ -133,6 +170,7 @@ async function updateApplicationStatus(applicationId, newStatus) {
     await axios.post(`http://localhost:8090/api/job-application/${applicationId}/${newStatus}`, {})
     fetchJobApplications()
   } catch (error) {
+    toastr.error(error.response.data, 'Error')
     console.error('Error updating application status:', error)
   }
 }
@@ -203,7 +241,7 @@ function goBack() {
                 <span class="text-sm text-gray-500 hover:text-gray-700">Download CV</span>
               </div>
               <div
-                @click="viewCV(application.cv_url)"
+                @click="viewCV(application.cv_url, application.id)"
                 class="flex items-center space-x-1 cursor-pointer mt-2"
               >
                 <i class="pi pi-eye text-gray-500 hover:text-gray-700"></i>
@@ -211,8 +249,8 @@ function goBack() {
               </div>
             </td>
             <td class="py-4 px-8 text-sm text-gray-700">
-              <!-- <button
-                @click="updateApplicationStatus(application.id, 'accept')"
+              <button
+                @click="openEmailTemplatePopup(application)"
                 :disabled="application.status !== 'SEEN'"
                 :class="{
                   'bg-gray-300': application.status !== 'SEEN',
@@ -221,13 +259,13 @@ function goBack() {
                 class="px-4 py-2 mr-2 text-white rounded-lg"
               >
                 Accept
-              </button> -->
-              <button
+              </button>
+              <!-- <button
                 @click="openEmailTemplatePopup(application)"
                 class="px-4 py-2 text-white bg-green-600 rounded-lg"
               >
                 Accept
-              </button>
+              </button> -->
               <button
                 @click="updateApplicationStatus(application.id, 'reject')"
                 :disabled="application.status !== 'SEEN'"

@@ -178,15 +178,17 @@ onMounted(() => {
             </button>
           </div>
           <h5 class="text-lg font-semibold mt-6">Job Description:</h5>
-          <p class="text-slate-400 mt-4">
+          <p class="text-slate-400 mt-4" style="white-space: pre-line; word-break: break-word">
             {{ state.job.description }}
           </p>
+
           <h5 class="text-lg font-semibold mt-6">Requirements:</h5>
-          <p class="text-slate-400 mt-4">
+          <p class="text-slate-400 mt-4" style="white-space: pre-line; word-break: break-word">
             {{ state.job.requirement }}
           </p>
+
           <h5 class="text-lg font-semibold mt-6">Benefit:</h5>
-          <p class="text-slate-400 mt-4">
+          <p class="text-slate-400 mt-4" style="white-space: pre-line; word-break: break-word">
             {{ state.job.benefit }}
           </p>
         </div>
