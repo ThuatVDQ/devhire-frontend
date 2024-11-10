@@ -1,0 +1,118 @@
+<template>
+  <div>
+    <!-- Toggle button, only visible when sidebar is collapsed -->
+    <button
+      v-if="isCollapsed"
+      @click="toggleSidebar"
+      class="fixed top-4 left-4 z-20 bg-white rounded-full p-2 shadow focus:outline-none"
+    >
+      <i class="pi pi-list text-lg"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <div
+      :class="[
+        'fixed bg-gray-800 text-gray-100 transition-all duration-300 h-screen z-10',
+        isCollapsed ? 'w-0 overflow-hidden' : 'w-64'
+      ]"
+    >
+      <div v-if="!isCollapsed" class="p-4">
+        <!-- Close Button (inside the sidebar) -->
+        <div class="flex items-center justify-between">
+          <button @click="toggleSidebar" class="focus:outline-none">
+            <i class="pi pi-times text-xl"></i>
+          </button>
+          <span class="text-xl font-semibold">DevHire</span>
+        </div>
+
+        <!-- Logo and Sidebar Title -->
+        <div class="flex items-center mt-4">
+          <img src="@/assets/logo.svg" alt="DevHire Logo" class="w-8 h-8 mr-3" />
+          <span class="text-xl font-semibold">DevHire</span>
+        </div>
+
+        <!-- Search Box -->
+        <div class="mt-4">
+          <div class="relative text-gray-600 focus-within:text-gray-400">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-2">
+              <i class="pi pi-search text-gray-500"></i>
+            </span>
+            <input
+              type="search"
+              class="py-2 text-sm text-white bg-gray-700 rounded-md pl-10 focus:outline-none w-full"
+              placeholder="Search..."
+            />
+          </div>
+        </div>
+
+        <!-- Navigation Links -->
+        <nav class="mt-6 space-y-2">
+          <RouterLink
+            to="/admin/dashboard"
+            class="flex items-center py-2 rounded transition duration-200 hover:bg-gray-700"
+            active-class="bg-gray-700"
+          >
+            <i class="pi pi-home mr-3"></i>
+            <span>Dashboard</span>
+          </RouterLink>
+          <RouterLink
+            to="/admin/users"
+            class="flex items-center py-2 rounded transition duration-200 hover:bg-gray-700"
+            active-class="bg-gray-700"
+          >
+            <i class="pi pi-users mr-3"></i>
+            <span>Users</span>
+          </RouterLink>
+          <RouterLink
+            to="/admin/jobs"
+            class="flex items-center py-2 rounded transition duration-200 hover:bg-gray-700"
+            active-class="bg-gray-700"
+          >
+            <i class="pi pi-briefcase mr-3"></i>
+            <span>Jobs</span>
+          </RouterLink>
+          <RouterLink
+            to="/admin/companies"
+            class="flex items-center py-2 rounded transition duration-200 hover:bg-gray-700"
+            active-class="bg-gray-700"
+          >
+            <i class="pi pi-building mr-3"></i>
+            <span>Companies</span>
+          </RouterLink>
+          <RouterLink
+            to="/admin/settings"
+            class="flex items-center py-2 rounded transition duration-200 hover:bg-gray-700"
+            active-class="bg-gray-700"
+          >
+            <i class="pi pi-cog mr-3"></i>
+            <span>Settings</span>
+          </RouterLink>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Main content area -->
+    <main :class="isCollapsed ? 'ml-0' : 'ml-64'">
+      <slot />
+    </main>
+  </div>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+
+const isCollapsed = ref(true)
+const toggleSidebar = () => {
+  isCollapsed.value = !isCollapsed.value
+}
+</script>
+
+<style scoped>
+/* Adjusts the width of the main content area based on sidebar state */
+.ml-0 {
+  margin-left: 0;
+}
+.ml-64 {
+  margin-left: 16rem;
+}
+</style>

@@ -1,4 +1,3 @@
-<!-- RecruiterView.vue -->
 <script setup>
 import { RouterView } from 'vue-router'
 import RecruiterSidebar from '@/components/RecruiterSidebar.vue'
@@ -7,33 +6,22 @@ import Footer from '@/components/Footer.vue'
 </script>
 
 <template>
-  <div class="recruiter-layout">
+  <div class="flex flex-col h-screen">
+    <!-- Navbar -->
     <RecruiterNavBar />
-    <div class="recruiter-body">
+
+    <!-- Main Body -->
+    <div class="flex flex-1">
+      <!-- Sidebar -->
       <RecruiterSidebar />
-      <div class="recruiter-content bg-gray-100">
+
+      <!-- Content Area -->
+      <div class="flex-1 bg-gray-100 p-5 overflow-y-auto">
         <RouterView />
       </div>
     </div>
+
+    <!-- Footer -->
     <Footer />
   </div>
 </template>
-
-<style scoped>
-.recruiter-layout {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-}
-
-.recruiter-body {
-  display: flex;
-  flex: 1;
-}
-
-.recruiter-content {
-  flex: 1;
-  height: 100%;
-  padding: 20px;
-}
-</style>

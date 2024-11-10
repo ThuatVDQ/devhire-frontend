@@ -29,6 +29,8 @@ import RecruiterRegister from '@/views/Recruiter/RecruiterRegister.vue'
 import FavoriteJobsView from '@/views/FavoriteJobsView.vue'
 import ChangePasswordView from '@/views/ChangePasswordView.vue'
 import AppliedJobsView from '@/views/AppliedJobsView.vue'
+import AdminView from '@/views/Admin/AdminView.vue'
+import DashBoard from '@/views/Admin/DashBoard.vue'
 
 const routes = [
   {
@@ -177,6 +179,17 @@ const routes = [
     path: '/recruiter/signup',
     name: 'recruiter-signup',
     component: RecruiterRegister
+  },
+  {
+    path: '/admin',
+    component: AdminView,
+    children: [
+      {
+        path: 'dashboard',
+        name: 'admin-dashboard',
+        component: DashBoard
+      }
+    ]
   }
 ]
 
