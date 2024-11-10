@@ -90,27 +90,33 @@ function openCV() {
     class="flex flex-col group relative overflow-hidden bg-white dark:bg-slate-900 shadow hover:shadow-md dark:shadow-gray-700 dark:hover:shadow-gray-700 hover:-mt-2 rounded-md transition-all duration-500"
   >
     <div class="px-6 pt-6 pb-2">
-      <div class="flex items-center">
+      <div class="flex items-center space-x-2">
+        <!-- Logo -->
         <div
-          class="flex items-center justify-center w-14 h-14 bg-white dark:bg-slate-900 shadow dark:shadow-gray-700 rounded-full overflow-hidden"
+          class="flex items-center justify-center w-14 h-14 bg-white dark:bg-slate-900 shadow dark:shadow-gray-700 rounded-full overflow-hidden flex-shrink-0"
         >
           <img class="w-full h-full object-cover" :src="logoSource" alt="Company Logo" />
         </div>
+
+        <!-- Content -->
         <div class="ms-3 ml-6">
+          <!-- Job Title -->
           <RouterLink
             class="inline-block text-[16px] font-semibold hover:text-emerald-600 transition-all duration-500 me-1"
             :to="`/jobs/${state.job.id}`"
-            >{{ state.job.title }}</RouterLink
           >
-          <span
-            class="inline-block text-sm text-red-400"
-            style="animation: blink 1s step-start infinite; opacity: 1"
-          >
+            {{ state.job.title }}
+          </RouterLink>
+          <span class="inline-block text-sm text-red-400">
             {{ differenceInDays > 0 ? `Remaining ${differenceInDays} days` : 'Expired' }}
           </span>
-          <div>
+
+          <!-- Company Name with Ellipsis -->
+          <div class="max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap">
             <span class="text-gray-400">{{ state.job.company.name }}</span>
           </div>
+
+          <!-- Application Period -->
           <div>
             <span v-if="state.job.date_applied" class="text-gray-600">
               Application period:
@@ -123,15 +129,19 @@ function openCV() {
               }}
             </span>
           </div>
+
+          <!-- Job Type and Salary -->
           <div class="mt-1">
             <span
               class="bg-emerald-600/10 inline-block text-emerald-600 text-xs px-2.5 py-0.5 font-semibold rounded-full me-1"
-              >{{ state.job.type }}</span
             >
-
-            <span class="text-sm font-medium inline-block me-1"
-              >Salary:
-              <span class="text-slate-400">
+              {{ state.job.type }}
+            </span>
+            <span class="text-sm font-medium inline-block me-1">
+              Salary:
+              <span
+                class="bg-emerald-600/10 inline-block text-emerald-600 text-xs px-2.5 py-0.5 font-semibold rounded-full me-1"
+              >
                 {{
                   state.job.salary_start === 0 && state.job.salary_end === 0
                     ? 'Negotiable'
@@ -140,6 +150,8 @@ function openCV() {
               </span>
             </span>
           </div>
+
+          <!-- Apply Status and CV -->
           <div class="mt-1">
             <span class="text-gray-400">{{ applyStatusMessage }}</span>
             <span
@@ -152,6 +164,7 @@ function openCV() {
           </div>
         </div>
       </div>
+
       <div>
         <span
           class="bg-slate-100 dark:bg-slate-800 inline-block text-slate-900 dark:text-slate-300 text-xs px-2.5 py-0.5 font-semibold rounded-full me-1"
@@ -214,10 +227,3 @@ function openCV() {
     </a>
   </div>
 </template>
-<style>
-@keyframes blink {
-  50% {
-    opacity: 0;
-  }
-}
-</style>

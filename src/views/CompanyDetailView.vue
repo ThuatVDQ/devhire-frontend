@@ -34,7 +34,6 @@ const fetchJobsByCompany = async () => {
       }
     })
     state.jobs = response.data
-    console.log('jobs fetched:', response.data)
   } catch (error) {
     console.error('Failed to fetch companies:', error)
   }
@@ -44,7 +43,8 @@ const fetchCompanyData = async (id) => {
   try {
     const response = await axios.get(`http://localhost:8090/api/companies/${id}`)
     state.company = response.data
-    console.log('Company:', response.data)
+    if (state.company.logo)
+      state.company.logo = `http://localhost:8090/uploads/${state.company.logo}`
   } catch (e) {
     console.error(e)
   }
@@ -82,18 +82,23 @@ watch(
         >
           <div class="flex items-center">
             <img
-              :src="company?.logo || defaultLogo"
-              @error="(e) => (e.target.src = defaultLogo)"
+              :src="state.company?.logo || defaultLogo"
               alt="logo-company"
               class="size-20 shadow dark:shadow-gray-700 rounded-md bg-slate-50 dark:bg-slate-800"
             />
             <div class="ms-4">
               <h5 class="text-xl font-bold">{{ state.company.name }}</h5>
               <div class="flex items-center space-x-4">
-                <h6 class="text-base text-slate-400 flex items-center">
+                <a
+                  :href="state.company.web_url || '#'"
+                  class="text-base text-blue-600 hover:text-blue-800 flex items-center underline"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   <i class="pi pi-globe pr-1"></i>
-                  {{ state.company.web_url }}
-                </h6>
+                  {{ state.company.web_url || 'Website not available' }}
+                </a>
+
                 <h6 class="text-base text-slate-400 flex items-center">
                   <i class="pi pi-building pr-1"></i>
                   {{ state.company.scale }} employees
@@ -108,7 +113,10 @@ watch(
       <div class="grid md:grid-cols-12 grid-cols-1 gap-[30px]">
         <div class="lg:col-span-8 md:col-span-7">
           <h5 class="text-xl font-semibold">Company Story</h5>
-          <p class="text-slate-400 mt-4">
+          <p
+            class="text-slate-400 mt-4"
+            style="white-space: pre-line; word-break: break-word; text-align: justify"
+          >
             {{ state.company.description }}
           </p>
           <h5 class="text-xl font-semibold mt-6">Vacancies:</h5>

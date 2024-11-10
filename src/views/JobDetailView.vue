@@ -156,15 +156,24 @@ onMounted(() => {
 
             <div class="md:ms-4 md:mt-0 mt-6">
               <h5 class="text-xl font-semibold">{{ state.job.title }}</h5>
-              <div class="mt-2">
-                <span class="text-slate-400 font-medium me-2 inline-flex items-center">
+              <div class="mt-3">
+                <span class="text-slate-600 font-medium me-2 inline-flex items-center">
                   <i class="pi pi-building mr-2"></i>
                   {{ state.job.company?.name || 'Dev Hire' }}
                 </span>
-                <span class="text-slate-400 font-medium me-2 inline-flex items-center">
+                <span class="text-slate-600 font-medium me-2 inline-flex items-center mt-2">
                   <i class="pi pi-map-marker mr-2"></i>
                   {{ state.job.company?.address || 'Dev Hire' }}
                 </span>
+                <a
+                  :href="state.job.company?.web_url || '#'"
+                  class="text-blue-600 hover:text-blue-800 font-medium inline-flex items-center mt-2 underline"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <i class="pi pi-globe mr-2"></i>
+                  {{ state.job.company?.web_url || 'Dev Hire' }}
+                </a>
               </div>
             </div>
           </div>
@@ -178,17 +187,26 @@ onMounted(() => {
             </button>
           </div>
           <h5 class="text-lg font-semibold mt-6">Job Description:</h5>
-          <p class="text-slate-400 mt-4" style="white-space: pre-line; word-break: break-word">
+          <p
+            class="mt-4"
+            style="white-space: pre-line; word-break: break-word; text-align: justify"
+          >
             {{ state.job.description }}
           </p>
 
-          <h5 class="text-lg font-semibold mt-6">Requirements:</h5>
-          <p class="text-slate-400 mt-4" style="white-space: pre-line; word-break: break-word">
+          <h5 class="text-lg font-semibold mt-16">Requirements:</h5>
+          <p
+            class="mt-4"
+            style="white-space: pre-line; word-break: break-word; text-align: justify"
+          >
             {{ state.job.requirement }}
           </p>
 
-          <h5 class="text-lg font-semibold mt-6">Benefit:</h5>
-          <p class="text-slate-400 mt-4" style="white-space: pre-line; word-break: break-word">
+          <h5 class="text-lg font-semibold mt-16">Benefit:</h5>
+          <p
+            class="mt-4"
+            style="white-space: pre-line; word-break: break-word; text-align: justify"
+          >
             {{ state.job.benefit }}
           </p>
         </div>

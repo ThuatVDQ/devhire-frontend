@@ -1,4 +1,5 @@
 <script setup>
+import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
 import defaultLogo from '../assets/logo.svg'
 
@@ -22,6 +23,16 @@ function truncateDescription(description) {
   // Nếu đã rút gọn, thêm dấu ba chấm
   return truncated.trim() + (truncated.length < description.length ? '...' : '')
 }
+
+const logoSource = computed(() => {
+  const logo = props.company.logo
+
+  if (logo) {
+    return `http://localhost:8090/uploads/${logo}`
+  } else {
+    return defaultLogo
+  }
+})
 </script>
 
 <template>
@@ -29,12 +40,7 @@ function truncateDescription(description) {
     <div
       class="size-14 flex items-center justify-center bg-white dark:bg-slate-900 shadow-md dark:shadow-gray-700 rounded-md relative -mt-12"
     >
-      <img
-        :src="company?.logo || defaultLogo"
-        @error="(e) => (e.target.src = defaultLogo)"
-        alt="Logo Company"
-        class="p-2"
-      />
+      <img :src="logoSource" alt="Logo Company" class="p-2" />
     </div>
     <div class="mt-4">
       <RouterLink
