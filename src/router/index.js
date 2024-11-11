@@ -31,6 +31,9 @@ import ChangePasswordView from '@/views/ChangePasswordView.vue'
 import AppliedJobsView from '@/views/AppliedJobsView.vue'
 import AdminView from '@/views/Admin/AdminView.vue'
 import DashBoard from '@/views/Admin/DashBoard.vue'
+import UserManagement from '@/views/Admin/UserManagement.vue'
+import JobManagement from '@/views/Admin/JobManagement.vue'
+import JobDetail from '@/views/Admin/JobDetail.vue'
 
 const routes = [
   {
@@ -188,6 +191,21 @@ const routes = [
         path: 'dashboard',
         name: 'admin-dashboard',
         component: DashBoard
+      },
+      {
+        path: 'users',
+        name: 'admin-users-management',
+        component: UserManagement
+      },
+      {
+        path: 'jobs',
+        name: 'admin-jobs-management',
+        component: JobManagement
+      },
+      {
+        path: 'job/:id',
+        name: 'admin-detail-job',
+        component: JobDetail
       }
     ]
   }

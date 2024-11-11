@@ -1,10 +1,9 @@
 <template>
+  <header class="mb-6">
+    <h1 class="text-3xl font-semibold text-white bg-emerald-600 px-6 py-10">Dashboard</h1>
+  </header>
   <div class="p-6 bg-gray-100 min-h-screen">
     <!-- Header -->
-    <header class="mb-6">
-      <h1 class="text-3xl font-semibold text-gray-700">Dashboard</h1>
-      <p class="text-gray-500">Welcome back! Here's an overview of your data.</p>
-    </header>
 
     <!-- Stats Section -->
     <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">

@@ -5,7 +5,7 @@
 
     <div class="flex flex-col flex-1 w-full">
       <!-- Content -->
-      <main class="flex-1 p-6 overflow-y-auto">
+      <main class="flex-1 overflow-y-auto">
         <RouterView />
       </main>
     </div>

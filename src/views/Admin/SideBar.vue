@@ -4,7 +4,7 @@
     <button
       v-if="isCollapsed"
       @click="toggleSidebar"
-      class="fixed top-4 left-4 z-20 bg-white rounded-full p-2 shadow focus:outline-none"
+      class="fixed top-20 left-0 z-20 bg-white rounded-full p-2 shadow focus:outline-none"
     >
       <i class="pi pi-list text-lg"></i>
     </button>
@@ -49,7 +49,7 @@
         <nav class="mt-6 space-y-2">
           <RouterLink
             to="/admin/dashboard"
-            class="flex items-center py-2 rounded transition duration-200 hover:bg-gray-700"
+            class="flex items-center p-2 rounded transition duration-200 hover:bg-gray-700"
             active-class="bg-gray-700"
           >
             <i class="pi pi-home mr-3"></i>
@@ -57,7 +57,7 @@
           </RouterLink>
           <RouterLink
             to="/admin/users"
-            class="flex items-center py-2 rounded transition duration-200 hover:bg-gray-700"
+            class="flex items-center p-2 rounded transition duration-200 hover:bg-gray-700"
             active-class="bg-gray-700"
           >
             <i class="pi pi-users mr-3"></i>
@@ -65,7 +65,7 @@
           </RouterLink>
           <RouterLink
             to="/admin/jobs"
-            class="flex items-center py-2 rounded transition duration-200 hover:bg-gray-700"
+            class="flex items-center p-2 rounded transition duration-200 hover:bg-gray-700"
             active-class="bg-gray-700"
           >
             <i class="pi pi-briefcase mr-3"></i>
@@ -73,7 +73,7 @@
           </RouterLink>
           <RouterLink
             to="/admin/companies"
-            class="flex items-center py-2 rounded transition duration-200 hover:bg-gray-700"
+            class="flex items-center p-2 rounded transition duration-200 hover:bg-gray-700"
             active-class="bg-gray-700"
           >
             <i class="pi pi-building mr-3"></i>
@@ -81,7 +81,7 @@
           </RouterLink>
           <RouterLink
             to="/admin/settings"
-            class="flex items-center py-2 rounded transition duration-200 hover:bg-gray-700"
+            class="flex items-center p-2 rounded transition duration-200 hover:bg-gray-700"
             active-class="bg-gray-700"
           >
             <i class="pi pi-cog mr-3"></i>
