@@ -12,12 +12,17 @@ const isLoading = ref(true)
 const fetchData = async (page = 0) => {
   isLoading.value = true
   try {
+    // Lấy token từ localStorage
+    const token = localStorage.getItem('token')
+
+    // Cấu hình headers chỉ khi có token
+    const headers = token ? { Authorization: `Bearer ${token}` } : {}
+
     const response = await axios.get('http://localhost:8090/api/companies', {
       params: { page, limit: pageSize.value },
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
+      headers
     })
+
     companies.value = response.data.companies
     totalPages.value = response.data.totalPages
     currentPage.value = page

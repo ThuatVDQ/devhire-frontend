@@ -28,14 +28,15 @@ const fetchCompanies = async () => {
 
 const fetchJobsByCompany = async () => {
   try {
+    const token = localStorage.getItem('token')
+
     const response = await axios.get('http://localhost:8090/api/jobs/company/' + route.params.id, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
+      headers: token ? { Authorization: `Bearer ${token}` } : {}
     })
+
     state.jobs = response.data
   } catch (error) {
-    console.error('Failed to fetch companies:', error)
+    console.error('Error fetching jobs:', error)
   }
 }
 
