@@ -3,6 +3,8 @@ import { ref, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import axios from 'axios'
 import CardJob from '@/components/CardJob.vue'
+import toastr from 'toastr'
+import 'toastr/build/toastr.min.css'
 import icon_sad from '@/assets/icon-sad.png'
 
 const jobs = ref([])
@@ -14,11 +16,20 @@ const isLoading = ref(true)
 const fetchData = async (page = 0) => {
   isLoading.value = true
   try {
+    const token = localStorage.getItem('token')
+
+    // Exit function if no token is available
+    if (!token) {
+      toastr.error('You must login', 'Error')
+      return
+    }
+
+    // Configure headers with token
+    const headers = { Authorization: `Bearer ${token}` }
+
     const response = await axios.get('http://localhost:8090/api/jobs/applied', {
       params: { page, limit: pageSize.value },
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
+      headers
     })
     jobs.value = response.data.jobs.map((job) => {
       return {

@@ -3,6 +3,8 @@ import axios from 'axios'
 import { RouterLink } from 'vue-router'
 import { computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import toastr from 'toastr'
+import 'toastr/build/toastr.min.css'
 import defaultLogo from '../assets/logo.svg'
 
 const router = useRouter()
@@ -36,14 +38,24 @@ const differenceInDays = computed(() => {
 
 async function favoriteJob() {
   try {
+    // Get token from localStorage
+    const token = localStorage.getItem('token')
+
+    // Exit function if no token is available
+    if (!token) {
+      toastr.error('You must login to favorite a job', 'Error')
+      return
+    }
+
+    // Configure headers with token
+    const headers = { Authorization: `Bearer ${token}` }
+
     if (!state.job.is_favorite) {
       await axios.post(
         `http://localhost:8090/api/jobs/${state.job.id}/like`,
         {},
         {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
+          headers
         }
       )
       state.job.is_favorite = true
@@ -53,9 +65,7 @@ async function favoriteJob() {
 
         {
           params: { jobId: state.job.id },
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
+          headers
         }
       )
       state.job.is_favorite = false
@@ -83,6 +93,13 @@ function openCV() {
   const fullUrl = `${baseUrl}${state.job.cv_url}`
   window.open(fullUrl, '_blank')
 }
+
+function formatSalary(amount) {
+  if (amount >= 1000000) {
+    return `${amount / 1000000}M`
+  }
+  return amount
+}
 </script>
 
 <template>
@@ -107,8 +124,15 @@ function openCV() {
           >
             {{ state.job.title }}
           </RouterLink>
-          <span class="inline-block text-sm text-red-400">
-            {{ differenceInDays > 0 ? `Remaining ${differenceInDays} days` : 'Expired' }}
+
+          <span
+            class="bg-emerald-600/10 inline-block text-emerald-600 text-xs px-2.5 py-0.5 font-semibold rounded-full me-1"
+          >
+            {{
+              state.job.salary_start === 0 && state.job.salary_end === 0
+                ? 'Negotiable'
+                : `${formatSalary(state.job.salary_start)} - ${formatSalary(state.job.salary_end)} ${state.job.currency}`
+            }}
           </span>
 
           <!-- Company Name with Ellipsis -->
@@ -137,17 +161,8 @@ function openCV() {
             >
               {{ state.job.type }}
             </span>
-            <span class="text-sm font-medium inline-block me-1">
-              Salary:
-              <span
-                class="bg-emerald-600/10 inline-block text-emerald-600 text-xs px-2.5 py-0.5 font-semibold rounded-full me-1"
-              >
-                {{
-                  state.job.salary_start === 0 && state.job.salary_end === 0
-                    ? 'Negotiable'
-                    : `${state.job.salary_start} - ${state.job.salary_end} ${state.job.currency}`
-                }}
-              </span>
+            <span class="inline-block text-sm text-red-400">
+              {{ differenceInDays > 0 ? `Remaining ${differenceInDays} days` : 'Expired' }}
             </span>
           </div>
 
