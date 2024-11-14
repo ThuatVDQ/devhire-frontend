@@ -110,7 +110,13 @@ const fetchJobData = async (id) => {
 }
 
 const showApplicationForm = () => {
-  state.isFormVisible = true
+  // Lấy token từ localStorage
+  const token = localStorage.getItem('token')
+  if (token) {
+    state.isFormVisible = true
+  } else {
+    toastr.error('Please login to apply for this job.', 'Error')
+  }
 }
 
 const closeApplicationForm = () => {
