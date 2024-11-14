@@ -13,11 +13,13 @@
     "server": "json-server --watch src/jobs.json --port 8000"
   },
   "dependencies": {
+    "@stomp/stompjs": "^7.0.0",
     "axios": "^1.7.7",
     "cropperjs": "^1.6.2",
     "flatpickr": "^4.6.13",
     "json-server": "^1.0.0-beta.2",
     "primeicons": "^7.0.0",
+    "sockjs-client": "^1.6.1",
     "toastr": "^2.1.4",
     "vue": "^3.4.29",
     "vue-router": "^4.3.3"

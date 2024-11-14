@@ -6,6 +6,7 @@ import router from './router'
 import 'flatpickr/dist/flatpickr.css'
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
+import './utils/websocket'
 
 toastr.options = {
   closeButton: true,
