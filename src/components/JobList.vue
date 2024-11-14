@@ -39,13 +39,20 @@ const fetchData = async (page = 0) => {
 }
 
 const fetchFavorites = async (page = 0) => {
+  const token = localStorage.getItem('token')
+
+  // Exit function if no token is available
+  if (!token) {
+    return
+  }
+
+  // Configure headers with token
+  const headers = { Authorization: `Bearer ${token}` }
   isLoading.value = true
   try {
     const response = await axios.get('http://localhost:8090/api/favorite-job/favorite', {
       params: { page, limit: pageSize.value },
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
+      headers
     })
     jobs.value = response.data.jobs.map((job) => ({
       ...job,
@@ -63,6 +70,11 @@ const fetchFavorites = async (page = 0) => {
 const fetchSearchData = async (page = 0, criteria = {}) => {
   isLoading.value = true
   try {
+    // Lấy token từ localStorage
+    const token = localStorage.getItem('token')
+
+    // Cấu hình headers chỉ khi có token
+    const headers = token ? { Authorization: `Bearer ${token}` } : {}
     const response = await axios.get('http://localhost:8090/api/jobs/search', {
       params: {
         page,
@@ -71,9 +83,7 @@ const fetchSearchData = async (page = 0, criteria = {}) => {
         location: criteria.location,
         jobType: criteria.type
       },
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
+      headers
     })
     jobs.value = response.data.jobs
     totalPages.value = response.data.totalPages

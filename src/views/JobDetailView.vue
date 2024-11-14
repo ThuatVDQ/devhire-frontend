@@ -36,11 +36,24 @@ const formatDate = (dateString) => {
 
 const fetchCandidateData = async () => {
   try {
+    // Get token from localStorage
+    const token = localStorage.getItem('token')
+
+    // Exit function if no token is available
+    if (!token) {
+      console.warn('No token found. Exiting fetchCandidateData function.')
+      return
+    }
+
+    // Configure headers with token
+    const headers = { Authorization: `Bearer ${token}` }
+
+    // Make API call
     const response = await axios.get('http://localhost:8090/api/users/profile', {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
-    }) // Đổi URL theo API của bạn
+      headers
+    }) // Change URL according to your API
+
+    // Update candidate state with response data
     state.candidate.name = response.data.full_name
     state.candidate.email = response.data.email
     state.candidate.phone = response.data.phone
@@ -77,10 +90,14 @@ const handleFileDrop = (event) => {
 const fetchJobData = async (id) => {
   state.isLoading = true
   try {
+    // Lấy token từ localStorage
+    const token = localStorage.getItem('token')
+
+    // Cấu hình headers chỉ khi có token
+    const headers = token ? { Authorization: `Bearer ${token}` } : {}
+
     const response = await axios.get(`http://localhost:8090/api/jobs/${id}`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
+      headers
     })
     state.job = response.data
     if (state.job.company.logo)
@@ -93,7 +110,13 @@ const fetchJobData = async (id) => {
 }
 
 const showApplicationForm = () => {
-  state.isFormVisible = true
+  // Lấy token từ localStorage
+  const token = localStorage.getItem('token')
+  if (token) {
+    state.isFormVisible = true
+  } else {
+    toastr.error('Please login to apply for this job.', 'Error')
+  }
 }
 
 const closeApplicationForm = () => {
@@ -157,10 +180,14 @@ onMounted(() => {
             <div class="md:ms-4 md:mt-0 mt-6">
               <h5 class="text-xl font-semibold">{{ state.job.title }}</h5>
               <div class="mt-3">
-                <span class="text-slate-600 font-medium me-2 inline-flex items-center">
+                <RouterLink
+                  :to="`/companies/${state.job.company?.id}`"
+                  class="text-slate-600 font-medium me-2 inline-flex items-center hover:text-emerald-600 transition-all duration-500"
+                >
                   <i class="pi pi-building mr-2"></i>
                   {{ state.job.company?.name || 'Dev Hire' }}
-                </span>
+                </RouterLink>
+
                 <span class="text-slate-600 font-medium me-2 inline-flex items-center mt-2">
                   <i class="pi pi-map-marker mr-2"></i>
                   {{ state.job.company?.address || 'Dev Hire' }}
