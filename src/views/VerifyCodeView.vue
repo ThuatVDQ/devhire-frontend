@@ -61,7 +61,8 @@ import axios from 'axios'
 
 const props = defineProps({
   show: Boolean,
-  email: String
+  email: String,
+  messageType: String
 })
 
 const emit = defineEmits(['close', 'verified'])
@@ -142,7 +143,7 @@ async function submitCode() {
     })
 
     if (response.status === 200) {
-      emit('verified')
+      emit('verified', props.messageType)
       closePopup()
     }
   } catch (err) {

@@ -26,7 +26,7 @@ export default {
     }
   },
   plugins: [
-    function ({ addComponents, theme }) {
+    function ({ addComponents, theme, addBase }) {
       addComponents({
         '.form-input': {
           backgroundColor: '#F9FAFB',
@@ -79,6 +79,26 @@ export default {
               color: '#F9FAFB'
             }
           }
+        }
+      })
+      addBase({
+        'input[type="password"]::-ms-reveal': {
+          display: 'none'
+        },
+        'input[type="password"]::-ms-clear': {
+          display: 'none'
+        },
+        'input[type="password"]::-webkit-clear-button': {
+          display: 'none'
+        },
+        'input[type="password"]::-webkit-inner-spin-button': {
+          display: 'none'
+        },
+        'input[type="password"]::-webkit-outer-spin-button': {
+          display: 'none'
+        },
+        'input[type="password"]::-webkit-textfield-decoration-container': {
+          display: 'none'
         }
       })
     }
