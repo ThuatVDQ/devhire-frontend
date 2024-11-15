@@ -33,20 +33,30 @@
     </div>
 
     <div class="bg-white rounded-lg shadow p-6">
-      <h3 class="text-gray-800 text-lg font-semibold mb-4">Latest Job Posts</h3>
-      <ul class="divide-y divide-gray-200">
-        <li v-for="job in latestJobPosts" :key="job.id" class="py-4">
-          <div class="flex justify-between items-center">
-            <router-link
-              :to="'/recruiter/jobs/' + job.id"
-              class="text-blue-500 font-bold text-sm hover:underline"
-            >
-              {{ job.title }}
-            </router-link>
-            <p class="text-gray-500 text-xs">{{ job.datePosted }}</p>
-          </div>
-        </li>
-      </ul>
+      <h3 class="text-gray-800 text-xl font-semibold mb-4">Latest Job Posts</h3>
+      <table class="min-w-full table-auto text-left">
+        <thead>
+          <tr>
+            <th class="py-2 px-4 border-b text-gray-600 text-sm font-semibold">Job Title</th>
+            <th class="py-2 px-4 border-b text-gray-600 text-sm font-semibold">Status</th>
+            <th class="py-2 px-4 border-b text-gray-600 text-sm font-semibold">Deadline</th>
+            <th class="py-2 px-4 border-b text-gray-600 text-sm font-semibold">Slots</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="job in latestJobPosts" :key="job.id">
+            <td class="py-2 px-4 border-b">
+              <!-- Giữ lại RouterLink để điều hướng tới chi tiết công việc -->
+              <router-link :to="'/recruiter/jobs/' + job.id">
+                {{ job.title }}
+              </router-link>
+            </td>
+            <td class="py-2 px-4 border-b">{{ job.status }}</td>
+            <td class="py-2 px-4 border-b">{{ formatDate(job.deadline) }}</td>
+            <td class="py-2 px-4 border-b">{{ job.slots }}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </section>
 </template>
@@ -60,6 +70,12 @@ const totalJobsPosted = ref(0)
 const totalApplications = ref(0)
 const jobsPendingApproval = ref(0)
 const latestJobPosts = ref([])
+
+const formatDate = (dateString) => {
+  const options = { year: 'numeric', month: 'long', day: 'numeric' }
+  const date = new Date(dateString)
+  return date.toLocaleDateString('en-US', options)
+}
 
 const applicationsPerJobData = ref({
   labels: [],
@@ -208,6 +224,19 @@ async function fetchTotalApplications() {
   }
 }
 
+async function fetchLatestJobs() {
+  try {
+    const response = await axios.get('http://localhost:8090/api/jobs/latest', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    latestJobPosts.value = response.data
+  } catch (error) {
+    console.error('Error fetching latest jobs:', error)
+  }
+}
+
 // Fetch data on mounted
 onMounted(async () => {
   await fetchTotalJobsPosted()
@@ -215,6 +244,7 @@ onMounted(async () => {
   await fetchTotalApplications()
   await fetchMonthlyApplications()
   await fetchApplicationsPerJob()
+  await fetchLatestJobs()
 })
 
 // Cập nhật chartOptions
