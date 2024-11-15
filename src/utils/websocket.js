@@ -8,13 +8,42 @@ const stompClient = new Client({
   reconnectDelay: 5000
 })
 
-stompClient.onConnect = () => {
-  console.log('Connected to WebSocket')
-  const username = localStorage.getItem('username')
-  stompClient.subscribe(`/topic/notifications/${username}`, (message) => {
-    const notification = JSON.parse(message.body)
-    toastr.success(notification.message, 'New Notification')
-  })
+let notificationCallback = null
+
+// Hàm để khởi tạo WebSocket và lắng nghe thông báo
+export const initializeWebSocket = (username, onNotificationReceived) => {
+  notificationCallback = onNotificationReceived // Lưu callback để sử dụng khi có thông báo mới
+
+  stompClient.onConnect = () => {
+    console.log('Connected to WebSocket')
+
+    stompClient.subscribe(`/topic/notifications/${username}`, (message) => {
+      const notification = JSON.parse(message.body)
+
+      // Lưu cấu hình gốc
+      const originalOptions = { ...toastr.options }
+
+      // Cấu hình tạm thời cho Toastr
+      toastr.options = {
+        ...originalOptions,
+        positionClass: 'toast-bottom-left'
+      }
+
+      toastr.info('New Notification')
+
+      toastr.options = originalOptions
+
+      if (notificationCallback) {
+        notificationCallback(notification)
+      }
+    })
+  }
+
+  stompClient.activate()
 }
 
-stompClient.activate()
+// Hàm ngắt kết nối WebSocket
+export const disconnectWebSocket = () => {
+  stompClient.deactivate()
+  console.log('Disconnected from WebSocket')
+}
