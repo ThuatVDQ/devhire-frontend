@@ -125,6 +125,7 @@ const deleteNotification = async (notificationId) => {
     notifications.value = notifications.value.filter(
       (notification) => notification.id !== notificationId
     )
+    fetchUnreadCount()
   } catch (error) {
     console.error('Error deleting notification:', error)
   }

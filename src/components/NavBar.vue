@@ -3,6 +3,7 @@ import { reactive, ref, onMounted } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 import defaultAvatar from '../assets/avatar-default.svg'
+import Notifications from '@/components/Notifications.vue'
 
 const data = reactive({
   user: {}
@@ -142,12 +143,7 @@ onMounted(() => {
 
       <div class="hidden md:flex items-center space-x-4 relative">
         <div v-if="isLoggedIn" class="flex items-center space-x-4 relative">
-          <button class="relative">
-            <i class="pi pi-bell text-gray-600 text-2xl"></i>
-            <span
-              class="absolute top-0 right-0 inline-block w-2 h-2 bg-red-600 rounded-full"
-            ></span>
-          </button>
+          <Notifications />
 
           <div
             class="relative flex items-center"
