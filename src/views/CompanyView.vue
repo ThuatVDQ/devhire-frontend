@@ -2,8 +2,7 @@
 import CompanyList from '@/components/CompanyList.vue'
 import CardExploreJob from '@/components/CardExploreJob.vue'
 import Accordion from '@/components/Accordion.vue'
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
-import axios from 'axios'
+import { ref, computed } from 'vue'
 
 const openAccordion = ref(null)
 
@@ -12,65 +11,8 @@ const handleToggleAccordion = (index) => {
 }
 
 const keyword = ref('')
-const selectedCity = ref('')
-const searchQuery = ref('')
-const isLocationDropdownOpen = ref(false)
-const cities = ref([])
-
-const locationDropdown = ref(null)
-
-const toggleLocationDropdown = () => {
-  isLocationDropdownOpen.value = !isLocationDropdownOpen.value
-}
-
-const clearLocation = () => {
-  selectedCity.value = ''
-}
-
-// Load list of cities
-onMounted(async () => {
-  try {
-    const response = await axios.get('https://provinces.open-api.vn/api/?depth=2')
-    cities.value = response.data.map((city) => ({ name: city.name, code: city.code }))
-  } catch (error) {
-    console.error('Error fetching cities:', error)
-  }
-})
-
-// Filter cities based on search query
-function removeVietnameseTones(str) {
-  return str
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/đ/g, 'd')
-    .replace(/Đ/g, 'D')
-}
-
-const filteredCities = computed(() => {
-  if (!searchQuery.value) return cities.value
-  const search = removeVietnameseTones(searchQuery.value.trim().toLowerCase())
-  return cities.value.filter((city) =>
-    removeVietnameseTones(city.name.toLowerCase()).includes(search)
-  )
-})
-
-const selectCity = (cityName) => {
-  selectedCity.value = cityName
-  isLocationDropdownOpen.value = false
-}
-const handleClickOutside = (event) => {
-  if (locationDropdown.value && !locationDropdown.value.contains(event.target)) {
-    isLocationDropdownOpen.value = false
-  }
-}
-
-// Attach and detach the click event listener
-onMounted(() => {
-  window.addEventListener('click', handleClickOutside)
-})
-
-onBeforeUnmount(() => {
-  window.removeEventListener('click', handleClickOutside)
+const filteredKeyword = computed(() => {
+  return keyword.value.trim().toLowerCase()
 })
 </script>
 
@@ -105,49 +47,6 @@ onBeforeUnmount(() => {
               class="w-full bg-transparent border-none outline-none text-gray-900 dark:text-white text-lg"
             />
           </div>
-
-          <!-- Custom Location Dropdown -->
-          <div ref="locationDropdown" class="relative w-full">
-            <div
-              @click="toggleLocationDropdown"
-              class="flex items-center bg-gray-50 dark:bg-gray-700 p-3 rounded-lg cursor-pointer"
-            >
-              <i class="pi pi-map-marker text-green-700 mr-4 text-lg"></i>
-              <span class="text-gray-900 dark:text-white text-lg flex-1">
-                {{ selectedCity || 'Select location' }}
-              </span>
-              <button
-                v-if="selectedCity"
-                @click.stop="clearLocation"
-                class="text-gray-500 hover:text-red-500"
-              >
-                ✕
-              </button>
-            </div>
-
-            <!-- Location Dropdown List -->
-            <div
-              v-if="isLocationDropdownOpen"
-              class="absolute mt-2 w-full bg-white dark:bg-gray-800 shadow-lg rounded-lg z-10"
-            >
-              <input
-                v-model="searchQuery"
-                type="text"
-                placeholder="Search location..."
-                class="w-full px-5 py-3 border-b border-gray-200 outline-none focus:border-green-500 text-lg"
-              />
-              <ul class="max-h-48 overflow-y-auto">
-                <li
-                  v-for="city in filteredCities"
-                  :key="city.code"
-                  @click="selectCity(city.name)"
-                  class="px-5 py-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 text-lg"
-                >
-                  {{ city.name }}
-                </li>
-              </ul>
-            </div>
-          </div>
         </form>
       </div>
     </div>
@@ -157,7 +56,7 @@ onBeforeUnmount(() => {
   <section class="relative md:py-24 py-16">
     <div class="container">
       <div class="grid grid-cols-1 pb-8">
-        <CompanyList />
+        <CompanyList :keyword="filteredKeyword" />
       </div>
     </div>
 
