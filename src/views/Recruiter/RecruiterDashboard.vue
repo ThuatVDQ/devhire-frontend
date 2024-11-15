@@ -21,8 +21,14 @@
     <!-- Charts -->
     <div class="grid grid-cols-1 gap-6 mb-8">
       <div class="bg-white rounded-lg shadow p-6">
+        <h3 class="text-lg font-semibold mb-4">Applications Per Job</h3>
+        <BarChart :chartData="applicationsPerJobData" :options="chartOptions" />
+      </div>
+    </div>
+    <div class="grid grid-cols-1 gap-6 mb-8">
+      <div class="bg-white rounded-lg shadow p-6">
         <h3 class="text-lg font-semibold mb-4">Monthly Applications</h3>
-        <BarChart :chartData="monthlyApplicationsData" />
+        <BarChart :chartData="monthlyApplicationsData" :options="chartOptions" />
       </div>
     </div>
 
@@ -31,7 +37,6 @@
       <ul class="divide-y divide-gray-200">
         <li v-for="job in latestJobPosts" :key="job.id" class="py-4">
           <div class="flex justify-between items-center">
-            <!-- Đặt RouterLink quanh tiêu đề công việc -->
             <router-link
               :to="'/recruiter/jobs/' + job.id"
               class="text-blue-500 font-bold text-sm hover:underline"
@@ -45,9 +50,8 @@
     </div>
   </section>
 </template>
-
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
 import BarChart from '@/components/BarChart.vue'
 
@@ -68,29 +72,6 @@ const applicationsPerJobData = ref({
   ]
 })
 
-// Hàm để gán dữ liệu mẫu vào applicationsPerJobData
-function setDummyApplicationsPerJobData() {
-  const dummyLabels = ['Job 1', 'Job 2', 'Job 3', 'Job 4']
-  const dummyData = [12, 19, 3, 5]
-
-  // Sử dụng Object.assign để thay thế toàn bộ đối tượng để Vue nhận diện thay đổi
-  applicationsPerJobData.value = {
-    labels: dummyLabels,
-    datasets: [
-      {
-        label: 'Applications',
-        backgroundColor: '#4CAF50',
-        data: dummyData
-      }
-    ]
-  }
-
-  console.log('Applications Per Job Data with Dummy Data:', applicationsPerJobData.value)
-}
-
-// Gọi hàm setDummyApplicationsPerJobData khi component được mounted
-onMounted(setDummyApplicationsPerJobData)
-
 const monthlyApplicationsData = ref({
   labels: [],
   datasets: [
@@ -102,46 +83,38 @@ const monthlyApplicationsData = ref({
   ]
 })
 
-// Define functions for fetching data
-async function fetchTotalJobsPosted() {
+// Hàm để lấy số liệu ứng tuyển theo công việc từ API
+async function fetchApplicationsPerJob() {
   try {
-    const response = await axios.get('http://localhost:8090/api/jobs/total-posted', {
+    const response = await axios.get('http://localhost:8090/api/job-application/count-per-job', {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     })
-    totalJobsPosted.value = response.data
+    const jobData = response.data
+    console.log(jobData)
+
+    // Khởi tạo mảng labels (tên công việc) và data (số lượng ứng tuyển)
+    const labels = jobData.map((job) => job.jobTitle) // Giả sử API trả về mảng công việc với `title`
+    const data = jobData.map((job) => job.count) // Giả sử API trả về mảng số lượng ứng tuyển
+
+    // Cập nhật lại dữ liệu cho biểu đồ
+    applicationsPerJobData.value = {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Applications',
+          backgroundColor: '#4CAF50',
+          data: data
+        }
+      ]
+    }
   } catch (error) {
-    console.error('Error fetching total jobs posted:', error)
+    console.error('Error fetching applications per job data:', error)
   }
 }
 
-async function fetchJobsPendingApproval() {
-  try {
-    const response = await axios.get('http://localhost:8090/api/jobs/total-pending', {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
-    })
-    jobsPendingApproval.value = response.data
-  } catch (error) {
-    console.error('Error fetching jobs pending approval:', error)
-  }
-}
-
-async function fetchTotalApplications() {
-  try {
-    const response = await axios.get('http://localhost:8090/api/job-application/total', {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
-    })
-    totalApplications.value = response.data
-  } catch (error) {
-    console.error('Error fetching total applications:', error)
-  }
-}
-
+// Hàm lấy số liệu ứng tuyển theo tháng từ API
 async function fetchMonthlyApplications() {
   try {
     const response = await axios.get('http://localhost:8090/api/job-application/monthly-count', {
@@ -193,11 +166,76 @@ async function fetchMonthlyApplications() {
   }
 }
 
+// Hàm lấy tổng số công việc đã đăng
+async function fetchTotalJobsPosted() {
+  try {
+    const response = await axios.get('http://localhost:8090/api/jobs/total-posted', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    totalJobsPosted.value = response.data
+  } catch (error) {
+    console.error('Error fetching total jobs posted:', error)
+  }
+}
+
+// Hàm lấy tổng số công việc đang chờ phê duyệt
+async function fetchJobsPendingApproval() {
+  try {
+    const response = await axios.get('http://localhost:8090/api/jobs/total-pending', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    jobsPendingApproval.value = response.data
+  } catch (error) {
+    console.error('Error fetching jobs pending approval:', error)
+  }
+}
+
+// Hàm lấy tổng số ứng tuyển
+async function fetchTotalApplications() {
+  try {
+    const response = await axios.get('http://localhost:8090/api/job-application/total', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    totalApplications.value = response.data
+  } catch (error) {
+    console.error('Error fetching total applications:', error)
+  }
+}
+
 // Fetch data on mounted
 onMounted(async () => {
   await fetchTotalJobsPosted()
   await fetchJobsPendingApproval()
   await fetchTotalApplications()
   await fetchMonthlyApplications()
+  await fetchApplicationsPerJob()
+})
+
+// Cập nhật chartOptions
+const chartOptions = computed(() => {
+  const numOfDataPoints = applicationsPerJobData.value.labels.length
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      x: {
+        ticks: {
+          maxRotation: 0,
+          autoSkip: true
+        },
+        barPercentage: numOfDataPoints <= 5 ? 0.9 : numOfDataPoints <= 10 ? 0.7 : 0.5,
+        categoryPercentage: numOfDataPoints <= 5 ? 1 : numOfDataPoints <= 10 ? 0.8 : 0.6
+      },
+      y: {
+        beginAtZero: true
+      }
+    }
+  }
 })
 </script>
