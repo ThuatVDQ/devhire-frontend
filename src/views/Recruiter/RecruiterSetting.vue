@@ -60,7 +60,8 @@ import 'toastr/build/toastr.min.css'
 
 const router = useRouter()
 const logout = () => {
-  localStorage.removeItem('token') // Remove the token from localStorage
+  localStorage.removeItem('token')
+  localStorage.removeItem('username') // Remove the token from localStorage
   toastr.success('Logged out successfully')
   router.push('/recruiter/login') // Redirect to login page
 }

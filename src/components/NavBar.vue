@@ -54,6 +54,7 @@ const fetchUserProfile = async () => {
 
 const logout = () => {
   localStorage.removeItem('token')
+  localStorage.removeItem('username')
   isLoggedIn.value = false
   router.push('/login')
 }

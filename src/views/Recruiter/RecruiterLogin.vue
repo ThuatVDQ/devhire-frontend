@@ -79,6 +79,7 @@ const login = async () => {
 
     if (response.status === 200 && response.data.token) {
       localStorage.setItem('token', response.data.token)
+      localStorage.setItem('username', form.value.phone)
       router.push('/recruiter/dashboard')
       toastr.success('Login successfully!')
     } else {
