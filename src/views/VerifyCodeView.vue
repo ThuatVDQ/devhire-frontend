@@ -40,6 +40,19 @@
       <span v-if="error" class="text-red-500 text-sm block mt-4">{{ error }}</span>
     </div>
   </div>
+
+  <!-- Overlay mờ và icon xoay tròn khi đợi phản hồi từ backend -->
+  <div
+    v-if="isLoading"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+  >
+    <div class="text-center">
+      <div
+        class="w-16 h-16 border-4 border-t-4 border-gray-300 border-t-emerald-600 rounded-full animate-spin mb-4"
+      ></div>
+      <p class="text-white text-lg">Processing, please wait...</p>
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -56,6 +69,7 @@ const emit = defineEmits(['close', 'verified'])
 const code = ref(Array(6).fill(''))
 const error = ref('')
 const countdown = ref(300) // 5 minutes in seconds
+const isLoading = ref(false) // Biến kiểm tra trạng thái đang đợi phản hồi từ backend
 
 // Format countdown as mm:ss
 const formattedTime = computed(() => {
@@ -119,9 +133,9 @@ function handlePaste(event) {
 }
 
 async function submitCode() {
+  isLoading.value = true // Bắt đầu trạng thái loading
   try {
     const verificationCode = code.value.join('')
-    console.log(verificationCode + 'email' + props.email)
     const response = await axios.post(`http://localhost:8090/api/users/verify`, {
       email: props.email,
       verification_code: verificationCode
@@ -133,11 +147,13 @@ async function submitCode() {
     }
   } catch (err) {
     error.value = 'The verification code is incorrect. Please try again!'
-    console.log(error)
+  } finally {
+    isLoading.value = false // Kết thúc trạng thái loading
   }
 }
 
 async function resendCode() {
+  isLoading.value = true // Bắt đầu trạng thái loading
   try {
     countdown.value = 300
 
@@ -148,7 +164,8 @@ async function resendCode() {
     }
   } catch (err) {
     error.value = 'Failed to resend code. Please try again later.'
-    console.error(err)
+  } finally {
+    isLoading.value = false // Kết thúc trạng thái loading
   }
 }
 
