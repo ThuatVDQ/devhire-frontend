@@ -223,11 +223,12 @@ function validateForm() {
     toastr.error('Level is required.')
     isValid = false
   }
-  if (!inf.salaryStart || !inf.salaryEnd) {
-    toastr.error('Salary range is required.')
-    isValid = false
-  } else if (inf.salaryEnd <= inf.salaryStart) {
+  if (inf.salaryEnd < inf.salaryStart) {
     toastr.error('End salary must be greater than start salary.')
+    isValid = false
+  }
+  if (inf.salaryStart < 0 || inf.salaryEnd < 0) {
+    toastr.error('Salary cannot be a negative number.')
     isValid = false
   }
   if (!inf.selectedDate) {
@@ -421,7 +422,7 @@ function getDistrictCode(cityName, districtName) {
 <template>
   <section class="relative bg-slate-50 dark:bg-slate-800 lg:py-16 py-16">
     <div class="container">
-      <h1>Post a job</h1>
+      <h1 class="ml-16">Post a job</h1>
       <div class="lg:flex justify-center">
         <div>
           <div class="p-6 bg-white dark:bg-slate-900 shadow dark:shadow-gray-700 rounded-md">

@@ -67,7 +67,7 @@
                 <label class="relative inline-flex items-center mr-4 cursor-pointer">
                   <input
                     type="checkbox"
-                    :checked="job.isActive"
+                    :checked="job.status === 'OPEN'"
                     @change="toggleJobStatus(job.id, $event.target.checked)"
                     class="sr-only peer"
                   />

@@ -1,43 +1,45 @@
 <template>
-  <section class="dashboard-content">
-    <h2 class="dashboard-title">Dashboard Overview</h2>
+  <section class="p-6 bg-gray-100 min-h-screen">
+    <h2 class="text-2xl font-semibold mb-6 text-gray-800">Dashboard Overview</h2>
 
     <!-- Summary cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-      <div class="dashboard-card">
-        <h3 class="card-title">Total Jobs Posted</h3>
-        <p class="card-number">{{ totalJobsPosted }}</p>
+      <div class="bg-white rounded-lg shadow p-6 text-center">
+        <h3 class="text-gray-600 text-lg font-medium mb-2">Total Jobs Posted</h3>
+        <p class="text-4xl font-bold text-blue-500">{{ totalJobsPosted }}</p>
       </div>
-      <div class="dashboard-card">
-        <h3 class="card-title">Total Applications</h3>
-        <p class="card-number">{{ totalApplications }}</p>
+      <div class="bg-white rounded-lg shadow p-6 text-center">
+        <h3 class="text-gray-600 text-lg font-medium mb-2">Total Applications</h3>
+        <p class="text-4xl font-bold text-blue-500">{{ totalApplications }}</p>
       </div>
-      <div class="dashboard-card">
-        <h3 class="card-title">Jobs Pending Approval</h3>
-        <p class="card-number">{{ jobsPendingApproval }}</p>
-      </div>
-    </div>
-
-    <!-- Charts or reports -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-      <div class="dashboard-chart">
-        <h3 class="chart-title">Applications per Job</h3>
-        <!-- Placeholder for chart, replace with a chart library like Chart.js -->
-        <div class="chart-placeholder">[Chart]</div>
-      </div>
-      <div class="dashboard-chart">
-        <h3 class="chart-title">Monthly Applications</h3>
-        <div class="chart-placeholder">[Chart]</div>
+      <div class="bg-white rounded-lg shadow p-6 text-center">
+        <h3 class="text-gray-600 text-lg font-medium mb-2">Jobs Pending Approval</h3>
+        <p class="text-4xl font-bold text-blue-500">{{ jobsPendingApproval }}</p>
       </div>
     </div>
 
-    <div class="latest-jobs">
-      <h3 class="latest-title">Latest Job Posts</h3>
-      <ul class="job-list">
-        <li v-for="job in latestJobPosts" :key="job.id" class="job-item">
-          <h4>{{ job.title }}</h4>
-          <p>{{ job.datePosted }}</p>
-          <router-link :to="'/recruiter/jobs/' + job.id" class="job-link">View Details</router-link>
+    <!-- Charts -->
+    <div class="grid grid-cols-1 gap-6 mb-8">
+      <div class="bg-white rounded-lg shadow p-6">
+        <h3 class="text-lg font-semibold mb-4">Monthly Applications</h3>
+        <BarChart :chartData="monthlyApplicationsData" />
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6">
+      <h3 class="text-gray-800 text-lg font-semibold mb-4">Latest Job Posts</h3>
+      <ul class="divide-y divide-gray-200">
+        <li v-for="job in latestJobPosts" :key="job.id" class="py-4">
+          <div class="flex justify-between items-center">
+            <!-- Đặt RouterLink quanh tiêu đề công việc -->
+            <router-link
+              :to="'/recruiter/jobs/' + job.id"
+              class="text-blue-500 font-bold text-sm hover:underline"
+            >
+              {{ job.title }}
+            </router-link>
+            <p class="text-gray-500 text-xs">{{ job.datePosted }}</p>
+          </div>
         </li>
       </ul>
     </div>
@@ -47,146 +49,155 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
+import BarChart from '@/components/BarChart.vue'
 
-// State for summary cards
+// Define reactive variables
 const totalJobsPosted = ref(0)
 const totalApplications = ref(0)
 const jobsPendingApproval = ref(0)
-
-// State for latest job posts
 const latestJobPosts = ref([])
 
-// Fetch data from API when the component is mounted
-onMounted(async () => {
-  await fetchDashboardData()
-  await fetchLatestJobPosts()
+const applicationsPerJobData = ref({
+  labels: [],
+  datasets: [
+    {
+      label: 'Applications',
+      backgroundColor: '#4CAF50',
+      data: []
+    }
+  ]
 })
 
-async function fetchDashboardData() {
+// Hàm để gán dữ liệu mẫu vào applicationsPerJobData
+function setDummyApplicationsPerJobData() {
+  const dummyLabels = ['Job 1', 'Job 2', 'Job 3', 'Job 4']
+  const dummyData = [12, 19, 3, 5]
+
+  // Sử dụng Object.assign để thay thế toàn bộ đối tượng để Vue nhận diện thay đổi
+  applicationsPerJobData.value = {
+    labels: dummyLabels,
+    datasets: [
+      {
+        label: 'Applications',
+        backgroundColor: '#4CAF50',
+        data: dummyData
+      }
+    ]
+  }
+
+  console.log('Applications Per Job Data with Dummy Data:', applicationsPerJobData.value)
+}
+
+// Gọi hàm setDummyApplicationsPerJobData khi component được mounted
+onMounted(setDummyApplicationsPerJobData)
+
+const monthlyApplicationsData = ref({
+  labels: [],
+  datasets: [
+    {
+      label: 'Applications',
+      backgroundColor: '#2196F3',
+      data: []
+    }
+  ]
+})
+
+// Define functions for fetching data
+async function fetchTotalJobsPosted() {
   try {
-    const response = await axios.get('http://localhost:8000/dashboard/summary')
-    const { jobsPosted, applications, pendingJobs } = response.data
-    totalJobsPosted.value = jobsPosted
-    totalApplications.value = applications
-    jobsPendingApproval.value = pendingJobs
+    const response = await axios.get('http://localhost:8090/api/jobs/total-posted', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    totalJobsPosted.value = response.data
   } catch (error) {
-    console.error('Error fetching dashboard summary data:', error)
+    console.error('Error fetching total jobs posted:', error)
   }
 }
 
-async function fetchLatestJobPosts() {
+async function fetchJobsPendingApproval() {
   try {
-    const response = await axios.get('http://localhost:8000/jobs/latest')
-    latestJobPosts.value = response.data
+    const response = await axios.get('http://localhost:8090/api/jobs/total-pending', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    jobsPendingApproval.value = response.data
   } catch (error) {
-    console.error('Error fetching latest job posts:', error)
+    console.error('Error fetching jobs pending approval:', error)
   }
 }
+
+async function fetchTotalApplications() {
+  try {
+    const response = await axios.get('http://localhost:8090/api/job-application/total', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    totalApplications.value = response.data
+  } catch (error) {
+    console.error('Error fetching total applications:', error)
+  }
+}
+
+async function fetchMonthlyApplications() {
+  try {
+    const response = await axios.get('http://localhost:8090/api/job-application/monthly-count', {
+      params: { year: new Date().getFullYear() },
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    const monthlyData = response.data
+
+    // Khởi tạo mảng labels cho 12 tháng
+    const labels = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
+    ]
+
+    // Khởi tạo mảng data cho 12 tháng với giá trị mặc định là 0
+    const data = new Array(12).fill(0)
+
+    // Cập nhật data dựa trên dữ liệu từ API
+    monthlyData.forEach((item) => {
+      const monthIndex = item.month - 1 // Chuyển tháng sang chỉ số bắt đầu từ 0
+      data[monthIndex] = item.application_count // Gán giá trị từ API
+    })
+
+    // Gán lại toàn bộ đối tượng `monthlyApplicationsData` để Vue nhận diện thay đổi
+    monthlyApplicationsData.value = {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Applications',
+          backgroundColor: '#2196F3',
+          data: data
+        }
+      ]
+    }
+  } catch (error) {
+    console.error('Error fetching monthly applications data:', error)
+  }
+}
+
+// Fetch data on mounted
+onMounted(async () => {
+  await fetchTotalJobsPosted()
+  await fetchJobsPendingApproval()
+  await fetchTotalApplications()
+  await fetchMonthlyApplications()
+})
 </script>
-
-<style scoped>
-.dashboard-content {
-  padding: 20px;
-  background-color: #f5f7fa;
-  flex: 1;
-}
-
-.dashboard-title {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 20px;
-  color: #333;
-}
-
-.dashboard-card {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  text-align: center;
-}
-
-.card-title {
-  font-size: 16px;
-  color: #777;
-  margin-bottom: 10px;
-}
-
-.card-number {
-  font-size: 32px;
-  font-weight: bold;
-  color: #007bff;
-}
-
-.dashboard-chart {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-}
-
-.chart-title {
-  font-size: 16px;
-  color: #777;
-  margin-bottom: 10px;
-}
-
-.chart-placeholder {
-  height: 200px;
-  background-color: #e9ecef;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 8px;
-  color: #888;
-  font-size: 14px;
-}
-
-.latest-jobs {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-}
-
-.latest-title {
-  font-size: 16px;
-  font-weight: bold;
-  margin-bottom: 15px;
-}
-
-.job-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.job-item {
-  margin-bottom: 10px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #e9ecef;
-}
-
-.job-item h4 {
-  margin: 0;
-  font-size: 14px;
-  font-weight: bold;
-  color: #007bff;
-}
-
-.job-item p {
-  margin: 0;
-  font-size: 12px;
-  color: #777;
-}
-
-.job-link {
-  font-size: 12px;
-  color: #007bff;
-  text-decoration: none;
-}
-
-.job-link:hover {
-  text-decoration: underline;
-}
-</style>
