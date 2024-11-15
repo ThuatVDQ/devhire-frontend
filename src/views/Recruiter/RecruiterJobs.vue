@@ -57,11 +57,7 @@
         </thead>
         <tbody>
           <!-- Loop through paginated jobs and display each one -->
-          <tr
-            v-for="(job, index) in paginatedJobs"
-            :key="job.id"
-            class="border-b hover:bg-gray-100"
-          >
+          <tr v-for="(job, index) in jobs" :key="job.id" class="border-b hover:bg-gray-100">
             <td class="py-4 px-6 text-sm text-gray-700">
               <div class="flex items-center">
                 <label class="relative inline-flex items-center mr-4 cursor-pointer">
@@ -113,104 +109,94 @@
               </div>
             </td>
           </tr>
-          <!-- Empty state if no jobs exist -->
-          <tr v-if="paginatedJobs.length === 0">
-            <td colspan="5" class="py-4 px-6 text-center text-sm text-gray-500">No jobs found.</td>
-          </tr>
         </tbody>
       </table>
     </div>
 
     <!-- Pagination Controls -->
-    <div class="flex justify-center mt-6">
-      <!-- Previous Button -->
-      <button
-        @click="prevPage"
-        :disabled="currentPage === 1"
-        class="px-3 py-2 rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300 disabled:opacity-50"
-      >
-        <i class="pi pi-angle-left"></i>
-      </button>
-
-      <!-- Page Numbers -->
-      <div class="flex mx-2 space-x-2">
-        <button
-          v-for="page in totalPages"
-          :key="page"
-          @click="setPage(page)"
-          :class="[
-            'px-3 py-2 rounded-full',
-            currentPage === page ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600'
-          ]"
-          class="px-4 py-2 text-gray-700 rounded hover:bg-gray-400"
-        >
-          {{ page }}
-        </button>
+    <div v-if="totalPages > 1" class="grid md:grid-cols-12 grid-cols-1 mt-8">
+      <div class="md:col-span-12 text-center">
+        <nav aria-label="Page navigation example">
+          <ul class="inline-flex items-center -space-x-px">
+            <li>
+              <a
+                href="#"
+                class="size-[40px] inline-flex justify-center items-center text-slate-400 bg-white rounded-s-3xl"
+                @click.prevent="changePage(currentPage - 1)"
+                :class="{ 'opacity-50 pointer-events-none': currentPage <= 0 }"
+              >
+                <i class="pi pi-angle-left"></i>
+              </a>
+            </li>
+            <li v-for="page in totalPages" :key="page">
+              <a
+                href="#"
+                class="size-[40px] inline-flex justify-center items-center"
+                @click.prevent="changePage(page - 1)"
+                :class="{
+                  'bg-emerald-600 text-white': currentPage === page - 1,
+                  'bg-white': currentPage !== page - 1
+                }"
+              >
+                {{ page }}
+              </a>
+            </li>
+            <li>
+              <a
+                href="#"
+                class="size-[40px] inline-flex justify-center items-center text-slate-400 bg-white rounded-e-3xl"
+                @click.prevent="changePage(currentPage + 1)"
+                :class="{ 'opacity-50 pointer-events-none': currentPage >= totalPages - 1 }"
+              >
+                <i class="pi pi-angle-right"></i>
+              </a>
+            </li>
+          </ul>
+        </nav>
       </div>
-
-      <!-- Next Button -->
-      <button
-        @click="nextPage"
-        :disabled="currentPage === totalPages"
-        class="px-3 py-2 rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300 disabled:opacity-50"
-      >
-        <i class="pi pi-angle-right"></i>
-      </button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
-import toastr from 'toastr'
-import 'toastr/build/toastr.min.css'
 
-const router = useRouter()
 const jobs = ref([]) // Store job data
 const searchQuery = ref('') // Store search query
 const currentFilter = ref('all') // Store selected filter
-const currentPage = ref(1) // Current page
-const itemsPerPage = ref(5) // Number of items per page
+const currentPage = ref(0) // Current page
+const totalPages = ref(0)
+const pageSize = ref(10)
 
 const filters = [
-  { id: 'all', label: 'Tất cả', count: null },
-  { id: 'top-jobs', label: 'Đang chạy Top Jobs', count: 0 },
-  { id: 'displayed', label: 'Đang hiển thị', count: 5 },
-  { id: 'pending', label: 'Đang xét duyệt', count: 14 },
-  { id: 'rejected', label: 'Bị từ chối', count: 16 },
-  { id: 'private', label: 'Không công khai', count: 51 },
-  { id: 'expired', label: 'Hết hạn hiển thị', count: 75 },
-  { id: 'stopped', label: 'Dừng hiển thị', count: 14 }
+  { id: 'all', label: 'All', count: null },
+  { id: 'displayed', label: 'Open', count: 5 },
+  { id: 'pending', label: 'Pending Approval', count: 14 },
+  { id: 'rejected', label: 'Rejected', count: 16 },
+  { id: 'expired', label: 'Expired', count: 75 }
 ]
 
 // Fetch all jobs posted by the recruiter
-async function fetchJobs() {
+async function fetchJobs(page = 0) {
   try {
     const response = await axios.get('http://localhost:8090/api/jobs/company', {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
+      },
+      params: { page: page, limit: pageSize.value }
     })
-    if (Array.isArray(response.data)) {
-      jobs.value = response.data.map((job) => ({
-        ...job,
-        isActive: job.status === 'OPENING'
-      }))
-    } else {
-      console.error('Expected an array but got:', typeof response.data)
-    }
-    console.log('Fetched jobs:', jobs.value)
+    console.log(response.data)
+    jobs.value = response.data.jobs
+    totalPages.value = response.data.totalPages
+    currentPage.value = page
   } catch (e) {
     console.error('Failed to fetch jobs:', e)
   }
 }
-
-// Trigger the function on component mount
 fetchJobs()
-
-// Computed property to filter jobs based on search query and current filter
+// Filter jobs based on search query and current filter
 const filteredJobs = computed(() => {
   return jobs.value
     .filter((job) => {
@@ -220,96 +206,23 @@ const filteredJobs = computed(() => {
       if (currentFilter.value === 'pending') return job.status === 'PENDING'
       return true
     })
-    .filter((job) => job.title)
+    .filter((job) => job.title.toLowerCase().includes(searchQuery.value.toLowerCase()))
 })
-
-// Computed property for pagination
-const totalPages = computed(() => {
-  return Math.ceil(filteredJobs.value.length / itemsPerPage.value)
-})
-
-const paginatedJobs = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage.value
-  const end = start + itemsPerPage.value
-  return filteredJobs.value.slice(start, end)
-})
-
-// Methods for pagination
-function nextPage() {
-  if (currentPage.value < totalPages.value) {
-    currentPage.value++
+const changePage = (page) => {
+  if (page >= 0 && page < totalPages.value) {
+    fetchJobs(page)
+    scrollToTop()
   }
 }
 
-function prevPage() {
-  if (currentPage.value > 1) {
-    currentPage.value--
-  }
-}
+onMounted(() => {
+  fetchJobs(currentPage.value)
+})
 
-function setPage(page) {
-  currentPage.value = page
-}
-
-// Function to update the filter
-function setFilter(filterId) {
-  currentFilter.value = filterId
-  currentPage.value = 1 // Reset to first page when changing filter
-}
-
-async function downloadCVs(jobId, title) {
-  try {
-    const response = await axios.get(
-      `http://localhost:8090/api/job-application/${jobId}/download-cv`,
-      {
-        responseType: 'blob',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
-      }
-    )
-
-    const url = window.URL.createObjectURL(new Blob([response.data]))
-    const link = document.createElement('a')
-    link.href = url
-
-    const contentDisposition = response.headers['content-disposition']
-
-    let fileName = ``
-    if (contentDisposition && contentDisposition.includes('filename=')) {
-      fileName = contentDisposition.split('filename=')[1].split(';')[0].trim().replace(/"/g, '')
-    }
-    const fileNameWithoutExtension = fileName.split('.').slice(0, -1).join('.')
-    const fileExtension = fileName.split('.').pop()
-    fileName = `${fileNameWithoutExtension}_${title}.${fileExtension}`
-
-    link.setAttribute('download', fileName)
-    document.body.appendChild(link)
-    link.click()
-
-    window.URL.revokeObjectURL(url)
-    document.body.removeChild(link)
-
-    toastr.success('Download successful!')
-    updateApplicationStatus(jobId, 'seen-all')
-  } catch (error) {
-    console.error('Error downloading CVs:', error)
-    toastr.error('Download failed. Please try again.')
-  }
-}
-
-async function updateApplicationStatus(jobId, newStatus) {
-  try {
-    await axios.post(`http://localhost:8090/api/job-application/${jobId}/${newStatus}`, {})
-    fetchJobs()
-  } catch (error) {}
-}
-
-function goToEditJob(jobId) {
-  router.push(`/recruiter/edit-job/${jobId}`)
-}
-
-function goToJobDetail(jobId) {
-  router.push(`/recruiter/job-detail/${jobId}`)
+const scrollToTop = () => {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  })
 }
 </script>
