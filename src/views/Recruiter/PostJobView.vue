@@ -3,20 +3,9 @@ import { ref, onMounted } from 'vue'
 import PostForm from '@/components/PostForm.vue'
 import axios from 'axios'
 
-const categories = ref([])
 const skills = ref([])
 const address = ref([])
 const cities = ref([])
-
-// Fetch Categories, Skills, and Address data
-const fetchCategories = async () => {
-  try {
-    const response = await axios.get('http://localhost:8090/api/category')
-    categories.value = response.data
-  } catch (e) {
-    console.error('Error fetching categories:', e)
-  }
-}
 
 const fetchSkills = async () => {
   try {
@@ -133,7 +122,6 @@ function setDistricts(cityCode) {
 // Trigger the fetch methods on mount
 onMounted(async () => {
   await fetchCities()
-  await fetchCategories()
   await fetchSkills()
   await fetchAddresses()
 
@@ -144,6 +132,6 @@ onMounted(async () => {
 <template>
   <div class="text-left">
     <!-- Pass the data as props to PostForm -->
-    <PostForm :categories="categories" :skills="skills" :address="address" />
+    <PostForm :skills="skills" :address="address" />
   </div>
 </template>

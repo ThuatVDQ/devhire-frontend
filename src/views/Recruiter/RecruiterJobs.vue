@@ -225,6 +225,10 @@ function goToJobDetail(jobId) {
   router.push(`/recruiter/job-detail/${jobId}`)
 }
 
+function goToEditJob(jobId) {
+  router.push(`/recruiter/edit-job/${jobId}`)
+}
+
 const scrollToTop = () => {
   window.scrollTo({
     top: 0,

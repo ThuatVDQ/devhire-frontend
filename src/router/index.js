@@ -34,6 +34,7 @@ import DashBoard from '@/views/Admin/DashBoard.vue'
 import UserManagement from '@/views/Admin/UserManagement.vue'
 import JobManagement from '@/views/Admin/JobManagement.vue'
 import JobDetail from '@/views/Admin/JobDetail.vue'
+import EditJob from '@/views/Recruiter/EditJob.vue'
 
 const routes = [
   {
@@ -143,6 +144,11 @@ const routes = [
         path: 'job-detail/:id',
         name: 'recruiter-job-detail',
         component: RecruiterJobDetail
+      },
+      {
+        path: 'edit-job/:id',
+        name: 'recruiter-edit-job',
+        component: EditJob
       },
       {
         path: 'settings',

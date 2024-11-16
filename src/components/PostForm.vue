@@ -7,7 +7,7 @@ import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
 
 const props = defineProps({
-  categories: Array,
+  job: Object,
   skills: Array,
   address: Array
 })
@@ -117,23 +117,33 @@ const inf = reactive({
 })
 
 const details = reactive({
-  categories: props.categories.map((category) => ({ id: category.id, name: category.name })),
+  categories: [],
   title: '',
   selectedCategoryId: ''
 })
 
 watch(
-  () => props.categories,
-  (newCategories) => {
-    details.categories = newCategories.map((category) => ({
-      id: category.id,
-      name: category.name
-    }))
-    if (details.categories.length > 0) {
-      details.selectedCategoryId = details.categories[0].id
+  () => props.job,
+  (newJob) => {
+    console.log('New job:', newJob.currency)
+    if (newJob) {
+      details.title = newJob.title || ''
+      details.selectedCategoryId = newJob.category?.id || ''
+      inf.description = newJob.description || ''
+      inf.requirements = newJob.requirement || ''
+      inf.benefits = newJob.benefit || ''
+      inf.experience = newJob.experience || ''
+      inf.position = newJob.position || ''
+      inf.level = newJob.level || ''
+      inf.salaryStart = newJob.salary_start || 0
+      inf.salaryEnd = newJob.salary_end || 0
+      inf.type = newJob.type || 'FULL_TIME'
+      inf.currency = newJob.currency || 'VND'
+      inf.slots = newJob.slots || 1
+      inf.selectedDate = new Date(newJob.deadline).toISOString().split('T')[0] || ''
     }
   },
-  { immediate: true } // Chạy ngay khi component khởi tạo
+  { immediate: true }
 )
 
 watch(
@@ -382,112 +392,19 @@ onMounted(async () => {
     }
   })
 
-  // await fetchCategories()
+  await fetchCategories()
   await fetchCities()
   // await fetchSkills()
   // await fetchAddresses()
-
-  inf.type = 'FULL_TIME'
-  inf.currency = 'VND'
 })
 
 async function fetchCategories() {
   try {
     const response = await axios.get('http://localhost:8090/api/category')
     details.categories = response.data
-    if (details.categories.length > 0) {
-      details.selectedCategoryId = details.categories[0].id
-    }
   } catch (e) {
     console.error(e)
   }
-}
-
-async function fetchSkills() {
-  try {
-    const response = await axios.get('http://localhost:8090/api/companies/skills', {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
-    })
-    if (response.status === 204 || response.data.length === 0) {
-      inf.skills = [{ name: '' }]
-      return
-    }
-    inf.skills = response.data.map((skill) => ({ name: skill.name }))
-  } catch (error) {
-    console.error(error)
-  }
-}
-
-async function fetchAddresses() {
-  try {
-    const response = await axios.get('http://localhost:8090/api/companies/addresses', {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
-    })
-
-    if (response.status === 204 || response.data.length === 0) {
-      // Nếu không có dữ liệu, thêm một mục địa chỉ trống để phần nhập địa chỉ hiển thị
-      address.addresses = [
-        {
-          selectedCity: '',
-          selectedCityName: '',
-          selectedDistrict: '',
-          selectedDistrictName: '',
-          street: '',
-          districts: [],
-          isCityDropdownOpen: false
-        }
-      ]
-    } else {
-      address.addresses = response.data.map((addr) => {
-        const cityCode = getCityCode(addr.city)
-        const districtCode = getDistrictCode(addr.city, addr.district)
-
-        return {
-          selectedCity: cityCode,
-          selectedCityName: addr.city,
-          selectedDistrict: districtCode,
-          selectedDistrictName: addr.district,
-          street: addr.street,
-          districts: []
-        }
-      })
-      address.addresses.forEach((addr, index) => {
-        setDistricts(index)
-      })
-    }
-  } catch (error) {
-    console.error(error)
-    // Nếu xảy ra lỗi, thêm một địa chỉ trống để người dùng có thể nhập mới
-    address.addresses = [
-      {
-        selectedCity: '',
-        selectedCityName: '',
-        selectedDistrict: '',
-        selectedDistrictName: '',
-        street: '',
-        districts: [],
-        isCityDropdownOpen: false
-      }
-    ]
-  }
-}
-
-function getCityCode(cityName) {
-  const city = address.cities.find((city) => city.name === cityName)
-  return city ? city.code : ''
-}
-
-function getDistrictCode(cityName, districtName) {
-  const city = address.cities.find((city) => city.name === cityName)
-  if (city) {
-    const district = city.districts.find((district) => district.name === districtName)
-    return district ? district.code : ''
-  }
-  return ''
 }
 </script>
 
