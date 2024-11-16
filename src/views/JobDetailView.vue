@@ -12,6 +12,7 @@ const route = useRoute()
 const state = reactive({
   job: {},
   isLoading: true,
+  isApplying: false,
   isFormVisible: false,
   candidate: {
     name: '',
@@ -130,6 +131,7 @@ const submitApplication = async () => {
     fileInput.focus()
     return
   }
+  state.isApplying = true
   try {
     const jobId = route.params.id
 
@@ -149,6 +151,8 @@ const submitApplication = async () => {
   } catch (error) {
     console.error(error)
     toastr.error(error.response.data, 'Error')
+  } finally {
+    state.isApplying = false
   }
 }
 
@@ -161,8 +165,10 @@ onMounted(() => {
 
 <template>
   <section class="bg-slate-50 dark:bg-slate-800 md:pb-24 pb-16">
-    <div v-if="state.isLoading" class="spinner-container">
-      <div class="spinner"></div>
+    <div v-if="state.isLoading" class="flex justify-center">
+      <div
+        class="w-16 h-16 border-4 border-t-4 border-gray-300 border-t-emerald-600 rounded-full animate-spin mb-4"
+      ></div>
     </div>
     <div class="container mt-10">
       <div class="grid md:grid-cols-12 grid-cols-1 gap-[30px]">
@@ -399,7 +405,13 @@ onMounted(() => {
           </div>
         </div>
 
-        <div class="flex justify-end gap-4">
+        <div v-if="state.isApplying" class="flex justify-center">
+          <div
+            class="w-16 h-16 border-4 border-t-4 border-gray-300 border-t-emerald-600 rounded-full animate-spin mb-4"
+          ></div>
+        </div>
+
+        <div v-else class="flex justify-end gap-4">
           <button
             type="button"
             @click="closeApplicationForm"

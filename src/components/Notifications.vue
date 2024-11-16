@@ -73,6 +73,7 @@ const toggleNotifications = async () => {
   showNotifications.value = !showNotifications.value
   if (showNotifications.value) {
     newNotifications.value = false
+    unreadCount.value = 0
     await fetchNotifications()
   }
 }
@@ -104,7 +105,6 @@ const markAllAsRead = async () => {
         }
       }
     )
-    unreadCount.value = 0 // Đặt số lượng chưa đọc về 0
     notifications.value.forEach((notification) => {
       notification.is_read = true
     })
@@ -125,23 +125,8 @@ const deleteNotification = async (notificationId) => {
     notifications.value = notifications.value.filter(
       (notification) => notification.id !== notificationId
     )
-    fetchUnreadCount()
   } catch (error) {
     console.error('Error deleting notification:', error)
-  }
-}
-
-// Gọi API lấy số lượng thông báo chưa đọc
-const fetchUnreadCount = async () => {
-  try {
-    const response = await axios.get('http://localhost:8090/api/notifications/unread-count', {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-    unreadCount.value = response.data
-  } catch (error) {
-    console.error('Error fetching unread count:', error)
   }
 }
 
@@ -167,7 +152,6 @@ onBeforeUnmount(() => {
 
 // Kết nối WebSocket khi component được mount
 onMounted(() => {
-  fetchUnreadCount()
   const username = localStorage.getItem('username')
   if (username) {
     initializeWebSocket(username, addNotification)

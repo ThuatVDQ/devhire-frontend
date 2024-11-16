@@ -125,7 +125,6 @@ const details = reactive({
 watch(
   () => props.job,
   (newJob) => {
-    console.log('New job:', newJob.currency)
     if (newJob) {
       details.title = newJob.title || ''
       details.selectedCategoryId = newJob.category?.id || ''
@@ -394,8 +393,10 @@ onMounted(async () => {
 
   await fetchCategories()
   await fetchCities()
-  // await fetchSkills()
-  // await fetchAddresses()
+
+  if (details.selectedCategoryId === '') details.selectedCategoryId = details.categories[0].id
+  if (inf.type === '') inf.type = 'FULL_TIME'
+  if (inf.currency === '') inf.currency = 'USD'
 })
 
 async function fetchCategories() {
