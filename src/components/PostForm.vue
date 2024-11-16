@@ -1,10 +1,16 @@
 <script setup>
-import { reactive, onMounted, computed, ref, onUnmounted } from 'vue'
+import { reactive, onMounted, computed, ref, onUnmounted, watch } from 'vue'
 import flatpickr from 'flatpickr'
 import 'flatpickr/dist/flatpickr.css'
 import axios from 'axios'
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
+
+const props = defineProps({
+  categories: Array,
+  skills: Array,
+  address: Array
+})
 
 const errors = reactive({
   salary: '',
@@ -111,10 +117,60 @@ const inf = reactive({
 })
 
 const details = reactive({
-  categories: [],
+  categories: props.categories.map((category) => ({ id: category.id, name: category.name })),
   title: '',
   selectedCategoryId: ''
 })
+
+watch(
+  () => props.categories,
+  (newCategories) => {
+    details.categories = newCategories.map((category) => ({
+      id: category.id,
+      name: category.name
+    }))
+    if (details.categories.length > 0) {
+      details.selectedCategoryId = details.categories[0].id
+    }
+  },
+  { immediate: true } // Chạy ngay khi component khởi tạo
+)
+
+watch(
+  () => props.skills,
+  (newSkills) => {
+    inf.skills = newSkills.map((skill) => ({ name: skill.name }))
+  },
+  { immediate: true } // Chạy ngay khi component khởi tạo
+)
+
+watch(
+  () => props.address,
+  (newAddress) => {
+    address.addresses = newAddress.length
+      ? newAddress.map((addr) => ({
+          selectedCity: addr.selectedCity || '',
+          selectedCityName: addr.selectedCityName || '',
+          selectedDistrict: addr.selectedDistrict || '',
+          selectedDistrictName: addr.selectedDistrictName || '',
+          street: addr.street || '',
+          districts: addr.districts || [],
+          isCityDropdownOpen: false
+        }))
+      : [
+          {
+            selectedCity: '',
+            selectedCityName: '',
+            selectedDistrict: '',
+            selectedDistrictName: '',
+            street: '',
+            districts: [],
+            isCityDropdownOpen: false
+          }
+        ]
+  },
+  { immediate: true }
+)
 
 function addSkill() {
   inf.skills.push({ name: '' })
@@ -128,17 +184,33 @@ async function fetchCities() {
   try {
     const response = await axios.get('https://provinces.open-api.vn/api/?depth=2')
     address.cities = response.data
-    if (address.cities.length > 0) {
+
+    // Kiểm tra và đảm bảo `addresses` có ít nhất một phần tử
+    if (address.addresses.length === 0) {
+      address.addresses.push({
+        selectedCity: '',
+        selectedCityName: '',
+        selectedDistrict: '',
+        selectedDistrictName: '',
+        street: '',
+        districts: [],
+        isCityDropdownOpen: false
+      })
+    }
+
+    // Gán giá trị cho địa chỉ đầu tiên
+    if (address.cities.length > 0 && address.addresses[0]) {
       address.addresses[0].selectedCity = address.cities[0].code
       address.addresses[0].selectedCityName = address.cities[0].name
       address.addresses[0].districts = address.cities[0].districts
+
       if (address.addresses[0].districts.length > 0) {
         address.addresses[0].selectedDistrict = address.addresses[0].districts[0].code
         address.addresses[0].selectedDistrictName = address.addresses[0].districts[0].name
       }
     }
   } catch (e) {
-    console.error(e)
+    console.error('Error fetching cities:', e)
   }
 }
 
@@ -310,10 +382,10 @@ onMounted(async () => {
     }
   })
 
-  await fetchCategories()
+  // await fetchCategories()
   await fetchCities()
-  await fetchSkills()
-  await fetchAddresses()
+  // await fetchSkills()
+  // await fetchAddresses()
 
   inf.type = 'FULL_TIME'
   inf.currency = 'VND'

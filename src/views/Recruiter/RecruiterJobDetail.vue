@@ -170,7 +170,6 @@ async function updateApplicationStatus(applicationId, newStatus) {
     await axios.post(`http://localhost:8090/api/job-application/${applicationId}/${newStatus}`, {})
     fetchJobApplications()
   } catch (error) {
-    toastr.error(error.response.data, 'Error')
     console.error('Error updating application status:', error)
   }
 }
@@ -201,7 +200,7 @@ function goBack() {
     <!-- Centered Title -->
     <h2 class="text-2xl font-bold text-gray-800 mb-12 text-center">
       <span> Candidates apply for </span>
-      <span class="text-green-700">{{ title || 'Job Title' }}</span>
+      <span class="text-green-700 text-xl text-center mb-8">{{ title || 'Job Title' }}</span>
     </h2>
 
     <!-- Loading State -->
@@ -289,7 +288,11 @@ function goBack() {
     <!-- Pagination Controls -->
     <div class="flex justify-center mt-6">
       <!-- Previous Button -->
-      <button @click="prevPage" :disabled="currentPage === 1" class="pagination-button">
+      <button
+        @click="prevPage"
+        :disabled="currentPage === 1"
+        class="w-10 h-10 rounded-full border-none bg-gray-100 text-gray-600 text-base flex items-center justify-center transition-colors duration-300 hover:bg-gray-200"
+      >
         <i class="pi pi-angle-left"></i>
       </button>
 
@@ -300,8 +303,10 @@ function goBack() {
           :key="page"
           @click="setPage(page)"
           :class="[
-            'pagination-button',
-            currentPage === page ? 'pagination-active' : 'pagination-inactive'
+            'w-10 h-10 rounded-full border-none bg-gray-100 text-gray-600 text-base flex items-center justify-center transition-colors duration-300 hover:bg-gray-200',
+            currentPage === page
+              ? 'w-10 h-10 rounded-full border-none bg-green-500 text-white text-base flex items-center justify-center'
+              : 'w-10 h-10 rounded-full border-none bg-gray-100 text-gray-600 text-base flex items-center justify-center'
           ]"
         >
           {{ page }}
@@ -309,7 +314,11 @@ function goBack() {
       </div>
 
       <!-- Next Button -->
-      <button @click="nextPage" :disabled="currentPage === totalPages" class="pagination-button">
+      <button
+        @click="nextPage"
+        :disabled="currentPage === totalPages"
+        class="w-10 h-10 rounded-full border-none bg-gray-100 text-gray-600 text-base flex items-center justify-center transition-colors duration-300 hover:bg-gray-200"
+      >
         <i class="pi pi-angle-right"></i>
       </button>
     </div>
@@ -321,49 +330,3 @@ function goBack() {
     @close="closeEmailTemplatePopup"
   />
 </template>
-
-<style scoped>
-table {
-  width: 100%;
-}
-
-/* Pagination Button Styles */
-.pagination-button {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: none;
-  background-color: #f1f1f1;
-  color: #4a4a4a;
-  font-size: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.3s;
-}
-
-.pagination-button:hover {
-  background-color: #e1e1e1;
-}
-
-.pagination-active {
-  background-color: #22c55e;
-  color: white;
-}
-
-.pagination-inactive {
-  background-color: #f1f1f1;
-}
-
-h2 {
-  font-size: 1.5rem;
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-th,
-td {
-  padding: 1rem; /* Increased padding for better readability */
-  font-size: 1rem; /* Larger font size */
-}
-</style>

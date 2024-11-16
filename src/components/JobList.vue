@@ -10,7 +10,6 @@ const totalPages = ref(0)
 const isLoading = ref(true)
 
 const props = defineProps({
-  showFavorites: Boolean,
   searchCriteria: Object
 })
 
@@ -31,6 +30,7 @@ const fetchData = async (page = 0) => {
     jobs.value = response.data.jobs
     totalPages.value = response.data.totalPages
     currentPage.value = page
+    console.log(jobs.value)
   } catch (error) {
     console.error('Error fetching jobs:', error)
   } finally {
@@ -96,17 +96,6 @@ const fetchSearchData = async (page = 0, criteria = {}) => {
 }
 
 watch(
-  () => props.showFavorites,
-  (newValue) => {
-    if (newValue) {
-      fetchFavorites(currentPage.value)
-    } else {
-      fetchData(currentPage.value)
-    }
-  }
-)
-
-watch(
   () => props.searchCriteria,
   (newCriteria) => {
     currentPage.value = 0
@@ -135,19 +124,15 @@ const scrollToTop = () => {
     behavior: 'smooth'
   })
 }
-
-function handleRemoveFavorite(jobId) {
-  const index = jobs.value.findIndex((job) => job.id === jobId)
-  if (index !== -1) {
-    jobs.value.splice(index, 1)
-  }
-}
 </script>
 
 <template>
-  <div v-if="isLoading" class="spinner-container">
-    <div class="spinner"></div>
+  <div v-if="isLoading" class="flex justify-center items-center h-screen">
+    <div
+      class="w-10 h-10 border-4 border-gray-300 border-t-green-500 rounded-full animate-spin"
+    ></div>
   </div>
+
   <div v-else>
     <div v-if="jobs.length === 0 && !isLoading" class="flex justify-center items-center h-64">
       <p class="text-2xl text-gray-500">No jobs available at the moment.</p>
@@ -166,7 +151,7 @@ function handleRemoveFavorite(jobId) {
               <li>
                 <a
                   href="#"
-                  class="size-[40px] inline-flex justify-center items-center text-slate-400 bg-white rounded-s-3xl"
+                  class="w-10 h-10 flex justify-center items-center text-gray-400 bg-white rounded-l-full"
                   @click.prevent="changePage(currentPage - 1)"
                   :class="{ 'opacity-50 pointer-events-none': currentPage <= 0 }"
                 >
@@ -176,7 +161,7 @@ function handleRemoveFavorite(jobId) {
               <li v-for="page in totalPages" :key="page">
                 <a
                   href="#"
-                  class="size-[40px] inline-flex justify-center items-center"
+                  class="w-10 h-10 flex justify-center items-center"
                   @click.prevent="changePage(page - 1)"
                   :class="{ 'bg-emerald-600 text-white': currentPage === page - 1 }"
                 >
@@ -186,7 +171,7 @@ function handleRemoveFavorite(jobId) {
               <li>
                 <a
                   href="#"
-                  class="size-[40px] inline-flex justify-center items-center text-slate-400 bg-white rounded-e-3xl"
+                  class="w-10 h-10 flex justify-center items-center text-gray-400 bg-white rounded-r-full"
                   @click.prevent="changePage(currentPage + 1)"
                   :class="{ 'opacity-50 pointer-events-none': currentPage >= totalPages - 1 }"
                 >
@@ -200,26 +185,3 @@ function handleRemoveFavorite(jobId) {
     </div>
   </div>
 </template>
-<style scoped>
-.spinner-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
-
-.spinner {
-  width: 40px;
-  height: 40px;
-  border: 5px solid rgba(0, 0, 0, 0.1);
-  border-top-color: #4caf50;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-</style>

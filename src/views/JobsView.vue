@@ -16,7 +16,7 @@ const handleSearch = (criteria) => {
 </script>
 
 <template>
-  <SearchBar :showFavorites="showFavorites" @search="handleSearch" />
-  <JobList :showFavorites="showFavorites" :searchCriteria="searchCriteria" />
+  <SearchBar @search="handleSearch" />
+  <JobList :searchCriteria="searchCriteria" />
   <FeatureSection />
 </template>

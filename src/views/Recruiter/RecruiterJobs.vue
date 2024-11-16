@@ -163,6 +163,8 @@ import { ref, computed, onMounted } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
 
+const router = useRouter()
+
 const jobs = ref([]) // Store job data
 const searchQuery = ref('') // Store search query
 const currentFilter = ref('all') // Store selected filter
@@ -218,6 +220,10 @@ const changePage = (page) => {
 onMounted(() => {
   fetchJobs(currentPage.value)
 })
+
+function goToJobDetail(jobId) {
+  router.push(`/recruiter/job-detail/${jobId}`)
+}
 
 const scrollToTop = () => {
   window.scrollTo({
