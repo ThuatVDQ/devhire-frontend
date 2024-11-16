@@ -405,10 +405,14 @@ onMounted(() => {
           </div>
         </div>
 
-        <div v-if="state.isApplying" class="flex justify-center">
+        <div
+          v-if="state.isApplying"
+          class="fixed inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center z-50"
+        >
           <div
             class="w-16 h-16 border-4 border-t-4 border-gray-300 border-t-emerald-600 rounded-full animate-spin mb-4"
           ></div>
+          <p class="text-white text-lg">Please waiting ...</p>
         </div>
 
         <div v-else class="flex justify-end gap-4">
@@ -430,26 +434,3 @@ onMounted(() => {
     </div>
   </div>
 </template>
-<style scoped>
-.spinner-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
-
-.spinner {
-  width: 40px;
-  height: 40px;
-  border: 5px solid rgba(0, 0, 0, 0.1);
-  border-top-color: #4caf50;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-</style>

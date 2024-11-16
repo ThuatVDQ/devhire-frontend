@@ -13,6 +13,7 @@ const route = useRoute()
 
 const jobApplications = ref([])
 const isLoading = ref(true)
+const isRequireBackEnd = ref(false)
 
 // Pagination settings
 const currentPage = ref(1)
@@ -45,6 +46,7 @@ async function handleTemplateSelected({ subject, body }) {
 }
 
 async function sendEmail(application, subject, body) {
+  isRequireBackEnd.value = true
   try {
     const formattedBody = body.replace(/\n/g, '<br>')
     const response = await axios.post(
@@ -65,6 +67,8 @@ async function sendEmail(application, subject, body) {
   } catch (error) {
     toastr.error('Failed to send email:', error)
     console.error('Failed to send email:', error)
+  } finally {
+    isRequireBackEnd.value = false
   }
 }
 
@@ -187,140 +191,152 @@ function goBack() {
 </script>
 
 <template>
-  <div class="container mx-auto py-6 px-30">
-    <!-- Back Button -->
-    <button
-      @click="goBack"
-      class="px-4 py-2 mb-4 bg-gray-200 text-gray-900 rounded-lg flex items-center"
+  <div class="relative">
+    <div
+      v-if="isRequireBackEnd"
+      class="fixed inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center z-50"
     >
-      <i class="pi pi-arrow-left mr-2"></i>
-      Back
-    </button>
-
-    <!-- Centered Title -->
-    <h2 class="text-2xl font-bold text-gray-800 mb-12 text-center">
-      <span> Candidates apply for </span>
-      <span class="text-green-700 text-xl text-center mb-8">{{ title || 'Job Title' }}</span>
-    </h2>
-
-    <!-- Loading State -->
-    <div v-if="isLoading" class="text-center py-4">Loading...</div>
-
-    <!-- Applications Section -->
-    <div v-else class="bg-white shadow-md rounded-lg overflow-hidden">
-      <table class="min-w-full bg-white border-collapse">
-        <thead class="bg-gray-400">
-          <tr>
-            <th class="py-4 px-8 text-left text-sm font-medium text-white uppercase">
-              Candidate Name
-            </th>
-            <th class="py-4 px-8 text-left text-sm font-medium text-white uppercase">
-              Application Date
-            </th>
-            <th class="py-4 px-8 text-left text-sm font-medium text-white uppercase">Status</th>
-            <th class="py-4 px-8 text-left text-sm font-medium text-white uppercase"></th>
-            <th class="py-4 px-8 text-left text-sm font-medium text-white uppercase"></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="(application, index) in paginatedApplications"
-            :key="application.id"
-            class="border-b hover:bg-gray-100"
-          >
-            <td class="py-4 px-8 text-sm text-gray-700">{{ application.full_name }}</td>
-            <td class="py-4 px-8 text-sm text-gray-700">{{ formatDate(application.applyDate) }}</td>
-            <td class="py-4 px-8 text-sm text-gray-700">{{ application.status }}</td>
-            <td class="py-4 px-8 text-sm text-gray-700">
-              <div
-                class="flex items-center space-x-1 cursor-pointer"
-                @click="downloadCV(application.cv_id, application.full_name)"
-              >
-                <i class="pi pi-download text-gray-500 hover:text-gray-700"></i>
-                <span class="text-sm text-gray-500 hover:text-gray-700">Download CV</span>
-              </div>
-              <div
-                @click="viewCV(application.cv_url, application.id)"
-                class="flex items-center space-x-1 cursor-pointer mt-2"
-              >
-                <i class="pi pi-eye text-gray-500 hover:text-gray-700"></i>
-                <span class="text-sm text-gray-500 hover:text-gray-700">View CV</span>
-              </div>
-            </td>
-            <td class="py-4 px-8 text-sm text-gray-700">
-              <button
-                @click="openEmailTemplatePopup(application)"
-                :disabled="application.status !== 'SEEN'"
-                :class="{
-                  'bg-gray-300': application.status !== 'SEEN',
-                  'bg-green-600 ': application.status === 'SEEN'
-                }"
-                class="px-4 py-2 mr-2 text-white rounded-lg"
-              >
-                Accept
-              </button>
-              <!-- <button
-                @click="openEmailTemplatePopup(application)"
-                class="px-4 py-2 text-white bg-green-600 rounded-lg"
-              >
-                Accept
-              </button> -->
-              <button
-                @click="updateApplicationStatus(application.id, 'reject')"
-                :disabled="application.status !== 'SEEN'"
-                :class="{
-                  'bg-gray-300 ': application.status !== 'SEEN',
-                  'bg-red-600 ': application.status === 'SEEN'
-                }"
-                class="px-4 py-2 text-white rounded-lg"
-              >
-                Reject
-              </button>
-            </td>
-          </tr>
-          <tr v-if="paginatedApplications.length === 0">
-            <td colspan="5" class="py-4 px-6 text-center text-gray-500">No candidates found.</td>
-          </tr>
-        </tbody>
-      </table>
+      <!-- Spinner sử dụng Tailwind -->
+      <div
+        class="w-12 h-12 border-4 border-t-emerald-600 border-gray-300 rounded-full animate-spin"
+      ></div>
+      <p class="text-white text-lg">Please waiting ...</p>
     </div>
 
-    <!-- Pagination Controls -->
-    <div class="flex justify-center mt-6">
-      <!-- Previous Button -->
+    <div
+      :class="{ 'blur-sm pointer-events-none': isRequireBackEnd }"
+      class="container mx-auto py-6 px-30"
+    >
+      <!-- Back Button -->
       <button
-        @click="prevPage"
-        :disabled="currentPage === 1"
-        class="w-10 h-10 rounded-full border-none bg-gray-100 text-gray-600 text-base flex items-center justify-center transition-colors duration-300 hover:bg-gray-200"
+        @click="goBack"
+        class="px-4 py-2 mb-4 bg-gray-200 text-gray-900 rounded-lg flex items-center"
       >
-        <i class="pi pi-angle-left"></i>
+        <i class="pi pi-arrow-left mr-2"></i>
+        Back
       </button>
 
-      <!-- Page Numbers -->
-      <div class="flex mx-2 space-x-2">
-        <button
-          v-for="page in totalPages"
-          :key="page"
-          @click="setPage(page)"
-          :class="[
-            'w-10 h-10 rounded-full border-none bg-gray-100 text-gray-600 text-base flex items-center justify-center transition-colors duration-300 hover:bg-gray-200',
-            currentPage === page
-              ? 'w-10 h-10 rounded-full border-none bg-green-500 text-white text-base flex items-center justify-center'
-              : 'w-10 h-10 rounded-full border-none bg-gray-100 text-gray-600 text-base flex items-center justify-center'
-          ]"
-        >
-          {{ page }}
-        </button>
+      <!-- Centered Title -->
+      <h2 class="text-2xl font-bold text-gray-800 mb-12 text-center">
+        <span> Candidates apply for </span>
+        <span class="text-green-700 text-xl text-center mb-8">{{ title || 'Job Title' }}</span>
+      </h2>
+
+      <!-- Loading State -->
+      <div v-if="isLoading" class="text-center py-4">Loading...</div>
+
+      <!-- Applications Section -->
+      <div v-else class="bg-white shadow-md rounded-lg overflow-hidden">
+        <table class="min-w-full bg-white border-collapse">
+          <thead class="bg-gray-400">
+            <tr>
+              <th class="py-4 px-8 text-left text-sm font-medium text-white uppercase">
+                Candidate Name
+              </th>
+              <th class="py-4 px-8 text-left text-sm font-medium text-white uppercase">
+                Application Date
+              </th>
+              <th class="py-4 px-8 text-left text-sm font-medium text-white uppercase">Status</th>
+              <th class="py-4 px-8 text-left text-sm font-medium text-white uppercase"></th>
+              <th class="py-4 px-8 text-left text-sm font-medium text-white uppercase"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="(application, index) in paginatedApplications"
+              :key="application.id"
+              class="border-b hover:bg-gray-100"
+            >
+              <td class="py-4 px-8 text-sm text-gray-700">{{ application.full_name }}</td>
+              <td class="py-4 px-8 text-sm text-gray-700">
+                {{ formatDate(application.applyDate) }}
+              </td>
+              <td class="py-4 px-8 text-sm text-gray-700">{{ application.status }}</td>
+              <td class="py-4 px-8 text-sm text-gray-700">
+                <div
+                  class="flex items-center space-x-1 cursor-pointer"
+                  @click="downloadCV(application.cv_id, application.full_name)"
+                >
+                  <i class="pi pi-download text-gray-500 hover:text-gray-700"></i>
+                  <span class="text-sm text-gray-500 hover:text-gray-700">Download CV</span>
+                </div>
+                <div
+                  @click="viewCV(application.cv_url, application.id)"
+                  class="flex items-center space-x-1 cursor-pointer mt-2"
+                >
+                  <i class="pi pi-eye text-gray-500 hover:text-gray-700"></i>
+                  <span class="text-sm text-gray-500 hover:text-gray-700">View CV</span>
+                </div>
+              </td>
+              <td class="py-4 px-8 text-sm text-gray-700">
+                <button
+                  @click="openEmailTemplatePopup(application)"
+                  :disabled="application.status !== 'SEEN'"
+                  :class="{
+                    'bg-gray-300': application.status !== 'SEEN',
+                    'bg-green-600 ': application.status === 'SEEN'
+                  }"
+                  class="px-4 py-2 mr-2 text-white rounded-lg"
+                >
+                  Accept
+                </button>
+                <button
+                  @click="updateApplicationStatus(application.id, 'reject')"
+                  :disabled="application.status !== 'SEEN'"
+                  :class="{
+                    'bg-gray-300 ': application.status !== 'SEEN',
+                    'bg-red-600 ': application.status === 'SEEN'
+                  }"
+                  class="px-4 py-2 text-white rounded-lg"
+                >
+                  Reject
+                </button>
+              </td>
+            </tr>
+            <tr v-if="paginatedApplications.length === 0">
+              <td colspan="5" class="py-4 px-6 text-center text-gray-500">No candidates found.</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
-      <!-- Next Button -->
-      <button
-        @click="nextPage"
-        :disabled="currentPage === totalPages"
-        class="w-10 h-10 rounded-full border-none bg-gray-100 text-gray-600 text-base flex items-center justify-center transition-colors duration-300 hover:bg-gray-200"
-      >
-        <i class="pi pi-angle-right"></i>
-      </button>
+      <!-- Pagination Controls -->
+      <div class="flex justify-center mt-6">
+        <!-- Previous Button -->
+        <button
+          @click="prevPage"
+          :disabled="currentPage === 1"
+          class="w-10 h-10 rounded-full border-none bg-gray-100 text-gray-600 text-base flex items-center justify-center transition-colors duration-300 hover:bg-gray-200"
+        >
+          <i class="pi pi-angle-left"></i>
+        </button>
+
+        <!-- Page Numbers -->
+        <div class="flex mx-2 space-x-2">
+          <button
+            v-for="page in totalPages"
+            :key="page"
+            @click="setPage(page)"
+            :class="[
+              'w-10 h-10 rounded-full border-none bg-gray-100 text-gray-600 text-base flex items-center justify-center transition-colors duration-300 hover:bg-gray-200',
+              currentPage === page
+                ? 'w-10 h-10 rounded-full border-none bg-green-500 text-white text-base flex items-center justify-center'
+                : 'w-10 h-10 rounded-full border-none bg-gray-100 text-gray-600 text-base flex items-center justify-center'
+            ]"
+          >
+            {{ page }}
+          </button>
+        </div>
+
+        <!-- Next Button -->
+        <button
+          @click="nextPage"
+          :disabled="currentPage === totalPages"
+          class="w-10 h-10 rounded-full border-none bg-gray-100 text-gray-600 text-base flex items-center justify-center transition-colors duration-300 hover:bg-gray-200"
+        >
+          <i class="pi pi-angle-right"></i>
+        </button>
+      </div>
     </div>
   </div>
   <EmailTemplatePopup
