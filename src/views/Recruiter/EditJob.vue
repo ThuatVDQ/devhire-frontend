@@ -3,6 +3,8 @@ import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import PostForm from '@/components/PostForm.vue'
 import axios from 'axios'
+import toastr from 'toastr'
+import 'toastr/build/toastr.min.css'
 
 // Lấy ID từ URL params
 const route = useRoute()
@@ -63,6 +65,23 @@ const fetchJobDetails = async () => {
   }
 }
 
+async function updateJob(data) {
+  try {
+    const response = await axios.post(`http://localhost:8090/api/jobs/${id}/edit`, data, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    toastr.success(response.data, 'Success')
+    setTimeout(() => {
+      window.location.href = '/recruiter/jobs'
+    }, 1000)
+  } catch (error) {
+    console.error(errorẻ)
+    toastr.error(JSON.stringify(error.response.data), 'Error')
+  }
+}
+
 // Gọi API khi component được mount
 onMounted(async () => {
   await fetchCities() // Đảm bảo cities có trước
@@ -73,7 +92,13 @@ onMounted(async () => {
 <template>
   <div>
     <!-- Truyền dữ liệu qua PostForm -->
-    <PostForm v-if="jobDetails" :skills="skills" :address="address" :job="jobDetails" />
+    <PostForm
+      v-if="jobDetails"
+      :skills="skills"
+      :address="address"
+      :job="jobDetails"
+      @submit="updateJob"
+    />
     <p v-else>Loading job details...</p>
   </div>
 </template>

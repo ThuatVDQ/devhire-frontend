@@ -2,6 +2,8 @@
 import { ref, onMounted } from 'vue'
 import PostForm from '@/components/PostForm.vue'
 import axios from 'axios'
+import toastr from 'toastr'
+import 'toastr/build/toastr.min.css'
 
 const skills = ref([])
 const address = ref([])
@@ -47,7 +49,6 @@ const fetchAddresses = async () => {
       address.value = response.data.map((addr) => {
         const cityCode = getCityCode(addr.city)
         const districtCode = getDistrictCode(addr.city, addr.district)
-        console.log('cityCode:', cityCode)
         const district = setDistricts(cityCode)
         return {
           selectedCity: cityCode,
@@ -119,19 +120,34 @@ function setDistricts(cityCode) {
   }
 }
 
+async function createJob(data) {
+  try {
+    const response = await axios.post('http://localhost:8090/api/jobs', data, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    toastr.success(response.data, 'Success')
+    setTimeout(() => {
+      window.location.href = '/recruiter/jobs'
+    }, 1000)
+  } catch (error) {
+    console.error()
+    toastr.error(JSON.stringify(error.response.data), 'Error')
+  }
+}
+
 // Trigger the fetch methods on mount
 onMounted(async () => {
   await fetchCities()
   await fetchSkills()
   await fetchAddresses()
-
-  console.log('addresses:', address.value)
 })
 </script>
 
 <template>
   <div class="text-left">
     <!-- Pass the data as props to PostForm -->
-    <PostForm :skills="skills" :address="address" />
+    <PostForm :skills="skills" :address="address" @submit="createJob" />
   </div>
 </template>

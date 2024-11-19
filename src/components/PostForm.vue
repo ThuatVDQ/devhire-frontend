@@ -5,6 +5,9 @@ import 'flatpickr/dist/flatpickr.css'
 import axios from 'axios'
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
+import { defineProps, defineEmits } from 'vue'
+
+const emit = defineEmits(['submit'])
 
 const props = defineProps({
   job: Object,
@@ -382,6 +385,41 @@ async function submitForm() {
   }
 }
 
+function handleSubmit() {
+  if (!validateForm()) {
+    return
+  }
+
+  const data = {
+    title: details.title,
+    description: inf.description,
+    salary_start: inf.salaryStart,
+    salary_end: inf.salaryEnd,
+    type: inf.type,
+    currency: inf.currency,
+    experience: inf.experience,
+    position: inf.position,
+    level: inf.level,
+    requirement: inf.requirements,
+    benefit: inf.benefits,
+    deadline: inf.selectedDate,
+    slots: inf.slots,
+    category: {
+      id: details.selectedCategoryId
+    },
+    addresses: address.addresses.map((addr) => ({
+      country: 'Việt Nam',
+      street: addr.street,
+      city: addr.selectedCityName,
+      district: addr.selectedDistrictName
+    })),
+    skills: inf.skills.map((skill) => ({
+      name: skill.name
+    }))
+  }
+  emit('submit', data)
+}
+
 onMounted(async () => {
   flatpickr(document.querySelector('#deadline'), {
     dateFormat: 'Y-m-d',
@@ -412,7 +450,6 @@ async function fetchCategories() {
 <template>
   <section class="relative bg-slate-50 dark:bg-slate-800 lg:py-16 py-16">
     <div class="container">
-      <h1 class="ml-16">Post a job</h1>
       <div class="lg:flex justify-center">
         <div>
           <div class="p-6 bg-white dark:bg-slate-900 shadow dark:shadow-gray-700 rounded-md">
@@ -674,7 +711,7 @@ async function fetchCategories() {
                   <button
                     class="px-6 py-2 rounded-md bg-emerald-600 hover:bg-emerald-700 border-emerald-600 hover:border-emerald-700 text-white"
                     type="submit"
-                    @click="submitForm"
+                    @click="handleSubmit"
                   >
                     Post Now
                   </button>

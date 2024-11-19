@@ -193,7 +193,7 @@ onMounted(() => {})
       <div
         class="w-16 h-16 border-4 border-t-4 border-gray-300 border-t-emerald-600 rounded-full animate-spin mb-4"
       ></div>
-      <p class="text-white text-lg">Registering, please wait...</p>
+      <p class="text-white text-lg">Please waiting ...</p>
     </div>
   </section>
 
