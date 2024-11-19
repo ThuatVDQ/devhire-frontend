@@ -146,6 +146,11 @@ onMounted(async () => {
 </script>
 
 <template>
+  <header class="">
+    <h1 class="text-3xl font-semibold text-white bg-blue-700 px-11 py-10 text-center">
+      Create a New Job
+    </h1>
+  </header>
   <div class="text-left">
     <!-- Pass the data as props to PostForm -->
     <PostForm :skills="skills" :address="address" @submit="createJob" />

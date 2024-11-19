@@ -448,7 +448,7 @@ async function fetchCategories() {
 </script>
 
 <template>
-  <section class="relative bg-slate-50 dark:bg-slate-800 lg:py-16 py-16">
+  <section class="relative bg-slate-50 dark:bg-slate-800 lg:py-16 py-10">
     <div class="container">
       <div class="lg:flex justify-center">
         <div>

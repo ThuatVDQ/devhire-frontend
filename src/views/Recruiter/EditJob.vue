@@ -90,6 +90,11 @@ onMounted(async () => {
 </script>
 
 <template>
+  <header class="">
+    <h1 class="text-3xl font-semibold text-white bg-blue-700 px-11 py-10 text-center">
+      Edit Information to Job
+    </h1>
+  </header>
   <div>
     <!-- Truyền dữ liệu qua PostForm -->
     <PostForm

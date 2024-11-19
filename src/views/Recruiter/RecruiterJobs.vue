@@ -1,7 +1,8 @@
 <template>
-  <div class="container mx-auto p-6">
-    <h1 class="text-2xl font-semibold mb-6">Manage Jobs</h1>
-
+  <header class="">
+    <h1 class="text-3xl font-semibold text-white bg-blue-700 px-11 py-10">Jobs Management</h1>
+  </header>
+  <div class="container mx-auto p-11">
     <!-- Filter Bar (above search bar) -->
     <div class="flex justify-start mb-4 space-x-2">
       <button

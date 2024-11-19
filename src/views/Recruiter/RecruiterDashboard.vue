@@ -1,7 +1,8 @@
 <template>
-  <section class="p-6 bg-gray-100 min-h-screen">
-    <h2 class="text-2xl font-semibold mb-6 text-gray-800">Dashboard Overview</h2>
-
+  <header class="mb-6">
+    <h1 class="text-3xl font-semibold text-white bg-blue-700 px-11 py-10">Dashboard</h1>
+  </header>
+  <section class="p-11 bg-gray-100 min-h-screen">
     <!-- Summary cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
       <div class="bg-white rounded-lg shadow p-6 text-center">

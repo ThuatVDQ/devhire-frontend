@@ -1,7 +1,8 @@
 <template>
+  <header class="">
+    <h1 class="text-3xl font-semibold text-white bg-blue-700 px-20 py-10">Account Settings</h1>
+  </header>
   <div class="container mx-auto p-6">
-    <h1 class="text-2xl font-semibold mb-6">Account Settings</h1>
-
     <div class="flex justify-center">
       <!-- Sidebar -->
       <div class="w-1/4 bg-gray-50 p-5 rounded-lg">

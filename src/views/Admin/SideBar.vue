@@ -38,6 +38,7 @@
               <i class="pi pi-search text-gray-500"></i>
             </span>
             <input
+              v-model="searchQuery"
               type="search"
               class="py-2 text-sm text-white bg-gray-700 rounded-md pl-10 focus:outline-none w-full"
               placeholder="Search..."
@@ -48,44 +49,14 @@
         <!-- Navigation Links -->
         <nav class="mt-6 space-y-2">
           <RouterLink
-            to="/admin/dashboard"
+            v-for="item in filteredMenuItems"
+            :key="item.name"
+            :to="item.path"
             class="flex items-center p-2 rounded transition duration-200 hover:bg-gray-700"
             active-class="bg-gray-700"
           >
-            <i class="pi pi-home mr-3"></i>
-            <span>Dashboard</span>
-          </RouterLink>
-          <RouterLink
-            to="/admin/users"
-            class="flex items-center p-2 rounded transition duration-200 hover:bg-gray-700"
-            active-class="bg-gray-700"
-          >
-            <i class="pi pi-users mr-3"></i>
-            <span>Users</span>
-          </RouterLink>
-          <RouterLink
-            to="/admin/jobs"
-            class="flex items-center p-2 rounded transition duration-200 hover:bg-gray-700"
-            active-class="bg-gray-700"
-          >
-            <i class="pi pi-briefcase mr-3"></i>
-            <span>Jobs</span>
-          </RouterLink>
-          <RouterLink
-            to="/admin/companies"
-            class="flex items-center p-2 rounded transition duration-200 hover:bg-gray-700"
-            active-class="bg-gray-700"
-          >
-            <i class="pi pi-building mr-3"></i>
-            <span>Companies</span>
-          </RouterLink>
-          <RouterLink
-            to="/admin/settings"
-            class="flex items-center p-2 rounded transition duration-200 hover:bg-gray-700"
-            active-class="bg-gray-700"
-          >
-            <i class="pi pi-cog mr-3"></i>
-            <span>Settings</span>
+            <i :class="item.icon" class="mr-3"></i>
+            <span>{{ item.name }}</span>
           </RouterLink>
         </nav>
       </div>
@@ -99,12 +70,30 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 const isCollapsed = ref(true)
 const toggleSidebar = () => {
   isCollapsed.value = !isCollapsed.value
 }
+
+const searchQuery = ref('') // Từ khóa tìm kiếm
+
+const menuItems = [
+  { name: 'Dashboard', path: '/admin/dashboard', icon: 'pi pi-home' },
+  { name: 'Users', path: '/admin/users', icon: 'pi pi-users' },
+  { name: 'Jobs', path: '/admin/jobs', icon: 'pi pi-briefcase' },
+  { name: 'Companies', path: '/admin/companies', icon: 'pi pi-building' },
+  { name: 'Settings', path: '/admin/settings', icon: 'pi pi-cog' }
+]
+
+// Lọc danh sách menu theo từ khóa tìm kiếm
+const filteredMenuItems = computed(() => {
+  if (!searchQuery.value.trim()) return menuItems
+  return menuItems.filter((item) =>
+    item.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+  )
+})
 </script>
 
 <style scoped>

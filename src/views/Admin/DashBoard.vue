@@ -95,11 +95,3 @@
     </section>
   </div>
 </template>
-
-<script setup>
-// You can add chart data and other necessary data fetching logic here.
-</script>
-
-<style scoped>
-/* Any additional styling specific to this component can go here. */
-</style>
