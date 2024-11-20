@@ -1,25 +1,62 @@
 <template>
-  <div class="sidebar">
-    <ul class="menu">
-      <li v-for="item in menuItems" :key="item.name" class="menu-item">
-        <router-link
-          :to="item.path"
-          class="menu-link"
-          @mouseover="hoveredItem = item.name"
-          @mouseleave="hoveredItem = null"
+  <div class="relative h-full">
+    <!-- Sidebar -->
+    <div
+      :class="[
+        'fixed bg-gray-800 text-gray-100 transition-all duration-300 h-full z-10',
+        isCollapsed ? 'w-20' : 'w-64'
+      ]"
+    >
+      <!-- Header Sidebar -->
+      <div class="flex items-center py-4 px-4 bg-gray-900">
+        <img
+          src="@/assets/logo.svg"
+          alt="Logo"
+          class="transition-all duration-300"
+          :class="isCollapsed ? 'w-8 h-8' : 'w-12 h-12'"
+        />
+        <span
+          class="text-xl font-semibold ml-3 transition-opacity duration-300"
+          v-if="!isCollapsed"
         >
-          <div
-            class="icon-wrapper"
-            :style="{ backgroundColor: hoveredItem === item.name ? '#e0f7fa' : 'transparent' }"
-          >
-            <i :class="item.icon" class="menu-icon"></i>
-          </div>
-          <span class="menu-label" v-if="hoveredItem === item.name">
-            {{ item.name }}
+          DevHire
+        </span>
+        <!-- Nút Toggle -->
+        <button @click="toggleSidebar" class="ml-auto focus:outline-none text-gray-100 text-xl">
+          <i :class="isCollapsed ? 'pi pi-angle-right' : 'pi pi-angle-left'"></i>
+        </button>
+      </div>
+
+      <!-- Search Box -->
+      <div class="relative mt-4 px-4" v-if="!isCollapsed">
+        <div class="relative text-gray-600 focus-within:text-gray-400">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-2">
+            <i class="pi pi-search text-gray-500"></i>
           </span>
-        </router-link>
-      </li>
-    </ul>
+          <input
+            type="search"
+            class="py-2 text-sm text-white bg-gray-700 rounded-md pl-10 focus:outline-none w-full"
+            placeholder="Search..."
+          />
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <ul class="list-none p-0 m-0 mt-4">
+        <li v-for="item in menuItems" :key="item.name" class="mb-2">
+          <router-link
+            :to="item.path"
+            class="flex items-center px-4 py-3 rounded-lg transition duration-200 hover:bg-gray-700"
+            active-class="bg-gray-700"
+          >
+            <i :class="item.icon" class="text-lg"></i>
+            <span class="ml-4 transition-opacity duration-300" v-if="!isCollapsed">
+              {{ item.name }}
+            </span>
+          </router-link>
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -27,7 +64,7 @@
 export default {
   data() {
     return {
-      hoveredItem: null,
+      isCollapsed: false,
       menuItems: [
         { name: 'Dashboard', path: '/recruiter/dashboard', icon: 'pi pi-th-large' },
         { name: 'Post Job', path: '/recruiter/post-job', icon: 'pi pi-plus' },
@@ -36,68 +73,11 @@ export default {
         { name: 'Notifications', path: '/recruiter/notifications', icon: 'pi pi-bell' }
       ]
     }
+  },
+  methods: {
+    toggleSidebar() {
+      this.isCollapsed = !this.isCollapsed
+    }
   }
 }
 </script>
-
-<style scoped>
-.sidebar {
-  width: 80px;
-  background: #ffffff;
-  height: 100%;
-  padding: 20px 0;
-  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.menu {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  width: 100%;
-}
-
-.menu-item {
-  margin-bottom: 15px;
-  display: flex;
-  justify-content: center;
-}
-
-.menu-link {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-decoration: none;
-  color: #333;
-  transition:
-    background-color 0.3s,
-    color 0.3s;
-  width: 100%;
-  padding: 10px 0;
-  position: relative;
-  font-family: 'Arial', sans-serif;
-}
-
-.icon-wrapper {
-  border-radius: 50%;
-  padding: 8px;
-  transition: background-color 0.3s;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.menu-icon {
-  font-size: 24px;
-  color: #333;
-}
-
-.menu-label {
-  font-size: 12px;
-  margin-top: 5px;
-  display: block;
-  font-family: 'Arial', sans-serif;
-}
-</style>

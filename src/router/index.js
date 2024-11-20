@@ -35,6 +35,7 @@ import UserManagement from '@/views/Admin/UserManagement.vue'
 import JobManagement from '@/views/Admin/JobManagement.vue'
 import JobDetail from '@/views/Admin/JobDetail.vue'
 import EditJob from '@/views/Recruiter/EditJob.vue'
+import Login from '@/views/Admin/Login.vue'
 
 const routes = [
   {
@@ -188,6 +189,11 @@ const routes = [
     path: '/recruiter/signup',
     name: 'recruiter-signup',
     component: RecruiterRegister
+  },
+  {
+    path: '/admin/login',
+    name: 'admin-login',
+    component: Login
   },
   {
     path: '/admin',

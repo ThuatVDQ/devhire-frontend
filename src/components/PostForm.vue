@@ -12,7 +12,8 @@ const emit = defineEmits(['submit'])
 const props = defineProps({
   job: Object,
   skills: Array,
-  address: Array
+  address: Array,
+  isEdit: Boolean
 })
 
 const errors = reactive({
@@ -713,7 +714,7 @@ async function fetchCategories() {
                     type="submit"
                     @click="handleSubmit"
                   >
-                    Post Now
+                    {{ isEdit ? 'Update' : 'Post Now' }}
                   </button>
                 </div>
               </div>

@@ -102,8 +102,13 @@ onMounted(async () => {
       :skills="skills"
       :address="address"
       :job="jobDetails"
+      :isEdit="true"
       @submit="updateJob"
     />
-    <p v-else>Loading job details...</p>
+    <p v-else><div class="flex justify-center items-center h-screen">
+    <div
+      class="w-10 h-10 border-4 border-gray-300 border-t-green-500 rounded-full animate-spin"
+    ></div>
+  </div></p>
   </div>
 </template>

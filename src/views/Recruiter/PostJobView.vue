@@ -153,6 +153,6 @@ onMounted(async () => {
   </header>
   <div class="text-left">
     <!-- Pass the data as props to PostForm -->
-    <PostForm :skills="skills" :address="address" @submit="createJob" />
+    <PostForm :skills="skills" :address="address" :isEdit="false" @submit="createJob" />
   </div>
 </template>

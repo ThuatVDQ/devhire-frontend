@@ -40,9 +40,8 @@
       <table class="min-w-full bg-white">
         <thead class="bg-gray-50">
           <tr>
-            <th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase">
-              Job Title
-            </th>
+            <th class="text-gray-500"></th>
+            <th class="py-3 text-left text-xs font-medium text-gray-500 uppercase">Job Title</th>
             <th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase">
               Category
             </th>
@@ -59,25 +58,28 @@
         <tbody>
           <!-- Loop through paginated jobs and display each one -->
           <tr v-for="(job, index) in jobs" :key="job.id" class="border-b hover:bg-gray-100">
-            <td class="py-4 px-6 text-sm text-gray-700">
-              <div class="flex items-center">
-                <label class="relative inline-flex items-center mr-4 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    :checked="job.status === 'OPEN'"
-                    @change="toggleJobStatus(job.id, $event.target.checked)"
-                    class="sr-only peer"
-                  />
-                  <div
-                    class="w-8 h-4 bg-gray-200 rounded-full peer-focus:ring-4 peer-focus:ring-green-300 peer-checked:bg-green-500 peer-checked:after:translate-x-4 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all"
-                  ></div>
-                </label>
+            <td class="pl-2">
+              <label
+                v-if="job.status === 'OPEN'"
+                class="relative inline-flex items-center cursor-pointer"
+              >
+                <input
+                  type="checkbox"
+                  :checked="job.status === 'OPEN'"
+                  @click="(e) => handleToggleClick(e, job.id)"
+                  class="sr-only peer"
+                />
+                <div
+                  class="w-10 h-6 bg-gray-200 rounded-full peer-focus:ring-4 peer-focus:ring-green-300 peer-checked:bg-green-500 peer-checked:after:translate-x-4 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"
+                ></div>
+              </label>
 
-                <!-- Job Title (Clickable) -->
-                <div @click="goToJobDetail(job.id)" class="cursor-pointer hover:text-blue-500">
-                  {{ job.title }}
-                  <div class="text-xs text-gray-400">#{{ job.id }}</div>
-                </div>
+              <div v-else class="w-10 h-6"></div>
+            </td>
+            <td class="py-4 text-sm text-gray-700">
+              <div @click="goToJobDetail(job.id)" class="cursor-pointer hover:text-blue-500">
+                <div class="text-sm font-medium text-gray-800">{{ job.title }}</div>
+                <div class="text-xs text-gray-400">#{{ job.id }}</div>
               </div>
             </td>
             <td class="py-4 px-6 text-sm text-gray-700">
@@ -105,7 +107,11 @@
               </div>
             </td>
             <td class="py-4 px-6 text-sm text-gray-700">
-              <div @click="goToEditJob(job.id)" class="cursor-pointer hover:text-blue-500">
+              <div
+                v-if="job.status !== 'OPEN' && job.status !== 'HOT'"
+                @click="goToEditJob(job.id)"
+                class="cursor-pointer hover:text-blue-500"
+              >
                 <i class="pi pi-pencil text-gray-500 hover:text-gray-700"></i>
               </div>
             </td>
@@ -157,12 +163,24 @@
       </div>
     </div>
   </div>
+
+  <!-- Modal -->
+  <ConfirmationDialog
+    v-if="showModal"
+    :isVisible="showModal"
+    :message="modalMessage"
+    @confirm="confirmCloseJob"
+    @cancel="closeModal"
+  />
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
+import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
+import toastr from 'toastr'
+import 'toastr/build/toastr.min.css'
 
 const router = useRouter()
 
@@ -171,7 +189,7 @@ const searchQuery = ref('') // Store search query
 const currentFilter = ref('all') // Store selected filter
 const currentPage = ref(0) // Current page
 const totalPages = ref(0)
-const pageSize = ref(10)
+const pageSize = ref(3)
 
 const filters = [
   { id: 'all', label: 'All', count: null },
@@ -198,7 +216,51 @@ async function fetchJobs(page = 0) {
     console.error('Failed to fetch jobs:', e)
   }
 }
-fetchJobs()
+
+const showModal = ref(false)
+const currentJobId = ref(null)
+const modalMessage = ref('')
+
+const handleToggleClick = (event, jobId) => {
+  event.preventDefault() // Ngăn checkbox tự động thay đổi trạng thái
+
+  const job = jobs.value.find((job) => job.id === jobId)
+
+  if (!job) return
+
+  // Nếu trạng thái là OPEN và người dùng muốn đóng
+  if (job.status === 'OPEN') {
+    currentJobId.value = jobId
+    modalMessage.value = `Are you sure you want to close this job?`
+    showModal.value = true // Hiển thị modal
+  }
+}
+
+const confirmCloseJob = async () => {
+  try {
+    await axios.post(
+      `http://localhost:8090/api/jobs/${currentJobId.value}/expire`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        } // Gửi token qua header
+      }
+    )
+    toastr.success('Job closed successfully!', 'Success')
+    fetchJobs(currentPage.value)
+    closeModal()
+  } catch (e) {
+    console.error('Failed to close job:', e)
+  }
+}
+
+const closeModal = () => {
+  showModal.value = false
+  currentJobId.value = null
+  modalMessage.value = ''
+}
+
 // Filter jobs based on search query and current filter
 const filteredJobs = computed(() => {
   return jobs.value
