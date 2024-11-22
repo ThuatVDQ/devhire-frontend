@@ -4,19 +4,43 @@
   </header>
 
   <section class="p-6">
-    <div class="flex items-center justify-between mb-4">
-      <div class="relative w-1/3">
-        <input
-          type="text"
-          placeholder="Search by..."
-          class="w-full px-4 py-2 border border-gray-300 rounded-md pl-10"
-        />
-        <i
-          class="pi pi-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-        ></i>
+    <!-- Filter Labels -->
+    <div class="flex space-x-4">
+      <div class="flex space-x-4 mb-4">
+        <button
+          v-for="roleFilter in roleFilters"
+          :key="roleFilter.value"
+          @click="toggleRoleFilter(roleFilter.value)"
+          :class="[
+            'px-4 py-2 rounded-lg border',
+            currentRoleFilter === roleFilter.value
+              ? 'bg-blue-600 text-white border-blue-600'
+              : 'bg-white text-gray-700 border-gray-300'
+          ]"
+        >
+          {{ roleFilter.label }}
+        </button>
+      </div>
+
+      <!-- Status Filter -->
+      <div class="flex space-x-4 mb-4">
+        <button
+          v-for="statusFilter in statusFilters"
+          :key="statusFilter.value"
+          @click="toggleStatusFilter(statusFilter.value)"
+          :class="[
+            'px-4 py-2 rounded-lg border',
+            currentStatusFilter === statusFilter.value
+              ? 'bg-blue-600 text-white border-blue-600'
+              : 'bg-white text-gray-700 border-gray-300'
+          ]"
+        >
+          {{ statusFilter.label }}
+        </button>
       </div>
     </div>
 
+    <!-- User Table -->
     <div class="overflow-x-auto bg-white shadow-md rounded-lg">
       <table class="min-w-full text-left">
         <thead>
@@ -29,14 +53,33 @@
           </tr>
         </thead>
         <tbody class="text-gray-700 text-sm">
-          <tr class="border-b border-gray-200 hover:bg-gray-100">
-            <td class="py-3 px-6">1</td>
-            <td class="py-3 px-6">John Doe</td>
-            <td class="py-3 px-6">john.doe@example.com</td>
-            <td class="py-3 px-6">Admin</td>
+          <tr
+            v-for="user in users"
+            :key="user.id"
+            class="border-b border-gray-200 hover:bg-gray-100"
+          >
+            <td class="py-3 px-6">{{ user.id }}</td>
             <td class="py-3 px-6">
-              <button class="text-blue-500 hover:underline mr-4">Edit</button>
-              <button class="text-red-500 hover:underline">Delete</button>
+              <img
+                :src="`http://localhost:8090/uploads/${user.avatar_url}`"
+                alt="Logo"
+                @error="(e) => (e.target.src = defaultAvatar)"
+                class="w-6 h-6 rounded-full mr-2"
+              />{{ user.full_name }}
+            </td>
+            <td class="py-3 px-6">{{ user.email }}</td>
+            <td class="py-3 px-6">{{ user.role_name }}</td>
+            <td class="py-3 px-6">
+              <button
+                v-if="user.status === 'ACTIVE'"
+                class="text-red-700 hover:underline mr-4"
+                @click=""
+              >
+                Block
+              </button>
+              <button v-else class="text-emerald-500 hover:underline mr-4" @click="">
+                Unblock
+              </button>
             </td>
           </tr>
         </tbody>
@@ -48,6 +91,7 @@
       <div class="md:col-span-12 text-center">
         <nav aria-label="Page navigation example">
           <ul class="inline-flex items-center -space-x-px">
+            <!-- Previous Button -->
             <li>
               <a
                 href="#"
@@ -58,6 +102,7 @@
                 <i class="pi pi-angle-left"></i>
               </a>
             </li>
+            <!-- Page Numbers -->
             <li v-for="page in totalPages" :key="page">
               <a
                 href="#"
@@ -71,6 +116,7 @@
                 {{ page }}
               </a>
             </li>
+            <!-- Next Button -->
             <li>
               <a
                 href="#"
@@ -89,14 +135,84 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
+import defaultAvatar from '../../assets/avatar-default.svg'
 
+// State
+const users = ref([])
 const currentPage = ref(0)
-const totalPages = 5
+const totalPages = ref(1)
+const pageSize = ref(5)
+const currentRoleFilter = ref('')
+const currentStatusFilter = ref('')
 
-function changePage(page) {
-  if (page >= 0 && page < totalPages) {
+// Filters
+const roleFilters = ref([
+  { label: 'Recruiters', value: 2 }, // roleId = 2
+  { label: 'Candidates', value: 3 } // roleId = 3
+])
+
+// Status Filters
+const statusFilters = ref([
+  { label: 'Active', value: 'Active' },
+  { label: 'Inactive', value: 'Inactive' }
+])
+
+// Fetch Users API
+const fetchUsers = async (page = 0) => {
+  try {
+    const params = {
+      page: page,
+      limit: pageSize.value
+    }
+
+    // Kiểm tra filter để thêm tham số phù hợp
+    if (currentRoleFilter.value) {
+      params.roleId = currentRoleFilter.value
+    }
+
+    // Thêm status nếu có
+    if (currentStatusFilter.value) {
+      params.status = currentStatusFilter.value
+    }
+
+    const response = await axios.get('http://localhost:8090/api/admin/getAllUsers', {
+      params: params,
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('token')
+      }
+    })
+
+    // Update state
+    users.value = response.data.users
+    totalPages.value = response.data.totalPages
     currentPage.value = page
+  } catch (error) {
+    console.error('Error fetching users:', error)
   }
 }
+
+// Apply Filter
+const toggleRoleFilter = (role) => {
+  currentRoleFilter.value = currentRoleFilter.value === role ? '' : role
+  fetchUsers(0) // Reset về trang 0 khi đổi filter
+}
+
+// Toggle Status Filter
+const toggleStatusFilter = (status) => {
+  currentStatusFilter.value = currentStatusFilter.value === status ? '' : status
+  fetchUsers(0) // Reset về trang 0 khi đổi filter
+}
+
+// Change page handler
+const changePage = (page) => {
+  if (page >= 0 && page < totalPages.value) {
+    currentPage.value = page
+    fetchUsers(page)
+  }
+}
+
+// Initial fetch on component mount
+onMounted(() => fetchUsers(0))
 </script>

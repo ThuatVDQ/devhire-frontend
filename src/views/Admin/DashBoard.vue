@@ -17,6 +17,17 @@ const monthlyApplications = ref({
   ]
 })
 
+const monthlyJobs = ref({
+  labels: [],
+  datasets: [
+    {
+      label: 'Applications',
+      backgroundColor: '#2196F3',
+      data: []
+    }
+  ]
+})
+
 // Gọi API khi component được mount
 const fetchDashboardData = async () => {
   try {
@@ -75,7 +86,7 @@ const fetchMonthlyApplications = async () => {
     // Cập nhật data dựa trên dữ liệu từ API
     monthlyData.forEach((item) => {
       const monthIndex = item.month - 1 // Chuyển tháng sang chỉ số bắt đầu từ 0
-      data[monthIndex] = item.application_count // Gán giá trị từ API
+      data[monthIndex] = item.count // Gán giá trị từ API
     })
 
     // Gán lại toàn bộ đối tượng `monthlyApplicationsData` để Vue nhận diện thay đổi
@@ -94,9 +105,59 @@ const fetchMonthlyApplications = async () => {
   }
 }
 
+const fetchMonthlyJobs = async () => {
+  try {
+    const response = await axios.get('http://localhost:8090/api/admin/monthlyJobs?year=2024', {
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('token')
+      }
+    })
+    const monthlyData = response.data
+
+    // Khởi tạo mảng labels cho 12 tháng
+    const labels = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
+    ]
+
+    // Khởi tạo mảng data cho 12 tháng với giá trị mặc định là 0
+    const data = new Array(12).fill(0)
+
+    // Cập nhật data dựa trên dữ liệu từ API
+    monthlyData.forEach((item) => {
+      const monthIndex = item.month - 1 // Chuyển tháng sang chỉ số bắt đầu từ 0
+      data[monthIndex] = item.count // Gán giá trị từ API
+    })
+
+    // Gán lại toàn bộ đối tượng `monthlyApplicationsData` để Vue nhận diện thay đổi
+    monthlyJobs.value = {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Applications',
+          backgroundColor: '#2196F3',
+          data: data
+        }
+      ]
+    }
+  } catch (error) {
+    console.error('Error fetching monthly applications:', error)
+  }
+}
+
 onMounted(() => {
   fetchDashboardData()
-  // fetchRecentActivities()
+  fetchMonthlyJobs()
   fetchMonthlyApplications()
 })
 
@@ -185,6 +246,11 @@ const chartOptions = computed(() => {
       <div class="">
         <!-- Placeholder for Chart -->
         <BarChart :chartData="monthlyApplications" :options="chartOptions" />
+      </div>
+
+      <div class="">
+        <!-- Placeholder for Chart -->
+        <BarChart :chartData="monthlyJobs" :options="chartOptions" />
       </div>
     </section>
 

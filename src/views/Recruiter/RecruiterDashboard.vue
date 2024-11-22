@@ -164,7 +164,7 @@ async function fetchMonthlyApplications() {
     // Cập nhật data dựa trên dữ liệu từ API
     monthlyData.forEach((item) => {
       const monthIndex = item.month - 1 // Chuyển tháng sang chỉ số bắt đầu từ 0
-      data[monthIndex] = item.application_count // Gán giá trị từ API
+      data[monthIndex] = item.count // Gán giá trị từ API
     })
 
     // Gán lại toàn bộ đối tượng `monthlyApplicationsData` để Vue nhận diện thay đổi

@@ -28,7 +28,7 @@
           type="text"
           placeholder="Search jobs..."
           v-model="searchQuery"
-          @input="fetchData"
+          @input=""
           class="w-full px-4 py-2 border border-gray-300 rounded-md pl-10"
         />
         <i
@@ -95,21 +95,26 @@
               </span>
             </td>
             <td class="py-3 px-6">
-              <button
-                class="text-blue-500 hover:underline mr-4"
-                @click="showDialog('approve', job.id)"
-              >
-                Approve
-              </button>
-              <button
-                class="text-gray-500 hover:underline mr-4"
-                @click="showDialog('reject', job.id)"
-              >
-                Reject
-              </button>
-              <button class="text-red-500 hover:underline" @click="showDialog('close', job.id)">
-                Close
-              </button>
+              <!-- Kiểm tra trạng thái và hiển thị nút tương ứng -->
+              <template v-if="job.status === 'PENDING'">
+                <button
+                  class="text-blue-500 hover:underline mr-4"
+                  @click="showDialog('approve', job.id)"
+                >
+                  Approve
+                </button>
+                <button
+                  class="text-gray-500 hover:underline mr-4"
+                  @click="showDialog('reject', job.id)"
+                >
+                  Reject
+                </button>
+              </template>
+              <template v-else-if="job.status === 'OPEN' || job.status === 'HOT'">
+                <button class="text-red-500 hover:underline" @click="showDialog('close', job.id)">
+                  Close
+                </button>
+              </template>
             </td>
           </tr>
         </tbody>
@@ -192,7 +197,7 @@ const isLoading = ref(false)
 const fetchData = async (page = 0) => {
   isLoading.value = true
   try {
-    const response = await axios.get('http://localhost:8090/api/jobs', {
+    const response = await axios.get('http://localhost:8090/api/jobs/search', {
       params: { page, limit: pageSize.value }
     })
     jobs.value = response.data.jobs
@@ -221,6 +226,8 @@ function showDialog(action, jobId) {
     dialogMessage.value = 'Are you sure you want to approve this job?'
   } else if (action === 'reject') {
     dialogMessage.value = 'Are you sure you want to reject this job?'
+  } else {
+    dialogMessage.value = 'Are you sure you want to close this job?'
   }
 }
 
@@ -229,6 +236,8 @@ function onConfirm() {
     approveJob(currentJobId.value)
   } else if (currentAction.value === 'reject') {
     rejectJob(currentJobId.value)
+  } else {
+    closeJob(currentJobId.value)
   }
   closeDialog()
 }
@@ -237,6 +246,18 @@ function closeDialog() {
   isDialogVisible.value = false
   currentJobId.value = null
   currentAction.value = ''
+}
+
+async function closeJob(jobId) {
+  try {
+    const response = await axios.post(`http://localhost:8090/api/jobs/${jobId}/expire`, null)
+
+    if (response.status === 200) {
+      fetchData(currentPage.value)
+    }
+  } catch (error) {
+    toastr.error(error.response.data, 'Error: ')
+  }
 }
 
 async function approveJob(jobId) {

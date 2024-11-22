@@ -95,13 +95,3 @@ const filteredMenuItems = computed(() => {
   )
 })
 </script>
-
-<style scoped>
-/* Adjusts the width of the main content area based on sidebar state */
-.ml-0 {
-  margin-left: 0;
-}
-.ml-64 {
-  margin-left: 16rem;
-}
-</style>

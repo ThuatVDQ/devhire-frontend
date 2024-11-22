@@ -3,12 +3,10 @@
     <!-- Sidebar -->
     <SideBar />
 
-    <div class="flex flex-col flex-1 w-full">
-      <!-- Content -->
-      <main class="flex-1 overflow-y-auto">
-        <RouterView />
-      </main>
-    </div>
+    <!-- Content -->
+    <main class="flex-1 overflow-y-auto">
+      <RouterView />
+    </main>
   </div>
 </template>
 
