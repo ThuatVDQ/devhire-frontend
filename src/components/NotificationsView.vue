@@ -1,0 +1,106 @@
+<template>
+  <p
+    class="text-blue-500 text-right underline cursor-pointer mt-4 mb-4"
+    @click="markAllAsRead(notifications)"
+  >
+    Mark all as read
+  </p>
+
+  <div class="bg-white shadow-md rounded-lg p-4">
+    <ul>
+      <li
+        v-for="notification in notifications"
+        :key="notification.id"
+        :class="{
+          'p-2 border-b last:border-0 flex justify-between items-center cursor-pointer': true, // Con trỏ chuột bàn tay
+          'bg-gray-100': !notification.is_read // Nền xám nếu chưa đọc
+        }"
+        @click="markAsRead(notification)"
+      >
+        <!-- Nội dung thông báo -->
+        <div class="flex-1">
+          <p class="text-base text-gray-500">{{ notification.message }}</p>
+          <p class="text-sm text-gray-400 mt-1">
+            {{ formatTimeAgo(notification.send_at) }}
+          </p>
+        </div>
+
+        <!-- Dấu chấm xanh -->
+        <div
+          v-if="!notification.is_read"
+          class="w-3 h-3 bg-blue-500 rounded-full flex-shrink-0 ml-2"
+        ></div>
+      </li>
+    </ul>
+    <div v-if="notifications.length === 0" class="text-center text-gray-500 py-4">
+      No notifications available.
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { formatDistanceToNow } from 'date-fns'
+import axios from 'axios'
+import { ref } from 'vue'
+
+// Hàm định dạng thời gian thành dạng "x phút trước"
+const formatTimeAgo = (dateString) => {
+  return formatDistanceToNow(new Date(dateString), { addSuffix: true })
+}
+
+// Props
+defineProps({
+  notifications: {
+    type: Array,
+    required: true,
+    default: () => []
+  }
+})
+
+const markAsRead = async (notification) => {
+  try {
+    const response = await axios.put(
+      `http://localhost:8090/api/notifications/${notification.id}/read`,
+      null,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      }
+    )
+
+    console.log('Response:', response.data)
+
+    // Cập nhật trạng thái "đã đọc" của thông báo
+    if (notification) {
+      notification.is_read = true
+    }
+  } catch (error) {
+    console.error('Error marking notification as read:', error)
+  }
+}
+const markAllAsRead = async (notifications) => {
+  console.log('Marking all notifications as read...', notifications[0].is_read)
+  try {
+    const token = localStorage.getItem('token') // Lấy token từ localStorage
+
+    // Gửi yêu cầu PUT đến API
+    const response = await axios.put(
+      'http://localhost:8090/api/notifications/mark-all-read',
+      null,
+      {
+        headers: {
+          Authorization: `Bearer ${token}` // Gửi token trong tiêu đề
+        }
+      }
+    )
+
+    console.log('Response:', response.data)
+    for (const notification of notifications) {
+      notification.is_read = true
+    }
+  } catch (error) {
+    console.error('Error marking all notifications as read:', error)
+  }
+}
+</script>

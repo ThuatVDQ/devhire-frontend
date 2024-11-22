@@ -84,7 +84,7 @@ const menuItems = [
   { name: 'Users', path: '/admin/users', icon: 'pi pi-users' },
   { name: 'Jobs', path: '/admin/jobs', icon: 'pi pi-briefcase' },
   { name: 'Companies', path: '/admin/companies', icon: 'pi pi-building' },
-  { name: 'Settings', path: '/admin/settings', icon: 'pi pi-cog' }
+  { name: 'Notifications', path: '/admin/notifications', icon: 'pi pi-bell' }
 ]
 
 // Lọc danh sách menu theo từ khóa tìm kiếm

@@ -36,6 +36,9 @@ import JobManagement from '@/views/Admin/JobManagement.vue'
 import JobDetail from '@/views/Admin/JobDetail.vue'
 import EditJob from '@/views/Recruiter/EditJob.vue'
 import Login from '@/views/Admin/Login.vue'
+import CompaniesManagement from '@/views/Admin/CompaniesManagement.vue'
+import Notifications from '@/views/Admin/Notifications.vue'
+import RecruiterNotifications from '@/views/Recruiter/RecruiterNotifications.vue'
 
 const routes = [
   {
@@ -142,6 +145,11 @@ const routes = [
         component: RecruiterJobs
       },
       {
+        path: 'notifications',
+        name: 'manage-notifications',
+        component: RecruiterNotifications
+      },
+      {
         path: 'job-detail/:id',
         name: 'recruiter-job-detail',
         component: RecruiterJobDetail
@@ -210,9 +218,19 @@ const routes = [
         component: UserManagement
       },
       {
+        path: 'companies',
+        name: 'admin-companies-management',
+        component: CompaniesManagement
+      },
+      {
         path: 'jobs',
         name: 'admin-jobs-management',
         component: JobManagement
+      },
+      {
+        path: 'notifications',
+        name: 'admin-notifications-management',
+        component: Notifications
       },
       {
         path: 'job/:id',
