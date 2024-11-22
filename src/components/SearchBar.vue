@@ -6,7 +6,7 @@
       </div>
 
       <div class="bg-white dark:bg-slate-900 shadow-md rounded-lg p-6 max-w-5xl mx-auto">
-        <form class="flex items-center space-x-6">
+        <form @submit.prevent="onSearch" class="flex items-center space-x-6">
           <!-- Search Input -->
           <div class="flex items-center bg-gray-50 dark:bg-gray-700 rounded-lg p-3 w-full max-w-sm">
             <i class="pi pi-briefcase text-green-700 mr-4 text-lg"></i>
@@ -99,6 +99,12 @@
           </div>
 
           <!-- Submit Button -->
+          <button
+            type="submit"
+            class="bg-emerald-500 text-white px-6 py-3 rounded-lg text-lg hover:bg-emerald-600 transition"
+          >
+            Search
+          </button>
         </form>
       </div>
     </div>
@@ -208,13 +214,21 @@ const clearJobType = () => {
   selectedJobType.value = ''
 }
 
-watch([keyword, selectedCity, selectedJobType], () => {
+const onSearch = () => {
   emit('search', {
     keyword: keyword.value,
     location: selectedCity.value,
     type: selectedJobType.value
   })
-})
+}
+
+// watch([keyword, selectedCity, selectedJobType], () => {
+//   emit('search', {
+//     keyword: keyword.value,
+//     location: selectedCity.value,
+//     type: selectedJobType.value
+//   })
+// })
 </script>
 
 <style scoped>

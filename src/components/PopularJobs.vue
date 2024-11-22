@@ -3,6 +3,7 @@ import JobList from './JobList.vue'
 import { reactive, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import axios from 'axios'
+import CardJob from './CardJob.vue'
 
 const state = reactive({
   jobs: [],
@@ -11,8 +12,8 @@ const state = reactive({
 
 onMounted(async () => {
   try {
-    const response = await axios.get('http://localhost:8000/jobs')
-    state.jobs = response.data.slice(0, 6)
+    const response = await axios.get('http://localhost:8090/api/jobs')
+    state.jobs = response.data.jobs.slice(0, 6)
     console.log(response.data)
   } catch (e) {
     console.error(e)
@@ -31,7 +32,9 @@ onMounted(async () => {
         reviews on over 30000+ companies worldwide.
       </p>
     </div>
-    <JobList :jobs="state.jobs" :pagination="false" />
+    <div class="grid lg:grid-cols-2 md:grid-cols-2 grid-cols-1 mt-8 gap-[30px] auto-rows-fr">
+      <CardJob v-for="job in state.jobs" :key="job.id" :job="job" />
+    </div>
 
     <div class="grid md:grid-cols-1 grid-cols-1 mt-8">
       <div class="md:col-span-12 text-center">

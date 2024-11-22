@@ -2,6 +2,7 @@
 import { ref, onMounted, defineProps, watch } from 'vue'
 import CardJob from './CardJob.vue'
 import axios from 'axios'
+import icon_sad from '@/assets/icon-sad.png'
 
 const jobs = ref([])
 const currentPage = ref(0)
@@ -134,8 +135,14 @@ const scrollToTop = () => {
   </div>
 
   <div v-else>
-    <div v-if="jobs.length === 0 && !isLoading" class="flex justify-center items-center h-64">
-      <p class="text-2xl text-gray-500">No jobs available at the moment.</p>
+    <div v-if="jobs.length === 0 && !isLoading" class="h-64">
+      <img
+        :src="icon_sad"
+        alt="Empty Saved Jobs"
+        class="mx-auto mb-4"
+        style="width: 300px; height: auto"
+      />
+      <p class="text-2xl text-gray-500 text-center">No jobs available at the moment.</p>
     </div>
 
     <div v-else class="container">

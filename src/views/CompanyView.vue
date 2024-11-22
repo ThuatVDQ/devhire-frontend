@@ -11,9 +11,10 @@ const handleToggleAccordion = (index) => {
 }
 
 const keyword = ref('')
-const filteredKeyword = computed(() => {
-  return keyword.value.trim().toLowerCase()
-})
+const searchKeyword = ref('')
+const triggerSearch = () => {
+  searchKeyword.value = keyword.value.trim() // Chỉ gửi keyword đã được xác nhận
+}
 </script>
 
 <template>
@@ -36,7 +37,7 @@ const filteredKeyword = computed(() => {
   <section>
     <div class="container mx-auto pt-4">
       <div class="bg-white dark:bg-slate-900 shadow-md rounded-lg p-6 max-w-3xl mx-auto">
-        <form class="flex items-center space-x-6">
+        <form class="flex items-center space-x-6" @submit.prevent="triggerSearch">
           <!-- Search Input -->
           <div class="flex items-center bg-gray-50 dark:bg-gray-700 rounded-lg p-3 w-full">
             <i class="pi pi-briefcase text-green-700 mr-4 text-lg"></i>
@@ -45,8 +46,16 @@ const filteredKeyword = computed(() => {
               type="text"
               placeholder="Search..."
               class="w-full bg-transparent border-none outline-none text-gray-900 dark:text-white text-lg"
+              @keyup.enter="triggerSearch"
             />
           </div>
+          <button
+            type="button"
+            class="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700"
+            @click="triggerSearch"
+          >
+            Search
+          </button>
         </form>
       </div>
     </div>
@@ -56,7 +65,7 @@ const filteredKeyword = computed(() => {
   <section class="relative md:py-24 py-16">
     <div class="container">
       <div class="grid grid-cols-1 pb-8">
-        <CompanyList :keyword="filteredKeyword" />
+        <CompanyList :keyword="searchKeyword" />
       </div>
     </div>
 

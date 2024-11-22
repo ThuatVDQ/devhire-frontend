@@ -14,13 +14,13 @@
     <!-- Popup thông báo -->
     <div
       v-if="showNotifications"
-      class="absolute right-0 mt-2 w-[28rem] bg-white shadow-xl rounded-lg z-50"
+      class="absolute right-0 mt-2 w-[28rem] bg-white shadow-xl rounded-2xl z-50"
     >
       <div
-        class="p-5 border-b text-xl font-semibold text-gray-800 flex justify-between items-center @click.stop"
+        class="p-5 border-b text-xl font-semibold text-gray-800 flex justify-between items-center @click.stop bg-emerald-600"
       >
         <span>Notifications</span>
-        <button class="text-blue-500 text-sm" @click="markAllAsRead">Mark all as read</button>
+        <button class="text-white text-sm" @click="markAllAsRead">Mark all as read</button>
       </div>
       <ul class="max-h-96 overflow-y-auto">
         <li

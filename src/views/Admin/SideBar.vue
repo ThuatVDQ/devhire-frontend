@@ -72,7 +72,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 
-const isCollapsed = ref(true)
+const isCollapsed = ref(false) // Trạng thái của sidebar
 const toggleSidebar = () => {
   isCollapsed.value = !isCollapsed.value
 }

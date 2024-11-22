@@ -1,9 +1,11 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import Footer from '@/components/Footer.vue'
 import { RouterView } from 'vue-router'
+import { initializeWebSocket, disconnectWebSocket } from '@/utils/websocket'
+import axios from 'axios'
 
-const isCollapsed = ref(true) // Trạng thái thu hẹp/mở rộng của sidebar
+const isCollapsed = ref(false) // Trạng thái thu hẹp/mở rộng của sidebar
 const toggleSidebar = () => {
   isCollapsed.value = !isCollapsed.value
 }
@@ -23,6 +25,45 @@ const filteredMenuItems = computed(() => {
   return menuItems.filter((item) =>
     item.name.toLowerCase().includes(searchQuery.value.toLowerCase())
   )
+})
+
+const unreadCount = ref(0)
+const newNotification = ref(true)
+const fetchUnreadCount = async () => {
+  try {
+    const token = localStorage.getItem('token') // Lấy token từ localStorage
+    const response = await axios.get('http://localhost:8090/api/notifications/unread-count', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    unreadCount.value = response.data
+  } catch (error) {
+    console.error('Error fetching unread notification count:', error)
+  }
+}
+
+const handleNewNotification = () => {
+  fetchUnreadCount()
+  newNotification.value = true // Cập nhật số lượng thông báo chưa đọc từ API
+}
+
+const viewNotifications = () => {
+  newNotification.value = false // Khi xem thông báo, đặt cờ về false
+}
+
+onMounted(() => {
+  fetchUnreadCount()
+
+  // Kết nối WebSocket và lắng nghe thông báo
+  const username = localStorage.getItem('username')
+  if (username) {
+    initializeWebSocket(username, handleNewNotification)
+  }
+})
+
+onBeforeUnmount(() => {
+  disconnectWebSocket() // Ngắt kết nối WebSocket khi component bị hủy
 })
 </script>
 
@@ -86,9 +127,16 @@ const filteredMenuItems = computed(() => {
                 :to="item.path"
                 class="flex items-center p-2 rounded transition duration-200 hover:bg-gray-700"
                 active-class="bg-gray-700"
+                @click="item.name === 'Notifications' && viewNotifications()"
               >
                 <i :class="item.icon" class="mr-3"></i>
                 <span>{{ item.name }}</span>
+                <span
+                  v-if="item.name === 'Notifications' && newNotification"
+                  class="absolute right-2 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center"
+                >
+                  {{ unreadCount }}
+                </span>
               </RouterLink>
             </nav>
           </div>

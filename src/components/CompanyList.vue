@@ -2,6 +2,7 @@
 import CardCompany from './CardCompany.vue'
 import { ref, onMounted, watch } from 'vue'
 import axios from 'axios'
+import icon_sad from '@/assets/icon-sad.png'
 
 const props = defineProps({
   keyword: {
@@ -106,6 +107,15 @@ const scrollToTop = () => {
     ></div>
   </div>
   <div v-else>
+    <div v-if="!companies.length" class="">
+      <img
+        :src="icon_sad"
+        alt="Empty Saved Jobs"
+        class="mx-auto mb-4"
+        style="width: 300px; height: auto"
+      />
+      <p class="text-gray-500 text-lg text-center">No results found. Please try again.</p>
+    </div>
     <div class="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 mt-8 gap-[30px]">
       <CardCompany v-for="company in companies" :key="company.id" :company="company" />
     </div>

@@ -3,6 +3,7 @@ import CompanyList from './CompanyList.vue'
 import { RouterLink } from 'vue-router'
 import { reactive, onMounted } from 'vue'
 import axios from 'axios'
+import CardCompany from './CardCompany.vue'
 
 const state = reactive({
   companies: [],
@@ -11,8 +12,8 @@ const state = reactive({
 
 onMounted(async () => {
   try {
-    const response = await axios.get('http://localhost:8000/companies')
-    state.companies = response.data.slice(0, 8)
+    const response = await axios.get('http://localhost:8090/api/companies')
+    state.companies = response.data.companies.slice(0, 8)
     console.log(response.data)
   } catch (e) {
     console.error(e)
@@ -32,7 +33,10 @@ onMounted(async () => {
           reviews on over 30000+ companies worldwide.
         </p>
       </div>
-      <CompanyList :companies="state.companies" :pagination="false" />
+      <div class="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 mt-8 gap-[30px]">
+        <CardCompany v-for="company in state.companies" :key="company.id" :company="company" />
+      </div>
+      <!-- <CompanyList :companies="state.companies" :pagination="false" /> -->
     </div>
     <div class="grid md:grid-cols-12 grid-cols-1 mt-6">
       <div class="md:col-span-12 text-center">
