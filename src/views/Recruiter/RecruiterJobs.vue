@@ -57,7 +57,16 @@
     <!-- Filter Bar (above search bar) -->
 
     <div class="bg-white shadow-md rounded-lg overflow-hidden">
-      <table class="min-w-full bg-white">
+      <div v-if="!jobs.length" class="">
+        <img
+          :src="icon_sad"
+          alt="Empty Jobs"
+          class="mx-auto mb-4"
+          style="width: 300px; height: auto"
+        />
+        <p class="text-gray-500 text-lg text-center">No results found. Please try again.</p>
+      </div>
+      <table v-else class="min-w-full bg-white">
         <thead class="bg-gray-50">
           <tr>
             <th class="text-gray-500"></th>
@@ -200,6 +209,7 @@ import { useRouter } from 'vue-router'
 import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
+import icon_sad from '@/assets/icon-sad.png'
 
 const router = useRouter()
 

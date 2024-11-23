@@ -83,11 +83,15 @@
               <button
                 v-if="user.status === 'ACTIVE'"
                 class="text-red-700 hover:underline mr-4"
-                @click=""
+                @click="showDialog('block', user.id)"
               >
                 Block
               </button>
-              <button v-else class="text-emerald-500 hover:underline mr-4" @click="">
+              <button
+                v-else
+                class="text-emerald-500 hover:underline mr-4"
+                @click="showDialog('unblock', user.id)"
+              >
                 Unblock
               </button>
             </td>
@@ -141,6 +145,12 @@
         </nav>
       </div>
     </div>
+    <ConfirmationDialog
+      :isVisible="isDialogVisible"
+      :message="dialogMessage"
+      @confirm="onConfirm"
+      @cancel="closeDialog"
+    />
   </section>
 </template>
 
@@ -149,6 +159,9 @@ import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import defaultAvatar from '../../assets/avatar-default.svg'
 import icon_sad from '@/assets/icon-sad.png'
+import toastr from 'toastr'
+import 'toastr/build/toastr.min.css'
+import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
 
 // State
 const users = ref([])
@@ -157,6 +170,11 @@ const totalPages = ref(1)
 const pageSize = ref(5)
 const currentRoleFilter = ref('')
 const currentStatusFilter = ref('')
+
+const isDialogVisible = ref(false)
+const dialogMessage = ref('')
+const currentUserId = ref(null)
+const currentAction = ref('')
 
 // Filters
 const roleFilters = ref([
@@ -214,6 +232,72 @@ const toggleRoleFilter = (role) => {
 const toggleStatusFilter = (status) => {
   currentStatusFilter.value = currentStatusFilter.value === status ? '' : status
   fetchUsers(0) // Reset về trang 0 khi đổi filter
+}
+
+function showDialog(action, userId) {
+  currentUserId.value = userId
+  currentAction.value = action
+  isDialogVisible.value = true
+
+  // Set message based on action
+  if (action === 'block') {
+    dialogMessage.value = 'Are you sure you want to block this user?'
+  } else {
+    dialogMessage.value = 'Are you sure you want to unblock this user?'
+  }
+}
+
+function onConfirm() {
+  if (currentAction.value === 'block') {
+    blockUser(currentUserId.value)
+  } else {
+    unblockUser(currentUserId.value)
+  }
+  closeDialog()
+}
+
+function closeDialog() {
+  isDialogVisible.value = false
+  currentUserId.value = null
+  currentAction.value = ''
+}
+
+const blockUser = async (userId) => {
+  try {
+    const response = await axios.post(
+      'http://localhost:8090/api/admin/banUser',
+      {},
+      {
+        params: { userId },
+        headers: {
+          Authorization: 'Bearer ' + localStorage.getItem('token')
+        }
+      }
+    )
+    toastr.success(response.data, 'Success')
+    fetchUsers(currentPage.value) // Refresh danh sách người dùng
+  } catch (error) {
+    toastr.error(error.response?.data || 'Error banning user', 'Error')
+  }
+}
+
+const unblockUser = async (userId) => {
+  try {
+    const response = await axios.post(
+      'http://localhost:8090/api/admin/unbanUser',
+      {},
+      {
+        params: { userId },
+        headers: {
+          Authorization: 'Bearer ' + localStorage.getItem('token')
+        }
+      }
+    )
+    toastr.success(response.data, 'Success')
+    fetchUsers(currentPage.value) // Refresh danh sách người dùng
+  } catch (error) {
+    toastr.error(error.response?.data || 'Error unbanning user', 'Error')
+  }
 }
 
 // Change page handler
