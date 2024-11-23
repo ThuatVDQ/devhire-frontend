@@ -80,6 +80,7 @@ async function fetchJobApplications() {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     })
+    console.log('response:', response.data)
     jobApplications.value = response.data || []
     if (jobApplications.value.length > 0 && jobApplications.value[0].job_title) {
       title.value = jobApplications.value[0].job_title
@@ -203,10 +204,7 @@ function goBack() {
       <p class="text-white text-lg">Please waiting ...</p>
     </div>
 
-    <div
-      :class="{ 'blur-sm pointer-events-none': isRequireBackEnd }"
-      class="container mx-auto py-6 px-30"
-    >
+    <div :class="{ 'blur-sm pointer-events-none': isRequireBackEnd }" class="px-6 mx-auto py-6">
       <!-- Back Button -->
       <button
         @click="goBack"
@@ -228,17 +226,27 @@ function goBack() {
       <!-- Applications Section -->
       <div v-else class="bg-white shadow-md rounded-lg overflow-hidden">
         <table class="min-w-full bg-white border-collapse">
-          <thead class="bg-gray-400">
+          <!-- Header -->
+          <thead class="bg-blue-100">
             <tr>
-              <th class="py-4 px-8 text-left text-sm font-medium text-white uppercase">
+              <th class="py-4 px-6 text-left text-sm font-medium text-gray-700 uppercase w-1/4">
                 Candidate Name
               </th>
-              <th class="py-4 px-8 text-left text-sm font-medium text-white uppercase">
+              <th class="py-4 px-6 text-left text-sm font-medium text-gray-700 uppercase w-1/4">
+                Contact Information
+              </th>
+              <th class="py-4 px-6 text-left text-sm font-medium text-gray-700 uppercase w-1/4">
                 Application Date
               </th>
-              <th class="py-4 px-8 text-left text-sm font-medium text-white uppercase">Status</th>
-              <th class="py-4 px-8 text-left text-sm font-medium text-white uppercase"></th>
-              <th class="py-4 px-8 text-left text-sm font-medium text-white uppercase"></th>
+              <th class="py-4 px-6 text-left text-sm font-medium text-gray-700 uppercase w-1/6">
+                Status
+              </th>
+              <th
+                class="py-4 px-6 text-left text-sm font-medium text-gray-700 uppercase w-1/6"
+              ></th>
+              <th
+                class="py-4 px-6 text-left text-sm font-medium text-gray-700 uppercase w-1/6"
+              ></th>
             </tr>
           </thead>
           <tbody>
@@ -247,50 +255,58 @@ function goBack() {
               :key="application.id"
               class="border-b hover:bg-gray-100"
             >
-              <td class="py-4 px-8 text-sm text-gray-700">{{ application.full_name }}</td>
-              <td class="py-4 px-8 text-sm text-gray-700">
+              <td class="py-4 px-6 text-sm text-gray-700">{{ application.full_name }}</td>
+              <td class="py-4 px-6 text-sm text-gray-700">{{ application.email }}</td>
+              <td class="py-4 px-6 text-sm text-gray-700">
                 {{ formatDate(application.applyDate) }}
               </td>
-              <td class="py-4 px-8 text-sm text-gray-700">{{ application.status }}</td>
-              <td class="py-4 px-8 text-sm text-gray-700">
-                <div
-                  class="flex items-center space-x-1 cursor-pointer"
-                  @click="downloadCV(application.cv_id, application.full_name)"
-                >
-                  <i class="pi pi-download text-gray-500 hover:text-gray-700"></i>
-                  <span class="text-sm text-gray-500 hover:text-gray-700">Download CV</span>
-                </div>
-                <div
-                  @click="viewCV(application.cv_url, application.id)"
-                  class="flex items-center space-x-1 cursor-pointer mt-2"
-                >
-                  <i class="pi pi-eye text-gray-500 hover:text-gray-700"></i>
-                  <span class="text-sm text-gray-500 hover:text-gray-700">View CV</span>
+              <td class="py-4 px-6 text-sm text-gray-700">{{ application.status }}</td>
+              <td class="py-4 px-6 text-sm text-gray-700">
+                <div class="flex items-center space-x-6 whitespace-nowrap">
+                  <!-- Download CV -->
+                  <div
+                    class="flex items-center cursor-pointer"
+                    @click="downloadCV(application.cv_id, application.full_name)"
+                  >
+                    <i class="pi pi-download text-gray-500 hover:text-gray-700"></i>
+                    <span class="text-sm text-gray-500 hover:text-gray-700 ml-2">Download CV</span>
+                  </div>
+                  <!-- View CV -->
+                  <div
+                    @click="viewCV(application.cv_url, application.id)"
+                    class="flex items-center cursor-pointer"
+                  >
+                    <i class="pi pi-eye text-gray-500 hover:text-gray-700"></i>
+                    <span class="text-sm text-gray-500 hover:text-gray-700 ml-2">View CV</span>
+                  </div>
                 </div>
               </td>
+
               <td class="py-4 px-8 text-sm text-gray-700">
-                <button
-                  @click="openEmailTemplatePopup(application)"
-                  :disabled="application.status !== 'SEEN'"
-                  :class="{
-                    'bg-gray-300': application.status !== 'SEEN',
-                    'bg-green-600 ': application.status === 'SEEN'
-                  }"
-                  class="px-4 py-2 mr-2 text-white rounded-lg"
-                >
-                  Accept
-                </button>
-                <button
-                  @click="updateApplicationStatus(application.id, 'reject')"
-                  :disabled="application.status !== 'SEEN'"
-                  :class="{
-                    'bg-gray-300 ': application.status !== 'SEEN',
-                    'bg-red-600 ': application.status === 'SEEN'
-                  }"
-                  class="px-4 py-2 text-white rounded-lg"
-                >
-                  Reject
-                </button>
+                <div class="flex space-x-4">
+                  <button
+                    @click="openEmailTemplatePopup(application)"
+                    :disabled="application.status !== 'SEEN'"
+                    :class="{
+                      'bg-gray-300': application.status !== 'SEEN',
+                      'bg-green-600': application.status === 'SEEN'
+                    }"
+                    class="px-4 py-2 text-white rounded-lg"
+                  >
+                    Accept
+                  </button>
+                  <button
+                    @click="updateApplicationStatus(application.id, 'reject')"
+                    :disabled="application.status !== 'SEEN'"
+                    :class="{
+                      'bg-gray-300': application.status !== 'SEEN',
+                      'bg-red-600': application.status === 'SEEN'
+                    }"
+                    class="px-4 py-2 text-white rounded-lg"
+                  >
+                    Reject
+                  </button>
+                </div>
               </td>
             </tr>
             <tr v-if="paginatedApplications.length === 0">
