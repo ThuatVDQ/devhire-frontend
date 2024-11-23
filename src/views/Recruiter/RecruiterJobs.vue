@@ -2,28 +2,39 @@
   <header class="">
     <h1 class="text-3xl font-semibold text-white bg-blue-700 px-11 py-10">Jobs Management</h1>
   </header>
-  <div class="container mx-auto p-11">
-    <!-- Filter Bar (above search bar) -->
-    <div class="flex justify-start mb-4 space-x-2">
-      <button
-        v-for="filter in filters"
-        :key="filter.id"
-        @click="setFilter(filter.id)"
+  <div class="px-11 pt-11">
+    <div class="flex gap-2">
+      <span
+        v-for="filter in statusFilters"
+        :key="filter.value"
+        @click="toggleStatusFilter(filter.value)"
         :class="[
-          'px-4 py-2 rounded-full text-sm font-medium focus:outline-none',
-          currentFilter === filter.id ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700'
+          selectedStatus === filter.value
+            ? 'bg-blue-600 text-white border-blue-600'
+            : 'bg-white text-gray-700 border-gray-300'
         ]"
+        class="cursor-pointer px-4 py-1 rounded-full text-sm w-24 text-center"
       >
         {{ filter.label }}
-        <span v-if="filter.count !== null" class="ml-2 text-xs">
-          {{ filter.count }}
-        </span>
-      </button>
+      </span>
     </div>
-
-    <!-- Search Bar -->
-    <div class="flex justify-between mb-4">
-      <div class="relative w-full max-w-sm">
+    <div class="flex gap-2 mt-2">
+      <span
+        v-for="filter in typeFilters"
+        :key="filter.value"
+        @click="toggleTypeFilter(filter.value)"
+        :class="[
+          selectedType === filter.value
+            ? 'bg-blue-600 text-white border-blue-600'
+            : 'bg-white text-gray-700 border-gray-300'
+        ]"
+        class="cursor-pointer px-4 py-1 rounded-full text-sm w-24 text-center"
+      >
+        {{ filter.label }}
+      </span>
+    </div>
+    <div class="flex justify-between mt-2">
+      <div class="relative w-full max-w-sm flex">
         <span class="absolute inset-y-0 left-0 flex items-center pl-3">
           <i class="pi pi-search text-gray-400"></i>
         </span>
@@ -31,10 +42,19 @@
           type="text"
           v-model="searchQuery"
           placeholder="Search by..."
-          class="border rounded-lg p-2 pl-10 w-full text-sm border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          class="border rounded-xl p-2 pl-10 w-full text-sm border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
+        <button
+          @click="searchByKeyword"
+          class="bg-blue-600 text-white px-4 rounded-2xl ml-4 text-sm hover:bg-blue-700"
+        >
+          Search
+        </button>
       </div>
     </div>
+  </div>
+  <div class="mx-auto px-11 py-4">
+    <!-- Filter Bar (above search bar) -->
 
     <div class="bg-white shadow-md rounded-lg overflow-hidden">
       <table class="min-w-full bg-white">
@@ -79,7 +99,6 @@
             <td class="py-4 text-sm text-gray-700">
               <div @click="goToJobDetail(job.id)" class="cursor-pointer hover:text-blue-500">
                 <div class="text-sm font-medium text-gray-800">{{ job.title }}</div>
-                <div class="text-xs text-gray-400">#{{ job.id }}</div>
               </div>
             </td>
             <td class="py-4 px-6 text-sm text-gray-700">
@@ -186,27 +205,66 @@ const router = useRouter()
 
 const jobs = ref([]) // Store job data
 const searchQuery = ref('') // Store search query
-const currentFilter = ref('all') // Store selected filter
 const currentPage = ref(0) // Current page
 const totalPages = ref(0)
 const pageSize = ref(3)
 
-const filters = [
-  { id: 'all', label: 'All', count: null },
-  { id: 'displayed', label: 'Open', count: 5 },
-  { id: 'pending', label: 'Pending Approval', count: 14 },
-  { id: 'rejected', label: 'Rejected', count: 16 },
-  { id: 'expired', label: 'Expired', count: 75 }
-]
+const selectedStatus = ref('')
+const statusFilters = ref([
+  { label: 'Hot', value: 'HOT' },
+  { label: 'Open', value: 'OPEN' },
+  { label: 'Pending', value: 'PENDING' },
+  { label: 'Rejected', value: 'REJECTED' },
+  { label: 'Closed', value: 'CLOSED' }
+]) // Thêm 'All' vào danh sách bộ lọc
+
+const selectedType = ref('')
+const typeFilters = ref([
+  { label: 'Full-time', value: 'FULL_TIME' },
+  { label: 'Part-time', value: 'PART_TIME' },
+  { label: 'Internship', value: 'INTERNSHIP' }
+])
+
+const toggleStatusFilter = (status) => {
+  selectedStatus.value = selectedStatus.value === status ? '' : status
+  fetchJobs(0)
+}
+
+const toggleTypeFilter = (status) => {
+  selectedType.value = selectedType.value === status ? '' : status
+  fetchJobs(0)
+}
+
+const searchByKeyword = () => {
+  fetchJobs(0) // Gọi lại API từ trang đầu tiên
+}
 
 // Fetch all jobs posted by the recruiter
 async function fetchJobs(page = 0) {
   try {
+    const params = {
+      page: page,
+      limit: pageSize.value
+    }
+
+    // Kiểm tra filter để thêm tham số phù hợp
+    if (selectedStatus.value) {
+      params.status = selectedStatus.value
+    }
+
+    // Thêm status nếu có
+    if (selectedType.value) {
+      params.type = selectedType.value
+    }
+
+    if (searchQuery.value.trim() !== '') {
+      params.keyword = searchQuery.value.trim() // Thêm từ khóa tìm kiếm
+    }
     const response = await axios.get('http://localhost:8090/api/jobs/company', {
+      params: params,
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
-      },
-      params: { page: page, limit: pageSize.value }
+      }
     })
     console.log(response.data)
     jobs.value = response.data.jobs
