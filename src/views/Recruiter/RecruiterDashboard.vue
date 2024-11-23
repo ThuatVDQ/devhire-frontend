@@ -48,7 +48,7 @@
           <tr v-for="job in latestJobPosts" :key="job.id">
             <td class="py-2 px-4 border-b">
               <!-- Giữ lại RouterLink để điều hướng tới chi tiết công việc -->
-              <router-link :to="'/recruiter/jobs/' + job.id">
+              <router-link :to="'/recruiter/edit-job/' + job.id">
                 {{ job.title }}
               </router-link>
             </td>

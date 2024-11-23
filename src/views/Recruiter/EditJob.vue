@@ -77,7 +77,7 @@ async function updateJob(data) {
       window.location.href = '/recruiter/jobs'
     }, 1000)
   } catch (error) {
-    console.error(errorẻ)
+    console.error(error)
     toastr.error(JSON.stringify(error.response.data), 'Error')
   }
 }

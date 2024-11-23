@@ -36,8 +36,13 @@
               Reject
             </li>
             <li
-              @click="showDialog('close')"
-              class="flex items-center px-4 py-2 text-gray-700 hover:bg-emerald-100 cursor-pointer"
+              @click="(job.status === 'OPEN' || job.status === 'HOT') && showDialog('close')"
+              :class="[
+                'flex items-center px-4 py-2',
+                job.status === 'OPEN' || job.status === 'HOT'
+                  ? 'text-gray-700 hover:bg-emerald-100 cursor-pointer'
+                  : 'text-gray-400 cursor-not-allowed opacity-50'
+              ]"
             >
               <i class="pi pi-lock mr-2"></i>
               Close

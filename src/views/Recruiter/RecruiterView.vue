@@ -28,7 +28,7 @@ const filteredMenuItems = computed(() => {
 })
 
 const unreadCount = ref(0)
-const newNotification = ref(true)
+const newNotification = ref(false)
 const fetchUnreadCount = async () => {
   try {
     const token = localStorage.getItem('token') // Lấy token từ localStorage

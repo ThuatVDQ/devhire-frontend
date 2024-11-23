@@ -12,7 +12,7 @@
           :key="roleFilter.value"
           @click="toggleRoleFilter(roleFilter.value)"
           :class="[
-            'px-4 py-2 rounded-lg border',
+            'px-4 py-2 rounded-full border text-sm w-26 text-center',
             currentRoleFilter === roleFilter.value
               ? 'bg-blue-600 text-white border-blue-600'
               : 'bg-white text-gray-700 border-gray-300'
@@ -29,7 +29,7 @@
           :key="statusFilter.value"
           @click="toggleStatusFilter(statusFilter.value)"
           :class="[
-            'px-4 py-2 rounded-lg border',
+            'px-4 py-2 rounded-full border text-sm w-24',
             currentStatusFilter === statusFilter.value
               ? 'bg-blue-600 text-white border-blue-600'
               : 'bg-white text-gray-700 border-gray-300'
@@ -41,8 +41,18 @@
     </div>
 
     <!-- User Table -->
+
     <div class="overflow-x-auto bg-white shadow-md rounded-lg">
-      <table class="min-w-full text-left">
+      <div v-if="!users.length" class="">
+        <img
+          :src="icon_sad"
+          alt="Empty Jobs"
+          class="mx-auto mb-4"
+          style="width: 300px; height: auto"
+        />
+        <p class="text-gray-500 text-lg text-center">No results found. Please try again.</p>
+      </div>
+      <table v-else class="min-w-full text-left">
         <thead>
           <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
             <th class="py-3 px-6">ID</th>
@@ -138,6 +148,7 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import defaultAvatar from '../../assets/avatar-default.svg'
+import icon_sad from '@/assets/icon-sad.png'
 
 // State
 const users = ref([])

@@ -10,9 +10,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import axios from 'axios'
 import NotificationsView from '@/components/NotificationsView.vue'
+import { initializeWebSocket, disconnectWebSocket } from '@/utils/websocket'
 
 // State để lưu danh sách thông báo
 const notifications = ref([])
@@ -36,8 +37,21 @@ const fetchNotifications = async () => {
   }
 }
 
-// Gọi API khi component được mount
+const handleNewNotification = () => {
+  fetchNotifications()
+}
+
 onMounted(() => {
   fetchNotifications()
+
+  // Kết nối WebSocket và lắng nghe thông báo
+  const username = localStorage.getItem('username')
+  if (username) {
+    initializeWebSocket(username, handleNewNotification)
+  }
+})
+
+onBeforeUnmount(() => {
+  disconnectWebSocket() // Ngắt kết nối WebSocket khi component bị hủy
 })
 </script>

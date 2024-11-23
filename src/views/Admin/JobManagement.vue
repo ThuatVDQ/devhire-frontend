@@ -4,25 +4,41 @@
   </header>
 
   <div class="mb-2 px-6">
-    <div class="flex flex-wrap gap-2">
+    <div class="flex gap-2">
       <span
-        v-for="filter in filters"
-        :key="filter"
-        @click="toggleFilter(filter)"
-        :class="{
-          'bg-gray-600 text-white': selectedFilters.includes(filter),
-          'bg-gray-200 text-gray-600': !selectedFilters.includes(filter)
-        }"
-        class="cursor-pointer px-4 py-1 rounded-full text-sm"
+        v-for="filter in statusFilters"
+        :key="filter.value"
+        @click="toggleStatusFilter(filter.value)"
+        :class="[
+          selectedStatus === filter.value
+            ? 'bg-blue-600 text-white border-blue-600'
+            : 'bg-white text-gray-700 border-gray-300'
+        ]"
+        class="cursor-pointer px-4 py-1 rounded-full text-sm w-24 text-center"
       >
-        {{ filter }}
+        {{ filter.label }}
+      </span>
+    </div>
+    <div class="flex gap-2 mt-2">
+      <span
+        v-for="filter in typeFilters"
+        :key="filter.value"
+        @click="toggleTypeFilter(filter.value)"
+        :class="[
+          selectedType === filter.value
+            ? 'bg-blue-600 text-white border-blue-600'
+            : 'bg-white text-gray-700 border-gray-300'
+        ]"
+        class="cursor-pointer px-4 py-1 rounded-full text-sm w-24 text-center"
+      >
+        {{ filter.label }}
       </span>
     </div>
   </div>
 
   <section class="p-6">
     <!-- Search Section -->
-    <div class="flex items-center justify-between mb-4">
+    <!-- <div class="flex items-center justify-between mb-4">
       <div class="relative w-1/3">
         <input
           type="text"
@@ -35,7 +51,7 @@
           class="pi pi-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
         ></i>
       </div>
-    </div>
+    </div> -->
 
     <!-- Loading Spinner -->
     <div v-if="isLoading" class="flex justify-center items-center h-screen">
@@ -46,8 +62,21 @@
     </div>
 
     <!-- Jobs Table -->
-    <div v-else class="overflow-x-auto bg-white shadow-md rounded-lg">
-      <table class="min-w-full text-left" :class="{ 'opacity-50 pointer-events-none': isLoading }">
+    <div v-else class="overflow-x-auto bg-white shadow-md rounded-lg pb-4">
+      <div v-if="!jobs.length" class="">
+        <img
+          :src="icon_sad"
+          alt="Empty Jobs"
+          class="mx-auto mb-4"
+          style="width: 300px; height: auto"
+        />
+        <p class="text-gray-500 text-lg text-center">No results found. Please try again.</p>
+      </div>
+      <table
+        v-else
+        class="min-w-full text-left"
+        :class="{ 'opacity-50 pointer-events-none': isLoading }"
+      >
         <thead>
           <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
             <th class="py-3 px-6 text-center">
@@ -180,11 +209,35 @@ import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
 import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
 import { useRouter } from 'vue-router'
+import icon_sad from '@/assets/icon-sad.png'
 
 const router = useRouter()
 
-const filters = ref(['All', 'Pending', 'Open', 'Closed', 'Hot', 'Rejected']) // Thêm 'All' vào danh sách bộ lọc
-const selectedFilters = ref(['All'])
+const selectedStatus = ref('')
+const statusFilters = ref([
+  { label: 'Hot', value: 'HOT' },
+  { label: 'Open', value: 'OPEN' },
+  { label: 'Pending', value: 'PENDING' },
+  { label: 'Rejected', value: 'REJECTED' },
+  { label: 'Closed', value: 'CLOSED' }
+]) // Thêm 'All' vào danh sách bộ lọc
+
+const selectedType = ref('')
+const typeFilters = ref([
+  { label: 'Full-time', value: 'FULL_TIME' },
+  { label: 'Part-time', value: 'PART_TIME' },
+  { label: 'Internship', value: 'INTERNSHIP' }
+])
+
+const toggleStatusFilter = (status) => {
+  selectedStatus.value = selectedStatus.value === status ? '' : status
+  fetchData(0)
+}
+
+const toggleTypeFilter = (status) => {
+  selectedType.value = selectedType.value === status ? '' : status
+  fetchData(0)
+}
 
 const jobs = ref([])
 const currentPage = ref(0)
@@ -197,8 +250,25 @@ const isLoading = ref(false)
 const fetchData = async (page = 0) => {
   isLoading.value = true
   try {
-    const response = await axios.get('http://localhost:8090/api/jobs/search', {
-      params: { page, limit: pageSize.value }
+    const params = {
+      page: page,
+      limit: pageSize.value
+    }
+
+    // Kiểm tra filter để thêm tham số phù hợp
+    if (selectedStatus.value) {
+      params.status = selectedStatus.value
+    }
+
+    // Thêm status nếu có
+    if (selectedType.value) {
+      params.type = selectedType.value
+    }
+    const response = await axios.get('http://localhost:8090/api/admin/getAllJobs', {
+      params: params,
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('token')
+      }
     })
     jobs.value = response.data.jobs
     totalPages.value = response.data.totalPages
