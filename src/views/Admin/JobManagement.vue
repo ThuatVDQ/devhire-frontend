@@ -36,7 +36,7 @@
     </div>
   </div>
 
-  <section class="p-6">
+  <section class="px-6 pb-6">
     <!-- Search Section -->
     <!-- <div class="flex items-center justify-between mb-4">
       <div class="relative w-1/3">
@@ -52,6 +52,27 @@
         ></i>
       </div>
     </div> -->
+
+    <div class="flex justify-end mb-4">
+      <button
+        class="bg-green-500 text-white px-4 py-2 rounded-2xl mr-2"
+        @click="handleBulkAction('approve')"
+      >
+        Approve All
+      </button>
+      <button
+        class="bg-red-500 text-white px-4 py-2 rounded-2xl mr-2"
+        @click="handleBulkAction('reject')"
+      >
+        Reject All
+      </button>
+      <button
+        class="bg-blue-500 text-white px-4 py-2 rounded-2xl"
+        @click="handleBulkAction('close')"
+      >
+        Close All
+      </button>
+    </div>
 
     <!-- Loading Spinner -->
     <div v-if="isLoading" class="flex justify-center items-center h-screen">
@@ -244,8 +265,8 @@ const currentPage = ref(0)
 const totalPages = ref(1)
 const pageSize = ref(5) // Số lượng công việc mỗi trang
 const selectAllCheckbox = ref(false)
-const searchQuery = ref('')
 const isLoading = ref(false)
+const selectedJobIds = ref([])
 
 const fetchData = async (page = 0) => {
   isLoading.value = true
@@ -285,30 +306,70 @@ const isDialogVisible = ref(false)
 const dialogMessage = ref('')
 const currentJobId = ref(null)
 const currentAction = ref('')
-
-function showDialog(action, jobId) {
+const currentBulkAction = ref(false)
+function showDialog(action, jobId = null) {
   currentJobId.value = jobId
   currentAction.value = action
   isDialogVisible.value = true
 
+  if (jobId) {
+    // Hành động đơn lẻ
+    currentBulkAction.value = false
+    currentJobId.value = jobId
+  } else {
+    // Hành động hàng loạt
+    currentBulkAction.value = true
+    selectedJobIds.value = jobs.value.filter((job) => job.selected).map((job) => job.id)
+  }
+
   // Set message based on action
   if (action === 'approve') {
-    dialogMessage.value = 'Are you sure you want to approve this job?'
+    dialogMessage.value = currentBulkAction.value
+      ? 'Are you sure you want to approve all selected jobs?'
+      : 'Are you sure you want to approve this job?'
   } else if (action === 'reject') {
-    dialogMessage.value = 'Are you sure you want to reject this job?'
+    dialogMessage.value = currentBulkAction.value
+      ? 'Are you sure you want to reject all selected jobs?'
+      : 'Are you sure you want to reject this job?'
   } else {
-    dialogMessage.value = 'Are you sure you want to close this job?'
+    dialogMessage.value = currentBulkAction.value
+      ? 'Are you sure you want to close all selected jobs?'
+      : 'Are you sure you want to close this job?'
   }
 }
 
-function onConfirm() {
-  if (currentAction.value === 'approve') {
-    approveJob(currentJobId.value)
-  } else if (currentAction.value === 'reject') {
-    rejectJob(currentJobId.value)
+// function onConfirm() {
+//   if (currentAction.value === 'approve') {
+//     approveJob(currentJobId.value)
+//   } else if (currentAction.value === 'reject') {
+//     rejectJob(currentJobId.value)
+//   } else {
+//     closeJob(currentJobId.value)
+//   }
+//   closeDialog()
+// }
+
+async function onConfirm() {
+  if (currentBulkAction.value) {
+    // Hành động hàng loạt
+    if (currentAction.value === 'approve') {
+      await approveJobsBulk()
+    } else if (currentAction.value === 'reject') {
+      await rejectJobsBulk()
+    } else {
+      await closeJobsBulk()
+    }
   } else {
-    closeJob(currentJobId.value)
+    // Hành động đơn lẻ
+    if (currentAction.value === 'approve') {
+      await approveJob(currentJobId.value)
+    } else if (currentAction.value === 'reject') {
+      await rejectJob(currentJobId.value)
+    } else {
+      await closeJob(currentJobId.value)
+    }
   }
+
   closeDialog()
 }
 
@@ -360,12 +421,6 @@ function changePage(page) {
   }
 }
 
-function selectAll() {
-  jobs.value.forEach((job) => {
-    job.selected = selectAllCheckbox.value
-  })
-}
-
 function formatDate(dateString) {
   const date = new Date(dateString)
   return date.toLocaleDateString('vi-VN', {
@@ -377,6 +432,76 @@ function formatDate(dateString) {
 
 function goToJobDetail(jobId) {
   router.push({ name: 'admin-detail-job', params: { id: jobId } })
+}
+
+async function approveJobsBulk() {
+  console.log(selectedJobIds.value)
+  try {
+    const response = await axios.post(
+      'http://localhost:8090/api/jobs/approveJobs',
+      selectedJobIds.value,
+      {
+        headers: { Authorization: 'Bearer ' + localStorage.getItem('token') }
+      }
+    )
+    toastr.success(response.data, 'Success')
+    fetchData(currentPage.value) // Làm mới dữ liệu
+  } catch (error) {
+    toastr.error(error.response?.data || 'Bulk approve failed.', 'Error')
+  }
+}
+
+async function rejectJobsBulk() {
+  console.log(selectedJobIds.value)
+
+  try {
+    const response = await axios.post(
+      'http://localhost:8090/api/jobs/rejectJobs',
+      selectedJobIds.value,
+      {
+        headers: { Authorization: 'Bearer ' + localStorage.getItem('token') }
+      }
+    )
+    toastr.success(response.data, 'Success')
+    fetchData(currentPage.value) // Làm mới dữ liệu
+  } catch (error) {
+    toastr.error(error.response?.data || 'Bulk reject failed.', 'Error')
+  }
+}
+
+async function closeJobsBulk() {
+  console.log(selectedJobIds.value)
+
+  try {
+    const response = await axios.post(
+      'http://localhost:8090/api/jobs/closeJobs',
+      selectedJobIds.value,
+      {
+        headers: { Authorization: 'Bearer ' + localStorage.getItem('token') }
+      }
+    )
+    toastr.success(response.data, 'Success')
+    fetchData(currentPage.value) // Làm mới dữ liệu
+  } catch (error) {
+    toastr.error(error.response?.data || 'Bulk close failed.', 'Error')
+  }
+}
+
+const handleBulkAction = async (action) => {
+  const jobIds = jobs.value.filter((job) => job.selected).map((job) => job.id)
+
+  if (!jobIds.length) {
+    toastr.warning('No jobs selected.', 'Warning')
+    return
+  }
+  showDialog(action)
+}
+
+// Chọn tất cả công việc
+const selectAll = () => {
+  jobs.value.forEach((job) => {
+    job.selected = selectAllCheckbox.value
+  })
 }
 
 onMounted(() => fetchData(currentPage.value))
