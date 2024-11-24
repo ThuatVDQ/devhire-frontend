@@ -14,11 +14,13 @@ const state = reactive({
   isLoading: true,
   isApplying: false,
   isFormVisible: false,
+  isAddingLetter: false,
   candidate: {
     name: '',
     email: '',
     phone: '',
-    cv: null
+    cv: null,
+    letter: ''
   }
 })
 
@@ -115,8 +117,18 @@ const showApplicationForm = () => {
   const token = localStorage.getItem('token')
   if (token) {
     state.isFormVisible = true
+    state.candidate.cv = null
+    state.candidate.letter = ''
+    state.isAddingLetter = false
   } else {
     toastr.error('Please login to apply for this job.', 'Error')
+  }
+}
+
+const toggleLetter = () => {
+  state.isAddingLetter = !state.isAddingLetter
+  if (!state.isAddingLetter) {
+    state.candidate.letter = '' // Xóa giá trị của letter khi remove
   }
 }
 
@@ -137,6 +149,10 @@ const submitApplication = async () => {
 
     const formData = new FormData()
     formData.append('file', state.candidate.cv)
+    // Thêm letter vào formData
+    if (state.candidate.letter) {
+      formData.append('letter', state.candidate.letter)
+    }
 
     // Gửi POST request đến endpoint phù hợp với jobId
     const response = await axios.post(`http://localhost:8090/api/jobs/${jobId}/apply`, formData, {
@@ -403,6 +419,26 @@ onMounted(() => {
               readonly
             />
           </div>
+        </div>
+
+        <!-- Add Letter Button and Textarea -->
+        <div class="mb-4">
+          <button
+            type="button"
+            @click="toggleLetter"
+            class="py-2 px-4 bg-blue-600 text-white rounded-md"
+          >
+            {{ state.isAddingLetter ? 'Remove Letter' : 'Add Letter' }}
+          </button>
+        </div>
+        <div v-if="state.isAddingLetter" class="mb-4">
+          <label class="block text-sm font-medium">Cover Letter</label>
+          <textarea
+            v-model="state.candidate.letter"
+            rows="4"
+            class="w-full p-2 border rounded-md"
+            placeholder="Write your cover letter here"
+          ></textarea>
         </div>
 
         <div
