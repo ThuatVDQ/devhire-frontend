@@ -75,7 +75,9 @@
                 alt="Logo"
                 @error="(e) => (e.target.src = defaultAvatar)"
                 class="w-6 h-6 rounded-full mr-2"
-              />{{ user.full_name }}
+              /><span class="cursor-pointer" @click="goToDetail(user.id)">{{
+                user.full_name
+              }}</span>
             </td>
             <td class="py-3 px-6">{{ user.email }}</td>
             <td class="py-3 px-6">{{ user.role_name }}</td>
@@ -157,12 +159,14 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
+import { useRouter } from 'vue-router'
 import defaultAvatar from '../../assets/avatar-default.svg'
 import icon_sad from '@/assets/icon-sad.png'
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
 import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
 
+const router = useRouter()
 // State
 const users = ref([])
 const currentPage = ref(0)
@@ -308,6 +312,9 @@ const changePage = (page) => {
   }
 }
 
+const goToDetail = (id) => {
+  router.push({ name: 'admin-users-detail', params: { id: id } })
+}
 // Initial fetch on component mount
 onMounted(() => fetchUsers(0))
 </script>

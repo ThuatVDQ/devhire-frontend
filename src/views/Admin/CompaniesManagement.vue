@@ -31,7 +31,7 @@
                 @error="(e) => (e.target.src = defaultAvatar)"
                 class="w-6 h-6 rounded-full mr-2"
               />
-              {{ company.name }}
+              <span class="cursor-pointer" @click="goToDetail(company.id)">{{ company.name }}</span>
             </td>
             <td class="py-3 px-6">{{ company.email }}</td>
             <td class="py-3 px-6">{{ company.phone }}</td>
@@ -92,9 +92,11 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 import defaultAvatar from '../../assets/logo.svg'
 
+const router = useRouter()
 // State
 const companies = ref([])
 const currentPage = ref(0)
@@ -133,5 +135,9 @@ const changePage = (page) => {
   }
 }
 fetchCompanies()
+
+const goToDetail = (id) => {
+  router.push({ name: 'admin-companies-detail', params: { id: id } })
+}
 // Initial fetch on component mount
 </script>
