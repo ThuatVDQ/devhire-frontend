@@ -5,7 +5,8 @@ import BarChart from '@/components/BarChart.vue'
 
 // State để lưu dữ liệu từ API
 const dashboardData = ref(null)
-const recentActivities = ref([])
+const recentJobs = ref([])
+const recentUsers = ref([])
 const monthlyApplications = ref({
   labels: [],
   datasets: [
@@ -42,15 +43,6 @@ const fetchDashboardData = async () => {
     console.error('Error fetching dashboard data:', error)
   }
 }
-
-// const fetchRecentActivities = async () => {
-//   try {
-//     const response = await axios.get('/applicationsPerJob')
-//     recentActivities.value = response.data
-//   } catch (error) {
-//     console.error('Error fetching recent activities:', error)
-//   }
-// }
 
 const fetchMonthlyApplications = async () => {
   try {
@@ -155,10 +147,39 @@ const fetchMonthlyJobs = async () => {
   }
 }
 
+const fetchLatestUsers = async () => {
+  try {
+    const response = await axios.get('http://localhost:8090/api/admin/latestUsers', {
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('token')
+      }
+    })
+    recentUsers.value = response.data // Gán dữ liệu trả về vào biến state
+  } catch (error) {
+    console.error('Error fetching latest users:', error)
+  }
+}
+
+const fetchLatestJobs = async () => {
+  try {
+    const response = await axios.get('http://localhost:8090/api/admin/latestJobs', {
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('token')
+      }
+    })
+    console.log('Latest jobs:', response.data)
+    recentJobs.value = response.data // Gán dữ liệu trả về vào biến state
+  } catch (error) {
+    console.error('Error fetching latest jobs:', error)
+  }
+}
+
 onMounted(() => {
   fetchDashboardData()
   fetchMonthlyJobs()
   fetchMonthlyApplications()
+  fetchLatestUsers()
+  fetchLatestJobs()
 })
 
 const chartOptions = computed(() => {
@@ -255,46 +276,88 @@ const chartOptions = computed(() => {
     </section>
 
     <!-- Table Section -->
-    <section class="bg-white p-6 rounded-lg shadow">
-      <h2 class="text-xl font-semibold text-gray-700 mb-4">Recent Activity</h2>
+    <!-- Recent Users Section -->
+    <section class="bg-white p-6 rounded-lg shadow mb-6">
+      <h2 class="text-xl font-semibold text-gray-700 mb-4">Recent Users</h2>
       <div class="overflow-x-auto">
         <table class="w-full text-left table-auto">
           <thead>
             <tr class="text-gray-600 uppercase text-sm leading-normal bg-gray-100">
-              <th class="py-3 px-6">User</th>
-              <th class="py-3 px-6">Action</th>
-              <th class="py-3 px-6">Date</th>
-              <th class="py-3 px-6">Status</th>
+              <th class="py-3 px-6" style="width: 35%">Name</th>
+              <th class="py-3 px-6" style="width: 35%">Email</th>
+              <th class="py-3 px-6" style="width: 15%">Status</th>
+              <th class="py-3 px-6" style="width: 15%">Type</th>
             </tr>
           </thead>
           <tbody class="text-gray-700 text-sm">
-            <tr class="border-b border-gray-200 bg-gray-50 hover:bg-gray-100">
-              <td class="py-3 px-6">John Doe</td>
-              <td class="py-3 px-6">Created a job post</td>
-              <td class="py-3 px-6">2023-11-01</td>
+            <tr
+              v-for="user in recentUsers"
+              :key="user.id"
+              class="border-b border-gray-200 bg-gray-50 hover:bg-gray-100"
+            >
+              <td class="py-3 px-6">{{ user.full_name }}</td>
+              <td class="py-3 px-6">{{ user.email }}</td>
               <td class="py-3 px-6">
-                <span class="bg-green-200 text-green-800 py-1 px-3 rounded-full text-xs"
-                  >Completed</span
+                <span
+                  :class="[
+                    'py-1 px-3 rounded-full text-xs',
+                    user.status === 'ACTIVE'
+                      ? 'bg-green-200 text-green-800'
+                      : 'bg-red-200 text-red-800'
+                  ]"
                 >
+                  {{ user.status }}
+                </span>
               </td>
+              <td class="py-3 px-6">{{ user.role_name }}</td>
             </tr>
-            <tr class="border-b border-gray-200 bg-white hover:bg-gray-100">
-              <td class="py-3 px-6">Jane Smith</td>
-              <td class="py-3 px-6">Updated company info</td>
-              <td class="py-3 px-6">2023-11-02</td>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Recent Jobs Section -->
+    <section class="bg-white p-6 rounded-lg shadow">
+      <h2 class="text-xl font-semibold text-gray-700 mb-4">Recent Jobs</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left table-auto">
+          <thead>
+            <tr class="text-gray-600 uppercase text-sm leading-normal bg-gray-100">
+              <th class="py-3 px-6" style="width: 35%">Title</th>
+              <th class="py-3 px-6" style="width: 35%">Company</th>
+              <th class="py-3 px-6" style="width: 15%">Status</th>
+              <th class="py-3 px-6" style="width: 15%">Type</th>
+            </tr>
+          </thead>
+          <tbody class="text-gray-700 text-sm">
+            <tr
+              v-for="job in recentJobs"
+              :key="job.id"
+              class="border-b border-gray-200 bg-gray-50 hover:bg-gray-100"
+            >
+              <td class="py-3 px-6">{{ job.title }}</td>
+              <td class="py-3 px-6">{{ job.company.name }}</td>
               <td class="py-3 px-6">
-                <span class="bg-yellow-200 text-yellow-800 py-1 px-3 rounded-full text-xs"
-                  >Pending</span
+                <span
+                  :class="[
+                    'py-1 px-3 rounded-full text-xs',
+                    job.status === 'HOT'
+                      ? 'bg-red-500 text-white'
+                      : job.status === 'OPEN'
+                        ? 'bg-green-200 text-green-800'
+                        : job.status === 'PENDING'
+                          ? 'bg-yellow-200 text-yellow-800'
+                          : job.status === 'REJECT'
+                            ? 'bg-gray-300 text-gray-800'
+                            : job.status === 'CLOSE'
+                              ? 'bg-blue-200 text-blue-800'
+                              : ''
+                  ]"
                 >
+                  {{ job.status }}
+                </span>
               </td>
-            </tr>
-            <tr class="border-b border-gray-200 bg-gray-50 hover:bg-gray-100">
-              <td class="py-3 px-6">Mike Johnson</td>
-              <td class="py-3 px-6">Applied for a job</td>
-              <td class="py-3 px-6">2023-11-03</td>
-              <td class="py-3 px-6">
-                <span class="bg-red-200 text-red-800 py-1 px-3 rounded-full text-xs">Rejected</span>
-              </td>
+              <td class="py-3 px-6">{{ job.type }}</td>
             </tr>
           </tbody>
         </table>
