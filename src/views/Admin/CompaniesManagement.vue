@@ -123,6 +123,7 @@ const fetchCompanies = async (page = 0) => {
     totalPages.value = response.data.totalPages
     currentPage.value = page
   } catch (error) {
+    companies.value = []
     console.error('Error fetching companies:', error)
   }
 }

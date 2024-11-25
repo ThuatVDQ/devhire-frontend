@@ -296,6 +296,7 @@ const fetchData = async (page = 0) => {
     currentPage.value = page
     console.log(response.data.jobs)
   } catch (error) {
+    jobs.value = []
     console.error('Error fetching jobs:', error)
   } finally {
     isLoading.value = false

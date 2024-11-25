@@ -33,6 +33,7 @@ const fetchData = async (page = 0) => {
     currentPage.value = page
     console.log(jobs.value)
   } catch (error) {
+    jobs.value = []
     console.error('Error fetching jobs:', error)
   } finally {
     isLoading.value = false
@@ -90,6 +91,7 @@ const fetchSearchData = async (page = 0, criteria = {}) => {
     totalPages.value = response.data.totalPages
     currentPage.value = page
   } catch (error) {
+    jobs.value = []
     console.error('Error fetching search jobs:', error)
   } finally {
     isLoading.value = false

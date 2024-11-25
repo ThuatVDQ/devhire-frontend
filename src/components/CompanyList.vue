@@ -35,6 +35,7 @@ const searchCompanies = async (keyword, page = 0) => {
     totalPages.value = response.data.totalPages
     currentPage.value = page
   } catch (error) {
+    companies.value = []
     console.error('Error searching companies:', error)
   } finally {
     isLoading.value = false
@@ -71,6 +72,7 @@ const fetchData = async (page = 0) => {
     totalPages.value = response.data.totalPages
     currentPage.value = page
   } catch (error) {
+    companies.value = []
     console.error('Error fetching companies:', error)
   } finally {
     isLoading.value = false

@@ -222,6 +222,7 @@ const fetchUsers = async (page = 0) => {
     totalPages.value = response.data.totalPages
     currentPage.value = page
   } catch (error) {
+    users.value = []
     console.error('Error fetching users:', error)
   }
 }
