@@ -71,7 +71,7 @@ onMounted(() => {
             <div class="flex space-x-4 mb-5">
               <div class="w-1/2">
                 <label class="font-semibold">Name</label>
-                <p class="text-gray-700 dark:text-gray-300">{{ data.user.fullName }}</p>
+                <p class="text-gray-700 dark:text-gray-300">{{ data.user.full_name }}</p>
               </div>
               <div class="w-1/2">
                 <label class="font-semibold">Gender</label>
