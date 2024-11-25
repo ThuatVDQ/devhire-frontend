@@ -113,56 +113,63 @@
           rows="10"
         ></textarea>
       </div>
-      <div class="mt-4">
-        <label for="images" class="block mb-2 text-sm font-medium text-gray-700">Images</label>
-        <div class="relative">
-          <!-- Input thực tế nhưng bị ẩn -->
-          <input
-            type="file"
-            id="images"
-            multiple
-            accept="image/*"
-            @change="handleImageSelection"
-            class="hidden"
-            ref="fileInput"
-          />
-          <!-- Nút giả lập -->
-          <div
-            class="border-2 border-dashed border-gray-300 rounded-md p-6 text-center cursor-pointer hover:bg-gray-100"
-            @click="triggerFileInput"
-            @dragover.prevent
-            @dragenter.prevent
-            @dragleave.prevent
-            @drop.prevent="handleFileDrop"
-          >
-            Drag and drop your file here or click to browse
-          </div>
-        </div>
-        <div v-if="selectedImages.length" class="grid grid-cols-3 gap-4 mt-4">
-          <div
-            v-for="(image, index) in selectedImages"
-            :key="index"
-            class="relative group border border-gray-300 rounded-md overflow-hidden"
-          >
-            <img
-              :src="image"
-              alt="Selected Image"
-              class="w-full h-full object-contain border border-gray-300"
-            />
-            <button
-              @click.prevent="removeImage(index)"
-              class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-            >
-              &times;
-            </button>
-          </div>
-        </div>
-      </div>
 
       <button type="submit" class="mt-4 bg-emerald-600 text-white font-bold py-2 px-4 rounded">
         {{ isCompanyExist ? 'Save' : 'Sign Up' }}
       </button>
     </form>
+
+    <div class="p-4">
+      <label for="images" class="block mb-2 text-sm font-medium text-gray-700">Images</label>
+      <div class="relative">
+        <!-- Input thực tế nhưng bị ẩn -->
+        <input
+          type="file"
+          id="images"
+          multiple
+          accept="image/*"
+          @change="handleImageSelection"
+          class="hidden"
+          ref="fileInput"
+        />
+        <!-- Nút giả lập -->
+        <div
+          class="border-2 border-dashed border-gray-300 rounded-md p-6 text-center cursor-pointer hover:bg-gray-100"
+          @click="triggerFileInput"
+          @dragover.prevent
+          @dragenter.prevent
+          @dragleave.prevent
+          @drop.prevent="handleFileDrop"
+        >
+          Drag and drop your file here or click to browse
+        </div>
+      </div>
+      <div v-if="selectedImages.length" class="grid grid-cols-3 gap-4 mt-4">
+        <div
+          v-for="(image, index) in selectedImages"
+          :key="index"
+          class="relative group border border-gray-300 rounded-md overflow-hidden"
+        >
+          <img
+            :src="typeof image === 'string' ? image : URL.createObjectURL(image)"
+            alt="Company Image"
+            class="w-full h-[150px] object-contain object-center border border-gray-300"
+          />
+          <button
+            @click.prevent="removeImage(index)"
+            class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+          >
+            &times;
+          </button>
+        </div>
+      </div>
+      <button
+        @click="uploadImages"
+        class="mt-4 bg-emerald-600 text-white font-bold py-2 px-4 rounded"
+      >
+        Upload Images
+      </button>
+    </div>
   </div>
 
   <EditAvatar
@@ -187,6 +194,8 @@ const isSigningUp = ref(false)
 const errors = ref({})
 
 const selectedImages = ref([])
+const oldImages = ref([]) // Danh sách ảnh cũ
+const newImages = ref([])
 const selectedFileCount = ref(0) // Lưu số lượng tệp đã chọn
 const fileInput = ref(null) // Lưu trữ các ảnh đã chọn
 
@@ -196,43 +205,69 @@ const triggerFileInput = () => {
 }
 
 const handleFileDrop = (event) => {
-  const files = Array.from(event.dataTransfer.files)
+  event.preventDefault() // Ngăn chặn hành vi mặc định của trình duyệt
+  const files = Array.from(event.dataTransfer.files) // Lấy danh sách file từ sự kiện kéo-thả
 
   files.forEach((file) => {
-    // Kiểm tra loại file có phải là image không
     if (file.type.startsWith('image/')) {
       const reader = new FileReader()
       reader.onload = (e) => {
-        selectedImages.value.push(e.target.result) // Thêm ảnh vào danh sách hiển thị
+        newImages.value.push({ file, base64: e.target.result })
+        selectedImages.value.push(e.target.result) // Hiển thị Base64 cho giao diện
       }
       reader.readAsDataURL(file)
     } else {
-      toastr.error(`${file.name} is not a valid image file.`, 'Invalid File')
+      toastr.error(`${file.name} is not a valid image file.`, 'Invalid File') // Thông báo lỗi
     }
   })
 }
 
 const handleImageSelection = (event) => {
-  const files = Array.from(event.target.files)
-  for (const file of files) {
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      selectedImages.value.push(e.target.result)
-      selectedFileCount.value = selectedImages.value.length // Thêm ảnh vào danh sách hiển thị
+  const files = Array.from(event.target.files) // Lấy danh sách file được chọn
+
+  files.forEach((file) => {
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        newImages.value.push({ file, base64: e.target.result })
+        selectedImages.value.push(e.target.result) // Hiển thị Base64 cho giao diện
+      }
+      reader.readAsDataURL(file)
+    } else {
+      toastr.error(`${file.name} is not a valid image file.`, 'Invalid File') // Thông báo lỗi
     }
-    reader.readAsDataURL(file)
-  }
+  })
 
-  // Cập nhật số lượng tệp
-  selectedFileCount.value = selectedImages.value.length
+  selectedFileCount.value = selectedImages.value.length // Cập nhật số lượng ảnh được chọn
 
-  // Reset input file để cho phép chọn lại cùng file
+  // Reset giá trị input để cho phép chọn lại cùng file
   event.target.value = null
 }
 
 const removeImage = (index) => {
-  selectedImages.value.splice(index, 1) // Xóa ảnh khỏi danh sách hiển thị
-  selectedFileCount.value = selectedImages.value.length // Cập nhật số lượng tệp
+  const image = selectedImages.value[index]
+
+  if (typeof image === 'string' && image.startsWith('http://localhost:8090/uploads/')) {
+    console.log('Removing old image:', image)
+    // Loại ảnh cũ khỏi danh sách oldImages
+    oldImages.value = oldImages.value.filter(
+      (img) => `http://localhost:8090/uploads/${img}` !== image
+    )
+  } else {
+    console.log('Removing new image (Base64):', image)
+    // Tìm ảnh trong newImages bằng Base64
+    const imgIndex = newImages.value.findIndex((img) => img.base64 === image)
+
+    if (imgIndex !== -1) {
+      newImages.value.splice(imgIndex, 1) // Loại ảnh khỏi danh sách newImages
+    }
+
+    console.log('Updated newImages:', [...newImages.value])
+  }
+
+  // Xóa ảnh khỏi danh sách hiển thị
+  selectedImages.value.splice(index, 1)
+  selectedFileCount.value = selectedImages.value.length // Cập nhật số lượng ảnh
 
   // Nếu không còn ảnh nào, reset input file
   if (selectedImages.value.length === 0) {
@@ -240,6 +275,38 @@ const removeImage = (index) => {
     if (fileInputEl) {
       fileInputEl.value = null
     }
+  }
+}
+
+const uploadImages = async () => {
+  if (!selectedImages.value.length) {
+    toastr.error('Please select at least one image to upload', 'Error')
+    return
+  }
+
+  const formData = new FormData()
+
+  // Thêm danh sách ảnh cũ
+  formData.append('oldImages', JSON.stringify(oldImages.value))
+
+  // Thêm các file ảnh mới
+  newImages.value.forEach((imageObj) => {
+    formData.append('newImages', imageObj.file) // Chỉ gửi `file` từ đối tượng { file, base64 }
+  })
+
+  try {
+    const response = await axios.put('http://localhost:8090/api/companies/updateImages', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    toastr.success('Images uploaded successfully', 'Success')
+    fetchCompanyInfo()
+    newImages.value = []
+  } catch (error) {
+    toastr.error('Failed to upload images', 'Error')
+    console.error('Error uploading images:', error)
   }
 }
 
@@ -289,27 +356,6 @@ const handleSubmit = async () => {
   if (!validateForm()) return
 
   try {
-    const formData = new FormData()
-
-    formData.append('name', company.value.name)
-    formData.append('tax_code', company.value.tax_code)
-    formData.append('scale', company.value.scale)
-    formData.append('email', company.value.email)
-    formData.append('phone', company.value.phone)
-    formData.append('address', company.value.address)
-    formData.append('web_url', company.value.web_url)
-    formData.append('description', company.value.description)
-
-    // Thêm các tệp ảnh vào FormData
-    selectedImages.value.forEach((image, index) => {
-      const file = dataURLtoFile(image, `image_${index}`)
-      formData.append('images', file)
-      console.log('File added:', file)
-    })
-    // In ra nội dung của FormData trước khi gửi
-    formData.forEach((value, key) => {
-      console.log(key, value)
-    })
     if (isCompanyExist.value) {
       const response = await axios.put(
         'http://localhost:8090/api/companies/updateCompany',
@@ -321,7 +367,6 @@ const handleSubmit = async () => {
         }
       )
       toastr.success('Updated company successfully', 'Success')
-      console.log('Company Info Updated:', response.data)
     } else {
       const response = await axios.post('http://localhost:8090/api/companies', company.value, {
         headers: {
@@ -354,6 +399,12 @@ const fetchCompanyInfo = async () => {
     if (company.value.logo) {
       currentAvatar.value = `http://localhost:8090/uploads/${company.value.logo}`
       cropAvatar.value = currentAvatar.value
+    }
+    if (company.value.images && Array.isArray(company.value.images)) {
+      oldImages.value = company.value.images
+      selectedImages.value = company.value.images.map(
+        (image) => `http://localhost:8090/uploads/${image}`
+      ) // Hiển thị ảnh cũ trong giao diện
     }
   } catch (error) {
     if (error.response && error.response.status === 404) {

@@ -85,15 +85,15 @@ const fetchCompanyData = async (id) => {
   try {
     const response = await axios.get(`http://localhost:8090/api/companies/${id}`)
     state.company = response.data
+    console.log('Company fetched:', response.data)
     if (state.company.logo)
       state.company.logo = `http://localhost:8090/uploads/${state.company.logo}`
 
-    state.company.images = [
-      'http://via.placeholder.com/800x400?text=Image+1',
-      'http://via.placeholder.com/800x400?text=Image+2',
-      'http://via.placeholder.com/800x400?text=Image+3',
-      'http://via.placeholder.com/800x400?text=Image+4'
-    ]
+    if (state.company.images) {
+      state.company.images = state.company.images.map(
+        (image) => `http://localhost:8090/uploads/${image}`
+      )
+    }
   } catch (e) {
     console.error(e)
   }
@@ -172,7 +172,7 @@ watch(
               <img
                 :src="image"
                 alt="Company Image"
-                class="rounded-md shadow dark:shadow-gray-700 w-full"
+                class="rounded-md shadow dark:shadow-gray-700 w-full h-[150px] object-contain object-center"
               />
               <!-- Nếu là ảnh thứ 2, hiển thị lớp phủ -->
               <div
