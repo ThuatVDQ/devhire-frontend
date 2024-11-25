@@ -8,12 +8,12 @@
       <div class="w-1/4 bg-gray-50 p-5 rounded-lg">
         <ul class="space-y-6">
           <li>
-            <RouterLink to="/recruiter/settings/change-password" v-slot="{ isActive }">
+            <RouterLink to="/recruiter/settings/company" v-slot="{ isActive }">
               <div
                 class="flex items-center text-gray-700 hover:text-emerald-500"
                 :class="{ 'text-green-500 font-semibold': isActive }"
               >
-                <i class="pi pi-lock mr-4"></i> Change Password
+                <i class="pi pi-briefcase mr-4"></i> Company Information
               </div>
             </RouterLink>
           </li>
@@ -28,15 +28,16 @@
             </RouterLink>
           </li>
           <li>
-            <RouterLink to="/recruiter/settings/company" v-slot="{ isActive }">
+            <RouterLink to="/recruiter/settings/change-password" v-slot="{ isActive }">
               <div
                 class="flex items-center text-gray-700 hover:text-emerald-500"
                 :class="{ 'text-green-500 font-semibold': isActive }"
               >
-                <i class="pi pi-briefcase mr-4"></i> Company Information
+                <i class="pi pi-lock mr-4"></i> Change Password
               </div>
             </RouterLink>
           </li>
+
           <li
             @click="logout"
             class="flex items-center text-gray-700 hover:text-red-500 cursor-pointer"

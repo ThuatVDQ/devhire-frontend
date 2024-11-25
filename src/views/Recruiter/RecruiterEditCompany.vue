@@ -105,16 +105,60 @@
         </div>
       </div>
       <div class="mt-4">
-        <label for="description" class="block mb-2 text-sm font-medium text-gray-700"
-          >Description</label
-        >
+        <label for="description" class="mb-2 text-sm font-medium text-gray-700">Description</label>
         <textarea
           v-model="company.description"
           id="description"
           class="border border-gray-300 rounded-md p-2 w-full"
-          rows="4"
+          rows="10"
         ></textarea>
       </div>
+      <div class="mt-4">
+        <label for="images" class="block mb-2 text-sm font-medium text-gray-700">Images</label>
+        <div class="relative">
+          <!-- Input thực tế nhưng bị ẩn -->
+          <input
+            type="file"
+            id="images"
+            multiple
+            accept="image/*"
+            @change="handleImageSelection"
+            class="hidden"
+            ref="fileInput"
+          />
+          <!-- Nút giả lập -->
+          <div
+            class="border-2 border-dashed border-gray-300 rounded-md p-6 text-center cursor-pointer hover:bg-gray-100"
+            @click="triggerFileInput"
+            @dragover.prevent
+            @dragenter.prevent
+            @dragleave.prevent
+            @drop.prevent="handleFileDrop"
+          >
+            Drag and drop your file here or click to browse
+          </div>
+        </div>
+        <div v-if="selectedImages.length" class="grid grid-cols-3 gap-4 mt-4">
+          <div
+            v-for="(image, index) in selectedImages"
+            :key="index"
+            class="relative group border border-gray-300 rounded-md overflow-hidden"
+          >
+            <img
+              :src="image"
+              alt="Selected Image"
+              class="w-full h-full object-contain border border-gray-300"
+            />
+            <button
+              @click.prevent="removeImage(index)"
+              class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              &times;
+            </button>
+          </div>
+        </div>
+      </div>
+
       <button type="submit" class="mt-4 bg-emerald-600 text-white font-bold py-2 px-4 rounded">
         {{ isCompanyExist ? 'Save' : 'Sign Up' }}
       </button>
@@ -141,6 +185,63 @@ const company = ref({})
 const isCompanyExist = ref(false)
 const isSigningUp = ref(false)
 const errors = ref({})
+
+const selectedImages = ref([])
+const selectedFileCount = ref(0) // Lưu số lượng tệp đã chọn
+const fileInput = ref(null) // Lưu trữ các ảnh đã chọn
+
+const triggerFileInput = () => {
+  // Kích hoạt input file khi nhấn nút giả lập
+  fileInput.value.click()
+}
+
+const handleFileDrop = (event) => {
+  const files = Array.from(event.dataTransfer.files)
+
+  files.forEach((file) => {
+    // Kiểm tra loại file có phải là image không
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        selectedImages.value.push(e.target.result) // Thêm ảnh vào danh sách hiển thị
+      }
+      reader.readAsDataURL(file)
+    } else {
+      toastr.error(`${file.name} is not a valid image file.`, 'Invalid File')
+    }
+  })
+}
+
+const handleImageSelection = (event) => {
+  const files = Array.from(event.target.files)
+  for (const file of files) {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      selectedImages.value.push(e.target.result)
+      selectedFileCount.value = selectedImages.value.length // Thêm ảnh vào danh sách hiển thị
+    }
+    reader.readAsDataURL(file)
+  }
+
+  // Cập nhật số lượng tệp
+  selectedFileCount.value = selectedImages.value.length
+
+  // Reset input file để cho phép chọn lại cùng file
+  event.target.value = null
+}
+
+const removeImage = (index) => {
+  selectedImages.value.splice(index, 1) // Xóa ảnh khỏi danh sách hiển thị
+  selectedFileCount.value = selectedImages.value.length // Cập nhật số lượng tệp
+
+  // Nếu không còn ảnh nào, reset input file
+  if (selectedImages.value.length === 0) {
+    const fileInputEl = document.getElementById('images')
+    if (fileInputEl) {
+      fileInputEl.value = null
+    }
+  }
+}
 
 const showAvatarPopup = ref(false)
 const currentAvatar = ref(defaultAvatar)
@@ -170,10 +271,45 @@ const validateForm = () => {
   return Object.keys(errors.value).length === 0
 }
 
+const dataURLtoFile = (dataurl, filename) => {
+  const arr = dataurl.split(',')
+  const mime = arr[0].match(/:(.*?);/)[1] // Lấy MIME type từ metadata (vd: "image/png")
+  const bstr = atob(arr[1]) // Giải mã base64 thành chuỗi binary
+  let n = bstr.length
+  const u8arr = new Uint8Array(n)
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n) // Chuyển đổi từng ký tự binary
+  }
+  // Sử dụng MIME type để tự động đặt phần mở rộng cho file
+  const extension = mime.split('/')[1] // Lấy phần mở rộng từ MIME (vd: "png", "jpeg")
+  return new File([u8arr], `${filename}.${extension}`, { type: mime })
+}
+
 const handleSubmit = async () => {
   if (!validateForm()) return
 
   try {
+    const formData = new FormData()
+
+    formData.append('name', company.value.name)
+    formData.append('tax_code', company.value.tax_code)
+    formData.append('scale', company.value.scale)
+    formData.append('email', company.value.email)
+    formData.append('phone', company.value.phone)
+    formData.append('address', company.value.address)
+    formData.append('web_url', company.value.web_url)
+    formData.append('description', company.value.description)
+
+    // Thêm các tệp ảnh vào FormData
+    selectedImages.value.forEach((image, index) => {
+      const file = dataURLtoFile(image, `image_${index}`)
+      formData.append('images', file)
+      console.log('File added:', file)
+    })
+    // In ra nội dung của FormData trước khi gửi
+    formData.forEach((value, key) => {
+      console.log(key, value)
+    })
     if (isCompanyExist.value) {
       const response = await axios.put(
         'http://localhost:8090/api/companies/updateCompany',
