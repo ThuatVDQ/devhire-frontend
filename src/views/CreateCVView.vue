@@ -47,9 +47,6 @@
       @click.self="closePreview"
     >
       <div class="bg-white rounded-lg shadow-lg w-3/5 max-h-[90vh] p-6 relative overflow-y-auto">
-        <h2 class="text-2xl font-bold mb-4">
-          {{ isEditMode ? 'Edit Template' : 'Preview Template' }}
-        </h2>
         <component :is="selectedTemplate.component" :isEditable="isEditMode" />
       </div>
     </div>

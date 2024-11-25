@@ -1,8 +1,30 @@
 <template>
-  <div ref="template" class="bg-white shadow-md rounded-lg p-6 max-w-4xl mx-auto">
+  <div ref="template" class="bg-white rounded-lg p-6 max-w-4xl mx-auto">
     <!-- Header -->
     <div class="flex items-center space-x-6">
-      <div class="w-24 h-24 rounded-full bg-gray-200 flex-shrink-0"></div>
+      <div class="w-24 h-24 rounded-full bg-gray-200 flex-shrink-0 relative">
+        <!-- Hiển thị ảnh -->
+        <img
+          v-if="!isEdit"
+          :src="profileImage || 'https://via.placeholder.com/150'"
+          alt="Profile Image"
+          class="w-24 h-24 object-cover rounded-full"
+        />
+        <div v-else>
+          <img
+            v-if="profileImage"
+            :src="profileImage"
+            alt="Profile Image"
+            class="w-24 h-24 object-cover rounded-full mb-2"
+          />
+          <input
+            type="file"
+            accept="image/*"
+            @change="handleImageUpload"
+            class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+          />
+        </div>
+      </div>
       <div>
         <h1 v-if="!isEdit" class="text-2xl font-bold text-green-600">
           {{ data.personal_info.name }}
@@ -175,32 +197,34 @@
     <!-- Skills -->
     <div class="mt-6 border-t border-gray-200 pt-4">
       <h3 class="text-lg font-semibold text-gray-800 mb-2">Kỹ năng</h3>
-      <ul class="flex flex-wrap space-x-2">
+      <ul class="grid grid-cols-2 gap-2">
+        <!-- Chuyển sang grid để căn chỉnh đều -->
         <li
           v-for="(skill, index) in data.skills"
           :key="index"
-          class="bg-green-100 text-green-600 px-3 py-1 rounded-full text-sm flex items-center"
+          class="bg-green-100 text-green-600 px-3 py-1 rounded-full text-sm flex items-center space-x-2"
         >
-          <span v-if="!isEdit">{{ skill }}</span>
-          <input
-            v-else
-            v-model="data.skills[index]"
-            class="border rounded px-2 py-1 w-full"
-            placeholder="Kỹ năng"
-          />
-          <button
-            v-if="isEdit"
-            @click="removeSkill(index)"
-            class="text-red-500 text-xs ml-2 hover:underline"
-          >
-            ✕
-          </button>
+          <!-- Khi isEdit là false -->
+          <span v-if="!isEdit" class="truncate">{{ skill }}</span>
+
+          <!-- Khi isEdit là true -->
+          <div v-else class="flex items-center w-full">
+            <input
+              v-model="data.skills[index]"
+              class="border rounded px-2 py-1 w-full bg-white"
+              placeholder="Kỹ năng"
+            />
+            <button @click="removeSkill(index)" class="text-red-500 text-xs ml-2 hover:underline">
+              ✕
+            </button>
+          </div>
         </li>
       </ul>
       <button v-if="isEdit" @click="addSkill" class="text-blue-500 mt-3 hover:underline">
         + Add Skill
       </button>
     </div>
+
     <button
       v-if="isEdit"
       @click="downloadStyledPDF"
@@ -212,15 +236,38 @@
 </template>
 
 <script setup>
-defineProps(['isEditable'])
-import { reactive, ref, watch } from 'vue'
+import { reactive, ref, watch, nextTick } from 'vue'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
 import domtoimage from 'dom-to-image'
+import defaultAvatar from '@/assets/avatar-default.svg'
+
+const props = defineProps({ isEditable: Boolean })
 
 const template = ref(null)
 const isEdit = ref(false)
 
+watch(
+  () => props.isEditable,
+  (newVal) => {
+    console.log(newVal)
+    isEdit.value = newVal
+  },
+  { immediate: true }
+)
+
+const profileImage = ref(defaultAvatar)
+
+function handleImageUpload(event) {
+  const file = event.target.files[0]
+  if (file) {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      profileImage.value = e.target.result // Hiển thị ảnh đã chọn
+    }
+    reader.readAsDataURL(file)
+  }
+}
 const data = reactive({
   personal_info: {
     name: 'Nguyễn Văn A',
@@ -287,26 +334,41 @@ function removeSkill(index) {
   data.skills.splice(index, 1)
 }
 async function downloadStyledPDF() {
-  isEdit = false // Chuyển về chế độ không chỉnh sửa
+  isEdit.value = false // Đặt về chế độ xem trước
 
-  // Đợi Vue cập nhật lại giao diện trước khi chụp
   await nextTick()
 
-  const element = template.value // Sử dụng ref để lấy DOM element
+  const element = template.value
 
   try {
-    const dataUrl = await domtoimage.toPng(element) // Chụp giao diện
-    const pdf = new jsPDF('p', 'mm', 'a4') // Tạo file PDF với kích thước A4
+    // Tăng scale để cải thiện chất lượng
+    const scale = 3 // Tăng giá trị này để tăng độ phân giải
+    const options = {
+      width: element.offsetWidth * scale,
+      height: element.offsetHeight * scale,
+      style: {
+        transform: `scale(${scale})`,
+        transformOrigin: 'top left',
+        width: `${element.offsetWidth}px`,
+        height: `${element.offsetHeight}px`
+      }
+    }
 
+    // Sử dụng dom-to-image để tạo ảnh chất lượng cao
+    const dataUrl = await domtoimage.toPng(element, options)
+
+    const pdf = new jsPDF('p', 'mm', 'a4')
+
+    // Tính toán kích thước ảnh trong PDF
     const pdfWidth = pdf.internal.pageSize.getWidth()
     const pdfHeight = (element.offsetHeight * pdfWidth) / element.offsetWidth
 
-    pdf.addImage(dataUrl, 'PNG', 0, 0, pdfWidth, pdfHeight) // Thêm ảnh vào PDF
-    pdf.save('Styled_CV.pdf') // Lưu file PDF
+    pdf.addImage(dataUrl, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST') // Chọn chế độ FAST cho hiệu suất
+    pdf.save('Styled_CV.pdf')
   } catch (error) {
     console.error('Lỗi khi tạo PDF:', error)
   } finally {
-    isEdit.value = isEditable // Khôi phục trạng thái chỉnh sửa ban đầu
+    isEdit.value = props.isEditable // Khôi phục trạng thái chỉnh sửa
   }
 }
 </script>
