@@ -119,7 +119,7 @@
       </button>
     </form>
 
-    <div class="p-4">
+    <div v-if="isCompanyExist" class="p-4">
       <label for="images" class="block mb-2 text-sm font-medium text-gray-700">Images</label>
       <div class="relative">
         <!-- Input thực tế nhưng bị ẩn -->
@@ -248,21 +248,17 @@ const removeImage = (index) => {
   const image = selectedImages.value[index]
 
   if (typeof image === 'string' && image.startsWith('http://localhost:8090/uploads/')) {
-    console.log('Removing old image:', image)
     // Loại ảnh cũ khỏi danh sách oldImages
     oldImages.value = oldImages.value.filter(
       (img) => `http://localhost:8090/uploads/${img}` !== image
     )
   } else {
-    console.log('Removing new image (Base64):', image)
     // Tìm ảnh trong newImages bằng Base64
     const imgIndex = newImages.value.findIndex((img) => img.base64 === image)
 
     if (imgIndex !== -1) {
       newImages.value.splice(imgIndex, 1) // Loại ảnh khỏi danh sách newImages
     }
-
-    console.log('Updated newImages:', [...newImages.value])
   }
 
   // Xóa ảnh khỏi danh sách hiển thị
