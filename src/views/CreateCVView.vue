@@ -55,6 +55,7 @@
 <script setup>
 import CvTemplate from '@/components/TemplatesCV/elegant1.vue'
 import CvTemplate2 from '@/components/TemplatesCV/basic.vue'
+import CVTemplate3 from '@/components/TemplatesCV/modern1.vue'
 import { ref } from 'vue'
 
 const templates = [
@@ -67,6 +68,11 @@ const templates = [
     id: 2,
     name: 'Template 2',
     component: CvTemplate2
+  },
+  {
+    id: 3,
+    name: 'Template 3',
+    component: CVTemplate3
   }
 ]
 

@@ -3,7 +3,7 @@
     <!-- Header -->
     <div class="flex items-center space-x-6">
       <div class="w-24 h-24 rounded-full bg-gray-200 flex-shrink-0 relative">
-        <!-- Hiển thị ảnh -->
+        <!-- Display photo -->
         <img
           v-if="!isEdit"
           :src="profileImage || 'https://via.placeholder.com/150'"
@@ -32,7 +32,7 @@
         <input
           v-else
           v-model="data.personal_info.name"
-          class="text-2xl font-bold text-green-600 border rounded px-2 py-1"
+          class="text-2xl font-bold text-green-600 border rounded px-2 py-1 w-full"
         />
         <h2 v-if="!isEdit" class="text-lg font-semibold text-gray-600">
           {{ data.personal_info.job_title }}
@@ -40,7 +40,7 @@
         <input
           v-else
           v-model="data.personal_info.job_title"
-          class="text-lg font-semibold text-gray-600 border rounded px-2 py-1"
+          class="text-lg font-semibold text-gray-600 border rounded px-2 py-1 w-full mt-2"
         />
         <p v-if="!isEdit" class="text-gray-700 mt-2">{{ data.personal_info.summary }}</p>
         <textarea
@@ -53,7 +53,7 @@
 
     <!-- Personal Information -->
     <div class="mt-6 border-t border-gray-200 pt-4">
-      <h3 class="text-lg font-semibold text-gray-800 mb-2">Thông tin cá nhân</h3>
+      <h3 class="text-lg font-semibold text-gray-800 mb-2">Personal Information</h3>
       <ul class="space-y-1">
         <li class="flex items-center">
           <span class="material-icons text-green-600 mr-2">email</span>
@@ -102,7 +102,13 @@
 
     <!-- Education -->
     <div class="mt-6 border-t border-gray-200 pt-4">
-      <h3 class="text-lg font-semibold text-gray-800 mb-2">Học vấn</h3>
+      <div class="flex">
+        <h3 class="text-lg font-semibold text-gray-800">Education</h3>
+
+        <button v-if="isEdit" @click="addEducation" class="text-blue-500 ml-2 hover:underline">
+          <i class="pi pi-plus-circle"></i>
+        </button>
+      </div>
       <ul class="space-y-3">
         <li v-for="(edu, index) in data.education" :key="index" class="text-gray-700">
           <p>
@@ -110,49 +116,52 @@
             <input
               v-else
               v-model="edu.school"
-              class="border rounded px-2 py-1 w-full font-bold"
-              placeholder="Trường học"
+              class="border rounded px-2 py-1 w-full font-bold mb-2"
+              placeholder="School"
             />
             <span v-if="!isEdit"> - </span>
             <span v-if="!isEdit">{{ edu.major }}</span>
             <input
               v-else
               v-model="edu.major"
-              class="border rounded px-2 py-1 w-full"
-              placeholder="Ngành học"
+              class="border rounded px-2 py-1 w-full mb-2"
+              placeholder="Major"
             />
           </p>
           <p class="text-sm text-gray-500" v-if="!isEdit">{{ edu.year }}</p>
           <input
             v-else
             v-model="edu.year"
-            class="text-sm text-gray-500 border rounded px-2 py-1"
-            placeholder="Thời gian học"
+            class="text-sm text-gray-500 border rounded px-2 py-1 mr-2"
+            placeholder="Year"
           />
           <p class="text-sm text-gray-500" v-if="!isEdit">{{ edu.grade }}</p>
           <input
             v-else
             v-model="edu.grade"
-            class="text-sm text-gray-500 border rounded px-2 py-1"
-            placeholder="Loại tốt nghiệp"
+            class="text-sm text-gray-500 border rounded px-2 py-1 mr-2"
+            placeholder="Grade"
           />
           <button
             v-if="isEdit"
             @click="removeEducation(index)"
             class="text-red-500 text-sm mt-2 hover:underline"
           >
-            Remove
+            <i class="pi pi-trash"></i>
           </button>
         </li>
       </ul>
-      <button v-if="isEdit" @click="addEducation" class="text-blue-500 mt-3 hover:underline">
-        + Add Education
-      </button>
     </div>
 
     <!-- Work Experience -->
     <div class="mt-6 border-t border-gray-200 pt-4">
-      <h3 class="text-lg font-semibold text-gray-800 mb-2">Kinh nghiệm làm việc</h3>
+      <div class="flex">
+        <h3 class="text-lg font-semibold text-gray-800">Work Experience</h3>
+
+        <button v-if="isEdit" @click="addExperience" class="text-blue-500 ml-2 hover:underline">
+          <i class="pi pi-plus-circle"></i>
+        </button>
+      </div>
       <ul class="space-y-6">
         <li v-for="(exp, index) in data.work_experience" :key="index">
           <p v-if="!isEdit" class="text-gray-700 font-bold">{{ exp.company }}</p>
@@ -160,14 +169,14 @@
             v-else
             v-model="exp.company"
             class="text-gray-700 font-bold border rounded px-2 py-1 w-full"
-            placeholder="Tên công ty"
+            placeholder="Company Name"
           />
           <p class="text-sm text-gray-500" v-if="!isEdit">{{ exp.duration }}</p>
           <input
             v-else
             v-model="exp.duration"
             class="text-sm text-gray-500 border rounded px-2 py-1"
-            placeholder="Thời gian làm việc"
+            placeholder="Working Duration"
           />
           <ul class="list-disc list-inside mt-2 text-gray-700">
             <li v-for="(detail, dIndex) in exp.details" :key="dIndex">
@@ -176,7 +185,7 @@
                 v-else
                 v-model="exp.details[dIndex]"
                 class="border rounded px-2 py-1 w-full"
-                placeholder="Chi tiết công việc"
+                placeholder="Job Details"
               />
             </li>
           </ul>
@@ -185,44 +194,43 @@
             @click="removeExperience(index)"
             class="text-red-500 text-sm mt-2 hover:underline"
           >
-            Remove
+            <i class="pi pi-trash"></i>
           </button>
         </li>
       </ul>
-      <button v-if="isEdit" @click="addExperience" class="text-blue-500 mt-3 hover:underline">
-        + Add Experience
-      </button>
     </div>
 
     <!-- Skills -->
     <div class="mt-6 border-t border-gray-200 pt-4">
-      <h3 class="text-lg font-semibold text-gray-800 mb-2">Kỹ năng</h3>
+      <div class="flex">
+        <h3 class="text-lg font-semibold text-gray-800">Skills</h3>
+        <button v-if="isEdit" @click="addSkill" class="text-blue-500 hover:underline ml-2">
+          <i class="pi pi-plus-circle"></i>
+        </button>
+      </div>
       <ul class="grid grid-cols-2 gap-2">
-        <!-- Chuyển sang grid để căn chỉnh đều -->
+        <!-- Change to grid layout for even distribution -->
         <li
           v-for="(skill, index) in data.skills"
           :key="index"
           class="bg-green-100 text-green-600 px-3 py-1 rounded-full text-sm flex items-center space-x-2"
         >
-          <!-- Khi isEdit là false -->
+          <!-- When isEdit is false -->
           <span v-if="!isEdit" class="truncate">{{ skill }}</span>
 
-          <!-- Khi isEdit là true -->
+          <!-- When isEdit is true -->
           <div v-else class="flex items-center w-full">
             <input
               v-model="data.skills[index]"
               class="border rounded px-2 py-1 w-full bg-white"
-              placeholder="Kỹ năng"
+              placeholder="Skill"
             />
             <button @click="removeSkill(index)" class="text-red-500 text-xs ml-2 hover:underline">
-              ✕
+              <i class="pi pi-trash"></i>
             </button>
           </div>
         </li>
       </ul>
-      <button v-if="isEdit" @click="addSkill" class="text-blue-500 mt-3 hover:underline">
-        + Add Skill
-      </button>
     </div>
 
     <button
@@ -271,32 +279,32 @@ function handleImageUpload(event) {
 const data = reactive({
   personal_info: {
     name: 'Nguyễn Văn A',
-    job_title: 'Nhân viên bán hàng',
-    summary: 'Nhân viên bán hàng hiệu suất cao với X năm kinh nghiệm trong lĩnh vực A, B, C...',
+    job_title: 'Sales Staff',
+    summary: 'High-performance sales staff with X years of experience in areas A, B, C...',
     contact: {
-      email: 'hotro@topcv.vn',
-      phone: '(024) 6680 5588',
-      website: 'https://fb.com/topcv.vn',
-      address: 'Quận A, Hà Nội'
+      Email: 'hotro@topcv.vn',
+      Phone: '(024) 6680 5588',
+      Git: 'https://fb.com/topcv.vn',
+      Address: 'District A, Hanoi'
     }
   },
   education: [
     {
-      school: 'Đại học TOPCV',
-      major: 'Quản trị kinh doanh',
+      school: 'TOPCV University',
+      major: 'Business Administration',
       year: '2016 - 2020',
-      grade: 'Tốt nghiệp loại Giỏi'
+      grade: 'Graduated with Honors'
     }
   ],
   work_experience: [
     {
-      company: 'Công ty ABC',
-      title: 'Nhân viên kinh doanh',
+      company: 'ABC Company',
+      title: 'Sales Staff',
       duration: '08/2020 - 08/2022',
-      details: ['Phục vụ nhóm 20 khách hàng lớn đem về doanh thu 5-10 tỉ...']
+      details: ['Served a group of 20 major clients generating revenue of 5-10 billion...']
     }
   ],
-  skills: ['Tìm kiếm khách hàng', 'Kỹ năng thuyết phục', 'CRM']
+  skills: ['Customer Search', 'Persuasion Skills', 'CRM']
 })
 
 // Thêm / Xóa Education
@@ -310,7 +318,10 @@ function addEducation() {
   console.log(data.education)
 }
 function removeEducation(index) {
-  data.education.splice(index, 1)
+  if (data.education.length > 1) {
+    // Check if at least one remains
+    data.education.splice(index, 1)
+  }
 }
 
 // Thêm / Xóa Work Experience
@@ -323,7 +334,10 @@ function addExperience() {
   })
 }
 function removeExperience(index) {
-  data.work_experience.splice(index, 1)
+  if (data.work_experience.length > 1) {
+    // Check if at least one remains
+    data.work_experience.splice(index, 1)
+  }
 }
 
 // Thêm / Xóa Skill
@@ -331,7 +345,10 @@ function addSkill() {
   data.skills.push('')
 }
 function removeSkill(index) {
-  data.skills.splice(index, 1)
+  if (data.skills.length > 1) {
+    // Check if at least one remains
+    data.skills.splice(index, 1)
+  }
 }
 async function downloadStyledPDF() {
   isEdit.value = false // Đặt về chế độ xem trước
@@ -350,7 +367,8 @@ async function downloadStyledPDF() {
         transform: `scale(${scale})`,
         transformOrigin: 'top left',
         width: `${element.offsetWidth}px`,
-        height: `${element.offsetHeight}px`
+        height: `${element.offsetHeight}px`,
+        overflow: 'hidden'
       }
     }
 
@@ -363,7 +381,7 @@ async function downloadStyledPDF() {
     const pdfWidth = pdf.internal.pageSize.getWidth()
     const pdfHeight = (element.offsetHeight * pdfWidth) / element.offsetWidth
 
-    pdf.addImage(dataUrl, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST') // Chọn chế độ FAST cho hiệu suất
+    pdf.addImage(dataUrl, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST')
     pdf.save('Styled_CV.pdf')
   } catch (error) {
     console.error('Lỗi khi tạo PDF:', error)
