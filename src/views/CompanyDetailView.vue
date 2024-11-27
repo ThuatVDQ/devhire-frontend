@@ -6,6 +6,7 @@ import { reactive, onMounted, watch, onBeforeUnmount } from 'vue'
 import axios from 'axios'
 import defaultLogo from '../assets/logo.svg'
 import CardJob from '@/components/CardJob.vue'
+import { formatDistanceToNow, parseISO } from 'date-fns'
 
 const route = useRoute()
 
@@ -16,9 +17,56 @@ const state = reactive({
   isModalOpen: false,
   currentImageIndex: 0,
   jobs: [],
+  reviews: [],
+  totalPages: 0,
+  currentPage: 0,
   companies: [],
   isLoading: true
 })
+
+const newReview = reactive({
+  rating: 0,
+  comment: ''
+})
+
+const setRating = (star) => {
+  newReview.rating = star
+}
+
+const hoverRating = (star) => {
+  // Temporarily set rating to the hovered star for visual effect
+  newReview.hoverRating = star
+}
+
+const clearHover = () => {
+  // Clear the temporary hover rating
+  newReview.hoverRating = null
+}
+
+const submitReview = async () => {
+  try {
+    // Assuming you have a function to submit the review to the server
+    await axios.post(
+      `http://localhost:8090/api/reviews/${route.params.id}`,
+      {
+        rating: newReview.rating,
+        comment: newReview.comment
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      }
+    )
+    // Reset the form after submitting
+    newReview.rating = 0
+    newReview.comment = ''
+    fetchCompanyReviews(route.params.id)
+  } catch (error) {
+    console.error('Error submitting review:', error)
+  }
+}
+
 const openImageModal = (index) => {
   state.currentImageIndex = index
   state.isModalOpen = true
@@ -99,10 +147,55 @@ const fetchCompanyData = async (id) => {
   }
 }
 
+const fetchCompanyReviews = async (companyId, page = 0, limit = 10) => {
+  try {
+    const response = await axios.get(`http://localhost:8090/api/reviews/${companyId}`, {
+      params: {
+        page,
+        limit
+      }
+    })
+    console.log('Company reviews:', response.data)
+    const data = response.data
+    state.reviews = data.company_reviews || []
+    state.totalPages = data.totalPages
+    state.isLoading = false
+  } catch (error) {
+    console.error('Error fetching company reviews:', error)
+    state.isLoading = false
+  }
+}
+
+const formatReviewDate = (createdAt) => {
+  const date = parseISO(createdAt)
+  const distance = formatDistanceToNow(date, { addSuffix: true })
+
+  // If the review is older than 1 year, display the full date
+  const oneYearAgo = new Date()
+  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1)
+  if (date < oneYearAgo) {
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    }).format(date)
+  }
+
+  return distance
+}
+
+const loadMoreReviews = () => {
+  if (state.currentPage < state.totalPages - 1) {
+    state.currentPage += 1
+    fetchCompanyReviews(route.params.companyId, state.currentPage)
+  }
+}
+
 onMounted(async () => {
   state.isLoading = true
   await fetchCompanies()
   fetchCompanyData(route.params.id)
+  fetchCompanyReviews(route.params.id)
   state.isLoading = false
   fetchJobsByCompany()
 })
@@ -112,6 +205,7 @@ watch(
   () => route.params.id,
   (newId) => {
     fetchCompanyData(newId)
+    fetchCompanyReviews(newId)
     window.scrollTo(0, 0)
   }
 )
@@ -282,7 +376,91 @@ watch(
         </div>
       </div>
     </div>
-    <div class="container lg:mt-24 my-16">
+
+    <div class="container mt-14">
+      <!-- Reviews Section -->
+      <h3 class="text-2xl font-semibold text-gray-800 mb-6">Reviews</h3>
+
+      <!-- Display Reviews if available -->
+      <div v-if="state.reviews.length" class="space-y-6">
+        <div
+          v-for="(review, index) in state.reviews"
+          :key="index"
+          class="review-card bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-all duration-300"
+        >
+          <div class="flex space-x-3 items-center">
+            <h4 class="text-xl font-semibold text-gray-800">{{ review.full_name }}</h4>
+            <!-- <span class="text-sm text-gray-500">
+            {{ formatReviewDate(review.createdAt) }}
+          </span> -->
+          </div>
+          <div class="flex items-center text-yellow-500 mb-2">
+            <span
+              v-for="star in 5"
+              :key="star"
+              class="text-xl"
+              :class="{
+                'text-yellow-400': review.rating >= star,
+                'text-gray-300': review.rating < star
+              }"
+              >★</span
+            >
+          </div>
+          <p class="text-gray-700">{{ review.comment }}</p>
+        </div>
+
+        <!-- Pagination Button -->
+        <button
+          v-if="state.currentPage < state.totalPages - 1"
+          @click="loadMoreReviews"
+          class="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors"
+        >
+          Load More Reviews
+        </button>
+      </div>
+
+      <!-- Submit Review Form -->
+      <div class="mt-8 p-6 bg-white rounded-lg shadow-md">
+        <h4 class="text-xl font-semibold text-gray-800 mb-4">Submit Your Review</h4>
+
+        <div class="space-y-4">
+          <!-- Rating System with 5 stars -->
+          <div class="flex items-center">
+            <span
+              v-for="star in 5"
+              :key="star"
+              @click="setRating(star)"
+              class="text-3xl cursor-pointer"
+              :class="{
+                'text-yellow-400': newReview.rating >= star,
+                'text-gray-300': newReview.rating < star
+              }"
+            >
+              ★
+            </span>
+          </div>
+
+          <!-- Review Textarea -->
+          <textarea
+            v-model="newReview.comment"
+            placeholder="Write your review here..."
+            class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            rows="4"
+          ></textarea>
+
+          <!-- Submit Button -->
+          <button
+            @click="submitReview"
+            :disabled="!newReview.rating || !newReview.comment"
+            class="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50"
+          >
+            Send Review
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="container lg:mt-24 mb-16">
       <div class="grid grid-cols-1 pb-8 text-center">
         <div class="mb-4 md:text-[26px] md:leading-normal text-2xl leading-normal font-semibold">
           Related Companies
