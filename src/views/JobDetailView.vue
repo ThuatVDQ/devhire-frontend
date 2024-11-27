@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, onMounted, ref } from 'vue'
+import { reactive, onMounted, ref, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 import SimilarJobs from '@/components/SimilarJobs.vue'
 import axios from 'axios'
@@ -10,11 +10,17 @@ import defaultLogo from '../assets/logo.svg'
 const route = useRoute()
 
 const state = reactive({
-  job: {},
+  job: {
+    company: {
+      images: []
+    }
+  },
   isLoading: true,
   isApplying: false,
   isFormVisible: false,
   isAddingLetter: false,
+  isModalOpen: false,
+  currentImageIndex: 0,
   candidate: {
     name: '',
     email: '',
@@ -22,6 +28,44 @@ const state = reactive({
     cv: null,
     letter: ''
   }
+})
+
+const openImageModal = (index) => {
+  state.currentImageIndex = index
+  state.isModalOpen = true
+}
+
+const closeImageModal = () => {
+  state.isModalOpen = false
+}
+
+const goToImage = (index) => {
+  state.currentImageIndex = index
+}
+
+const previousImage = () => {
+  if (state.currentImageIndex > 0) {
+    state.currentImageIndex -= 1
+  }
+}
+
+const nextImage = () => {
+  if (state.currentImageIndex < state.job.company.images.length - 1) {
+    state.currentImageIndex += 1
+  }
+}
+const handleKeyDown = (event) => {
+  if (event.key === 'Escape') {
+    closeImageModal()
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', handleKeyDown)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', handleKeyDown)
 })
 
 const formatDate = (dateString) => {
@@ -103,8 +147,15 @@ const fetchJobData = async (id) => {
       headers
     })
     state.job = response.data
+    console.log(state.job)
     if (state.job.company.logo)
       state.job.company.logo = `http://localhost:8090/uploads/${state.job.company.logo}`
+
+    if (state.job.company.images) {
+      state.job.company.images = state.job.company.images.map(
+        (image) => `http://localhost:8090/uploads/${image}`
+      )
+    }
   } catch (e) {
     console.error(e)
   } finally {
@@ -234,6 +285,76 @@ onMounted(() => {
               <i v-if="state.job.apply_status" class="pi pi-replay mr-2"></i>
               {{ state.job.apply_status ? 'Applied' : 'Apply Now' }}
             </button>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4 my-6">
+            <div
+              v-for="(image, index) in state.job.company.images.slice(0, 2)"
+              :key="index"
+              class="relative cursor-pointer"
+              @click="openImageModal(index)"
+            >
+              <img
+                :src="image"
+                alt="Company Image"
+                class="rounded-md shadow dark:shadow-gray-700 w-full h-[150px] object-contain object-center"
+              />
+              <!-- Nếu là ảnh thứ 2, hiển thị lớp phủ -->
+              <div
+                v-if="index === 1 && state.job.company.images.length > 2"
+                class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center text-white font-bold text-xl"
+              >
+                +{{ state.job.company.images.length - 2 }}
+              </div>
+            </div>
+          </div>
+
+          <div
+            v-if="state.isModalOpen"
+            class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
+            @click.self="closeImageModal"
+          >
+            <div class="bg-white p-4 rounded-md shadow-lg max-w-3xl relative">
+              <!-- Hình ảnh hiện tại -->
+              <img
+                :src="state.job.company.images[state.currentImageIndex]"
+                alt="Company Image"
+                class="rounded-md"
+                :style="{ height: '600px' }"
+              />
+
+              <!-- Nút mũi tên trái -->
+              <button
+                @click="previousImage"
+                class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-2 shadow"
+                :disabled="state.currentImageIndex === 0"
+              >
+                <i class="pi pi-angle-left"></i>
+              </button>
+
+              <!-- Nút mũi tên phải -->
+              <button
+                @click="nextImage"
+                class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-2 shadow"
+                :disabled="state.currentImageIndex === state.job.company.images.length - 1"
+              >
+                <i class="pi pi-angle-right"></i>
+              </button>
+
+              <!-- Dấu chấm tròn hiển thị vị trí -->
+              <div class="flex justify-center mt-4">
+                <span
+                  v-for="(image, index) in state.job.company.images"
+                  :key="index"
+                  @click="goToImage(index)"
+                  class="w-3 h-3 rounded-full mx-1 cursor-pointer"
+                  :class="{
+                    'bg-gray-300': state.currentImageIndex !== index,
+                    'bg-emerald-600': state.currentImageIndex === index
+                  }"
+                ></span>
+              </div>
+            </div>
           </div>
           <h5 class="text-lg font-semibold mt-6">Job Description:</h5>
           <p

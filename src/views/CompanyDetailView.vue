@@ -190,12 +190,13 @@ watch(
             class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
             @click.self="closeImageModal"
           >
-            <div class="bg-white p-4 rounded-md shadow-lg max-w-3xl w-full relative">
+            <div class="bg-white p-4 rounded-md shadow-lg max-w-3xl relative w-auto">
               <!-- Hình ảnh hiện tại -->
               <img
                 :src="state.company.images[state.currentImageIndex]"
                 alt="Company Image"
-                class="w-full rounded-md"
+                class="rounded-md"
+                :style="{ height: '600px' }"
               />
 
               <!-- Nút mũi tên trái -->
