@@ -56,7 +56,7 @@
       <h3 class="text-lg font-semibold text-gray-800 mb-2">Personal Information</h3>
       <ul class="space-y-1">
         <li class="flex items-center">
-          <span class="material-icons text-green-600 mr-2">email</span>
+          <span class="material-icons text-green-600 mr-2">Email</span>
           <span v-if="!isEdit">{{ data.personal_info.contact.email }}</span>
           <input
             v-else
@@ -65,7 +65,7 @@
           />
         </li>
         <li class="flex items-center">
-          <span class="material-icons text-green-600 mr-2">phone</span>
+          <span class="material-icons text-green-600 mr-2">Phone</span>
           <span v-if="!isEdit">{{ data.personal_info.contact.phone }}</span>
           <input
             v-else
@@ -74,22 +74,22 @@
           />
         </li>
         <li class="flex items-center">
-          <span class="material-icons text-green-600 mr-2">language</span>
+          <span class="material-icons text-green-600 mr-2">Git</span>
           <a
             v-if="!isEdit"
-            :href="data.personal_info.contact.website"
+            :href="data.personal_info.contact.git"
             class="text-blue-500 hover:underline"
           >
-            {{ data.personal_info.contact.website }}
+            {{ data.personal_info.contact.git }}
           </a>
           <input
             v-else
-            v-model="data.personal_info.contact.website"
+            v-model="data.personal_info.contact.git"
             class="border rounded px-2 py-1 w-full"
           />
         </li>
         <li class="flex items-center">
-          <span class="material-icons text-green-600 mr-2">location_on</span>
+          <span class="material-icons text-green-600 mr-2">Location</span>
           <span v-if="!isEdit">{{ data.personal_info.contact.address }}</span>
           <input
             v-else
@@ -282,10 +282,10 @@ const data = reactive({
     job_title: 'Sales Staff',
     summary: 'High-performance sales staff with X years of experience in areas A, B, C...',
     contact: {
-      Email: 'hotro@topcv.vn',
-      Phone: '(024) 6680 5588',
-      Git: 'https://fb.com/topcv.vn',
-      Address: 'District A, Hanoi'
+      email: 'hotro@topcv.vn',
+      phone: '(024) 6680 5588',
+      git: 'https://fb.com/topcv.vn',
+      address: 'District A, Hanoi'
     }
   },
   education: [
@@ -382,7 +382,7 @@ async function downloadStyledPDF() {
     const pdfHeight = (element.offsetHeight * pdfWidth) / element.offsetWidth
 
     pdf.addImage(dataUrl, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST')
-    pdf.save('Styled_CV.pdf')
+    pdf.save(`CV_${data.personal_info.name}.pdf`)
   } catch (error) {
     console.error('Lỗi khi tạo PDF:', error)
   } finally {

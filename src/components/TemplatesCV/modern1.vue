@@ -531,7 +531,7 @@ async function downloadStyledPDF() {
     const pdfHeight = (element.scrollHeight * pdfWidth) / element.offsetWidth
 
     pdf.addImage(dataUrl, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST')
-    pdf.save('Styled_CV.pdf')
+    pdf.save(`CV_${data.personal_info.name}.pdf`)
   } catch (error) {
     console.error('Lỗi khi tạo PDF:', error)
   } finally {

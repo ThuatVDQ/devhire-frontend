@@ -41,8 +41,6 @@ import Notifications from '@/views/Admin/Notifications.vue'
 import RecruiterNotifications from '@/views/Recruiter/RecruiterNotifications.vue'
 import UserDetail from '@/views/Admin/UserDetail.vue'
 import CompanyDetail from '@/views/Admin/CompanyDetail.vue'
-import Elegant1 from '@/components/TemplatesCV/elegant1.vue'
-import Basic from '@/components/TemplatesCV/basic.vue'
 import CreateCVView from '@/views/CreateCVView.vue'
 
 const routes = [
@@ -92,6 +90,11 @@ const routes = [
         name: 'company-detail',
         component: CompanyDetailView,
         props: true
+      },
+      {
+        path: '/template-cv',
+        name: 'template-cv',
+        component: CreateCVView
       },
       {
         path: 'about',
@@ -253,11 +256,6 @@ const routes = [
         component: JobDetail
       }
     ]
-  },
-  {
-    path: '/test',
-    name: 'testtemplate',
-    component: CreateCVView
   }
 ]
 

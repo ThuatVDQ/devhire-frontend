@@ -1,6 +1,16 @@
 <template>
+  <div class="relative">
+    <img
+      src="@/assets/header-template-cv.png"
+      alt="Header Image"
+      class="w-full h-60 object-cover"
+    />
+    <div
+      class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center text-white"
+    ></div>
+  </div>
   <div class="max-w-7xl mx-auto p-6">
-    <h1 class="text-2xl font-bold mb-6 text-gray-800">Danh sách Templates</h1>
+    <h1 class="text-2xl font-bold mb-6">List Templates</h1>
     <div class="grid grid-cols-3 gap-6">
       <!-- Loop through templates -->
       <div
@@ -13,10 +23,16 @@
           <h2 class="text-lg font-semibold text-gray-700 mb-2">{{ template.name }}</h2>
           <!-- Thumbnail -->
           <div
-            class="w-full h-32 bg-gray-100 rounded-md flex items-center justify-center text-gray-400"
+            class="w-full h-56 bg-gray-100 rounded-md flex items-center justify-center text-gray-400"
           >
             <span>Thumbnail</span>
           </div>
+
+          <!-- <component
+            class="w-full h-56 bg-gray-100 rounded-md flex items-center justify-center text-gray-400 overflow-hidden"
+            :is="template.component"
+            :isEditable="isEditMode"
+          /> -->
         </div>
         <!-- Hover Options -->
         <div
@@ -71,6 +87,21 @@ const templates = [
   },
   {
     id: 3,
+    name: 'Template 3',
+    component: CVTemplate3
+  },
+  {
+    id: 4,
+    name: 'Template 1',
+    component: CvTemplate
+  },
+  {
+    id: 5,
+    name: 'Template 2',
+    component: CvTemplate2
+  },
+  {
+    id: 6,
     name: 'Template 3',
     component: CVTemplate3
   }
