@@ -3,7 +3,7 @@
     <!-- Header -->
     <div class="flex flex-col md:flex-row md:items-center md:space-x-6 border-b pb-4">
       <div
-        class="relative w-28 h-28 rounded-full bg-gray-300 flex-shrink-0 overflow-hidden mx-auto md:mx-0"
+        class="relative w-40 h-40 rounded-full bg-gray-300 flex-shrink-0 overflow-hidden mx-auto md:mx-0"
       >
         <!-- Display photo -->
         <img

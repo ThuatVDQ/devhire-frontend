@@ -2,20 +2,20 @@
   <div ref="template" class="bg-white rounded-lg p-6 max-w-4xl mx-auto">
     <!-- Header -->
     <div class="flex items-center space-x-6">
-      <div class="w-24 h-24 rounded-full bg-gray-200 flex-shrink-0 relative">
+      <div class="w-40 h-40 rounded-full bg-gray-200 flex-shrink-0 relative">
         <!-- Display photo -->
         <img
           v-if="!isEdit"
           :src="profileImage || 'https://via.placeholder.com/150'"
           alt="Profile Image"
-          class="w-24 h-24 object-cover rounded-full"
+          class="w-40 h-40 object-cover rounded-full"
         />
         <div v-else>
           <img
             v-if="profileImage"
             :src="profileImage"
             alt="Profile Image"
-            class="w-24 h-24 object-cover rounded-full mb-2"
+            class="w-40 h-40 object-cover rounded-full mb-2"
           />
           <input
             type="file"
@@ -102,8 +102,8 @@
 
     <!-- Education -->
     <div class="mt-6 border-t border-gray-200 pt-4">
-      <div class="flex">
-        <h3 class="text-lg font-semibold text-gray-800">Education</h3>
+      <div class="flex mb-3">
+        <h3 class="text-xl font-semibold text-gray-800">Education</h3>
 
         <button v-if="isEdit" @click="addEducation" class="text-blue-500 ml-2 hover:underline">
           <i class="pi pi-plus-circle"></i>
@@ -155,7 +155,7 @@
 
     <!-- Work Experience -->
     <div class="mt-6 border-t border-gray-200 pt-4">
-      <div class="flex">
+      <div class="flex mb-3">
         <h3 class="text-lg font-semibold text-gray-800">Work Experience</h3>
 
         <button v-if="isEdit" @click="addExperience" class="text-blue-500 ml-2 hover:underline">
@@ -202,7 +202,7 @@
 
     <!-- Skills -->
     <div class="mt-6 border-t border-gray-200 pt-4">
-      <div class="flex">
+      <div class="flex mb-3">
         <h3 class="text-lg font-semibold text-gray-800">Skills</h3>
         <button v-if="isEdit" @click="addSkill" class="text-blue-500 hover:underline ml-2">
           <i class="pi pi-plus-circle"></i>

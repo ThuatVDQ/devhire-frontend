@@ -72,38 +72,35 @@
 import CvTemplate from '@/components/TemplatesCV/elegant1.vue'
 import CvTemplate2 from '@/components/TemplatesCV/basic.vue'
 import CVTemplate3 from '@/components/TemplatesCV/modern1.vue'
+import CVTemplate4 from '@/components/TemplatesCV/professional1.vue'
+import CVTemplate5 from '@/components/TemplatesCV/professional2.vue'
 import { ref } from 'vue'
 
 const templates = [
   {
     id: 1,
-    name: 'Template 1',
+    name: 'Basic 1',
     component: CvTemplate
   },
   {
     id: 2,
-    name: 'Template 2',
+    name: 'Basic 2',
     component: CvTemplate2
   },
   {
     id: 3,
-    name: 'Template 3',
+    name: 'Elegant 1',
     component: CVTemplate3
   },
   {
     id: 4,
-    name: 'Template 1',
-    component: CvTemplate
+    name: 'Professional 1',
+    component: CVTemplate4
   },
   {
     id: 5,
-    name: 'Template 2',
-    component: CvTemplate2
-  },
-  {
-    id: 6,
-    name: 'Template 3',
-    component: CVTemplate3
+    name: 'Professional 2',
+    component: CVTemplate5
   }
 ]
 

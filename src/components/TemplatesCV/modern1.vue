@@ -3,7 +3,7 @@
     <!-- Header Section -->
     <div class="bg-green-600 text-white flex items-center p-6 rounded-t-lg">
       <div
-        class="relative w-28 h-28 rounded-full bg-gray-300 flex-shrink-0 overflow-hidden mx-auto md:mx-0"
+        class="relative w-40 h-40 rounded-full bg-gray-300 flex-shrink-0 overflow-hidden mx-auto md:mx-0"
       >
         <!-- Display image -->
         <img
@@ -45,7 +45,7 @@
 
     <!-- Contact Info -->
     <div class="grid grid-cols-2 gap-4 text-gray-700 mt-4">
-      <div>
+      <div class="space-y-3">
         <div class="flex items-center space-x-2">
           <!-- Icon for Email -->
           <i class="pi pi-envelope"></i>
@@ -71,7 +71,7 @@
         </div>
       </div>
 
-      <div>
+      <div class="space-y-3">
         <div class="flex items-center space-x-2">
           <!-- Icon for Git -->
           <i class="pi pi-github"></i>
