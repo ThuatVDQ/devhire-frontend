@@ -395,51 +395,60 @@ watch(
 const data = reactive({
   personal_info: {
     name: 'Nguyễn Văn A',
-    job_title: 'Marketing Specialist',
-    summary: 'Marketing specialist with 3 years of experience...',
+    job_title: 'Full Stack Developer', // Chức vụ thay thành Full Stack Developer
+    summary:
+      'Full Stack Developer with 4 years of experience in developing web applications using JavaScript, Node.js, React, and modern web technologies. Proficient in both front-end and back-end development, database management, and API design.',
     contact: {
-      email: 'hotro@topcv.vn',
+      email: 'nguyen.a@itcompany.vn', // Thay đổi email thành một email chuyên nghiệp
       phone: '(024) 6680 5588',
-      website: 'https://fb.com/topcv.vn',
+      website: 'https://github.com/nguyenvana', // Thay đổi link website thành GitHub của lập trình viên
       address: 'District A, Hanoi'
     }
   },
   skills: [
-    { name: 'Market Research', level: 90 },
-    { name: 'Data Analysis', level: 85 },
-    { name: 'Image & Video Design', level: 80 },
-    { name: 'Online Advertising', level: 75 },
-    { name: 'English', level: 90 }
+    { name: 'JavaScript', level: 90 }, // Thay các kỹ năng marketing thành kỹ năng lập trình
+    { name: 'Node.js', level: 85 },
+    { name: 'React', level: 80 },
+    { name: 'API Development', level: 75 },
+    { name: 'Database Management (MySQL, MongoDB)', level: 80 }
   ],
   certifications: [
-    { name: 'Digital Marketing Pro DMI', year: 2022 },
-    { name: 'Google Digital Marketing', year: 2021 }
+    { name: 'Certified JavaScript Developer', year: 2022 }, // Thay chứng chỉ marketing thành chứng chỉ IT
+    { name: 'AWS Certified Solutions Architect', year: 2021 }
   ],
   work_experience: [
     {
-      title: 'Marketing Specialist',
-      company: 'ABC Company',
-      duration: '12/2021 - Present',
-      details: ['Data analysis...', 'Managing online channels...']
+      title: 'Full Stack Developer',
+      company: 'Tech Solutions Inc.', // Công ty thay thành công ty công nghệ
+      duration: '01/2021 - Present',
+      details: [
+        'Developed and maintained scalable web applications using Node.js and React.',
+        'Collaborated with cross-functional teams to deliver high-quality software solutions.',
+        'Optimized API performance and reduced page load times by 30%.'
+      ]
     },
     {
-      title: 'SEO Content Staff',
-      company: 'BCD Company',
-      duration: '07/2020 - 11/2021',
-      details: ['Building backlinks...', 'Writing SEO-optimized content...']
+      title: 'Backend Developer',
+      company: 'WebTech Solutions',
+      duration: '06/2020 - 12/2020',
+      details: [
+        'Built and deployed RESTful APIs using Node.js and Express.',
+        'Worked with MongoDB and MySQL for database management and optimization.',
+        'Integrated third-party APIs for payment processing and user authentication.'
+      ]
     }
   ],
   education: [
     {
-      school: 'University of Commerce',
-      major: 'Marketing',
+      school: 'University of Danang - University of Science and Technology', // Thay tên trường thành một trường nổi tiếng về CNTT
+      major: 'Computer Science', // Chuyên ngành thay thành Khoa học Máy tính
       year: '2016 - 2020',
       grade: 'Graduated with Honors'
     }
   ],
   awards: [
-    { name: 'Best Content of Q3/2023', year: 2023 },
-    { name: 'Employee of the Year 2022', year: 2022 }
+    { name: 'Employee of the Year 2023', year: 2023 }, // Cập nhật giải thưởng phù hợp với ngành IT
+    { name: 'Best Developer of Q3/2022', year: 2022 }
   ]
 })
 

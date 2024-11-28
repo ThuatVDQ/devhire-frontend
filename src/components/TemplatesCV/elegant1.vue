@@ -279,32 +279,56 @@ function handleImageUpload(event) {
 const data = reactive({
   personal_info: {
     name: 'Nguyễn Văn A',
-    job_title: 'Sales Staff',
-    summary: 'High-performance sales staff with X years of experience in areas A, B, C...',
+    job_title: 'Software Developer', // Thay đổi từ Sales Staff sang Software Developer
+    summary:
+      'Experienced software developer with expertise in building web and mobile applications using modern technologies. Proficient in full-stack development, problem-solving, and working in agile environments.',
     contact: {
-      email: 'hotro@topcv.vn',
-      phone: '(024) 6680 5588',
-      git: 'https://fb.com/topcv.vn',
-      address: 'District A, Hanoi'
+      email: 'nguyen.a@itcompany.vn', // Thay đổi email
+      phone: '(024) 1234 5678',
+      git: 'https://github.com/nguyenvana', // GitHub URL
+      address: 'District B, Hanoi'
     }
   },
   education: [
     {
-      school: 'TOPCV University',
-      major: 'Business Administration',
+      school: 'Hanoi University of Science and Technology', // Thay đổi tên trường đại học
+      major: 'Computer Science', // Thay đổi chuyên ngành
       year: '2016 - 2020',
       grade: 'Graduated with Honors'
     }
   ],
   work_experience: [
     {
-      company: 'ABC Company',
-      title: 'Sales Staff',
-      duration: '08/2020 - 08/2022',
-      details: ['Served a group of 20 major clients generating revenue of 5-10 billion...']
+      company: 'Tech Solutions Inc.',
+      title: 'Backend Developer', // Thay đổi từ Sales Staff sang Backend Developer
+      duration: '08/2020 - Present',
+      details: [
+        'Developed and maintained RESTful APIs using Node.js and Express for various web applications.',
+        'Collaborated with front-end developers to integrate user-facing elements with server-side logic.',
+        'Optimized server-side performance, reducing API response times by 30%.'
+      ]
+    },
+    {
+      company: 'Innovative Tech Ltd.',
+      title: 'Frontend Developer', // Thêm một công ty nữa cho ví dụ
+      duration: '06/2020 - 08/2020',
+      details: [
+        'Developed responsive and user-friendly front-end applications using React and Redux.',
+        'Ensured high performance of applications and conducted code reviews.'
+      ]
     }
   ],
-  skills: ['Customer Search', 'Persuasion Skills', 'CRM']
+  skills: [
+    'JavaScript',
+    'Node.js',
+    'React',
+    'HTML/CSS',
+    'RESTful APIs',
+    'Database Management (MySQL, MongoDB)',
+    'Agile Development',
+    'Version Control (Git)',
+    'Problem Solving'
+  ]
 })
 
 // Thêm / Xóa Education

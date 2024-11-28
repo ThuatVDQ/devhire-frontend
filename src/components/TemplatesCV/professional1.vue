@@ -276,32 +276,46 @@ watch(
 const data = reactive({
   personal_info: {
     name: 'Nguyễn Văn A',
-    job_title: 'Sales Staff',
-    summary: 'High-performance sales staff with X years of experience in areas A, B, C...',
+    job_title: 'Software Developer', // Chức vụ thay thành Software Developer
+    summary:
+      'Software developer with 3 years of experience in developing web applications using modern technologies like JavaScript, React, and Node.js. Proficient in both front-end and back-end development, with strong problem-solving skills.',
     contact: {
-      email: 'hotro@topcv.vn',
+      email: 'nguyen.a@itcompany.vn', // Thay đổi email thành một email chuyên nghiệp
       phone: '(024) 6680 5588',
-      git: 'https://fb.com/topcv.vn',
+      git: 'https://github.com/nguyenvana', // Cập nhật link GitHub của lập trình viên
       address: 'District A, Hanoi'
     }
   },
   education: [
     {
-      school: 'TOPCV University',
-      major: 'Business Administration',
+      school: 'University of Danang - University of Science and Technology', // Thay trường đại học thành trường CNTT
+      major: 'Computer Science', // Chuyên ngành thay thành Khoa học Máy tính
       year: '2016 - 2020',
       grade: 'Graduated with Honors'
     }
   ],
   work_experience: [
     {
-      company: 'ABC Company',
-      title: 'Sales Staff',
+      company: 'Tech Solutions Inc.', // Công ty thay thành công ty công nghệ
+      title: 'Software Developer', // Chức danh thay thành Software Developer
       duration: '08/2020 - 08/2022',
-      details: ['Served a group of 20 major clients generating revenue of 5-10 billion...']
+      details: [
+        'Developed and maintained web applications using React, Node.js, and Express.',
+        'Collaborated with front-end and back-end teams to deliver high-quality software.',
+        'Optimized application performance, reducing load times by 25%.'
+      ]
     }
   ],
-  skills: ['Customer Search', 'Persuasion Skills', 'CRM']
+  skills: [
+    'JavaScript',
+    'React',
+    'Node.js',
+    'API Development',
+    'Problem Solving',
+    'Git',
+    'HTML/CSS',
+    'Database Management (MySQL, MongoDB)'
+  ] // Cập nhật kỹ năng CNTT
 })
 
 function handlePhotoUpload(event) {

@@ -313,33 +313,46 @@ watch(
 const data = reactive({
   personal_info: {
     name: 'Nguyễn Văn A',
-    job_title: 'Sales Staff',
-    summary: 'High-performance sales staff with X years of experience in areas A, B, C...',
+    job_title: 'Software Engineer', // Thay đổi chức vụ thành Software Engineer
+    summary:
+      'Software Engineer with 3 years of experience in building scalable web applications using JavaScript, Node.js, and React. Strong problem-solving skills and experience with both front-end and back-end development.',
     contact: {
-      email: 'hotro@topcv.vn',
+      email: 'nguyen.a@itcompany.vn', // Thay đổi email thành một email chuyên nghiệp
       phone: '(024) 6680 5588',
-      git: 'https://fb.com/topcv.vn',
+      git: 'https://github.com/nguyenvana', // Cập nhật GitHub URL
       address: 'District A, Hanoi'
     }
   },
   education: [
     {
-      school: 'TOPCV University',
-      major: 'Business Administration',
+      school: 'University of Danang - University of Science and Technology', // Trường học thay thành một trường công nghệ
+      major: 'Computer Science', // Chuyên ngành thay thành Khoa học Máy tính
       year: '2016 - 2020',
       grade: 'Graduated with Honors'
     }
   ],
   work_experience: [
     {
-      company: 'ABC Company',
-      title: 'Sales Staff',
+      company: 'Tech Solutions Inc.', // Thay đổi công ty thành công ty công nghệ
+      title: 'Software Engineer', // Thay chức danh thành Software Engineer
       duration: '08/2020 - 08/2022',
-      details: ['Served a group of 20 major clients generating revenue of 5-10 billion...']
+      details: [
+        'Developed and maintained web applications using JavaScript, Node.js, and React.',
+        'Collaborated with front-end and back-end teams to design, develop, and optimize software solutions.',
+        'Built and maintained RESTful APIs and integrated them with front-end applications.'
+      ]
     }
   ],
-  skills: ['Customer Search', 'Persuasion Skills', 'CRM'],
-  languages: ['English', 'Vietnamese', 'Japanese']
+  skills: [
+    'JavaScript',
+    'Node.js',
+    'React',
+    'API Development',
+    'Git',
+    'Database Management (MySQL, MongoDB)',
+    'Problem Solving'
+  ], // Thay kỹ năng thành kỹ năng CNTT
+  languages: ['English', 'Vietnamese', 'Japanese', 'SQL'] // Thêm SQL vào phần ngôn ngữ vì đây là kỹ năng quan trọng trong CNTT
 })
 
 function handlePhotoUpload(event) {

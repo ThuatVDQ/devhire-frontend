@@ -251,35 +251,58 @@ const data = reactive({
   personal_info: {
     photo: null,
     name: 'Nguyễn Văn B',
-    job_title: 'Marketing Staff',
-    summary: 'Marketing staff with 5 years of experience in advertising...',
+    job_title: 'Software Engineer', // Chức vụ thay đổi thành Software Engineer
+    summary:
+      'Software engineer with 4 years of experience in full-stack web development, specializing in JavaScript frameworks and building scalable web applications.',
     contact: {
-      Email: 'example@gmail.com',
+      Email: 'nguyenb@example.com', // Thay đổi email thành một email chuyên nghiệp
       Phone: '0123 456 789',
-      Git: 'https://portfolio.com',
-      Address: 'District B, Ho Chi Minh City'
+      Git: 'https://github.com/nguyenb', // Thay đổi GitHub URL
+      Address: 'District C, Ho Chi Minh City'
     }
   },
   education: [
     {
-      school: 'University of Economics Ho Chi Minh City',
-      major: 'Marketing',
+      school: 'University of Danang - University of Science and Technology', // Thay đổi tên trường
+      major: 'Computer Science', // Chuyên ngành thay thành Khoa học Máy tính
       year: '2015 - 2019',
       grade: 'Graduated with Honors'
     }
   ],
   work_experience: [
     {
-      company: 'XYZ Company',
-      title: 'Marketing Staff',
-      duration: '01/2020 - Present',
+      company: 'Tech Innovators Ltd.', // Công ty thay thành công ty công nghệ
+      title: 'Full Stack Developer', // Chức danh thay thành Full Stack Developer
+      duration: '03/2020 - Present',
       details: [
-        'Develop marketing strategies for new products...',
-        'Manage advertising budget for maximum effectiveness...'
+        'Developed and maintained web applications using Node.js and React.',
+        'Collaborated with front-end developers to integrate user-facing elements with server-side logic.',
+        'Optimized application performance and reduced page load times by 30%.'
+      ]
+    },
+    {
+      company: 'Tech Solutions Inc.',
+      title: 'Backend Developer', // Thêm một công ty với vị trí Backend Developer
+      duration: '06/2019 - 03/2020',
+      details: [
+        'Built and deployed RESTful APIs using Node.js and Express.',
+        'Implemented authentication systems using JWT and OAuth 2.0.',
+        'Worked with MySQL and MongoDB for database management.'
       ]
     }
   ],
-  skills: ['Project Management', 'SEO', 'Communication Skills', 'Social Media Marketing']
+  skills: [
+    'JavaScript',
+    'Node.js',
+    'React',
+    'Express.js',
+    'MongoDB',
+    'MySQL',
+    'Version Control (Git)',
+    'Agile Methodology',
+    'Problem Solving',
+    'API Development'
+  ]
 })
 
 function handlePhotoUpload(event) {
