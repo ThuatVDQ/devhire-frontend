@@ -39,7 +39,6 @@ import Login from '@/views/Admin/Login.vue'
 import CompaniesManagement from '@/views/Admin/CompaniesManagement.vue'
 import Notifications from '@/views/Admin/Notifications.vue'
 import RecruiterNotifications from '@/views/Recruiter/RecruiterNotifications.vue'
-import UserDetail from '@/views/Admin/UserDetail.vue'
 import CompanyDetail from '@/views/Admin/CompanyDetail.vue'
 import CreateCVView from '@/views/CreateCVView.vue'
 
@@ -224,11 +223,6 @@ const routes = [
         path: 'users',
         name: 'admin-users-management',
         component: UserManagement
-      },
-      {
-        path: 'users/:id',
-        name: 'admin-users-detail',
-        component: UserDetail
       },
       {
         path: 'companies',

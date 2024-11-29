@@ -178,21 +178,6 @@ const openPopup = () => {
               Save
             </button>
           </div>
-          <div class="p-6 mt-3 shadow dark:shadow-gray-700 rounded-md bg-white dark:bg-slate-900">
-            <h5 class="text-xl font-semibold mb-5">Social Url</h5>
-            <label class="font-semibold">Facebook</label>
-            <input type="text" v-model="data.user.facebook_url" class="form-input mb-5" />
-            <label class="font-semibold">Linkedin</label>
-            <input type="text" v-model="data.user.linkedin_url" class="form-input mb-5" />
-            <label class="font-semibold">Github</label>
-            <input type="text" v-model="data.user.github_url" class="form-input mb-5" />
-            <button
-              class="px-6 py-2 rounded-md bg-emerald-600 hover:bg-emerald-700 border-emerald-600 hover:border-emerald-700 text-white"
-              type="submit"
-            >
-              Save
-            </button>
-          </div>
         </div>
       </div>
     </div>

@@ -75,9 +75,7 @@
                 alt="Logo"
                 @error="(e) => (e.target.src = defaultAvatar)"
                 class="w-6 h-6 rounded-full mr-2"
-              /><span class="cursor-pointer" @click="goToDetail(user.id)">{{
-                user.full_name
-              }}</span>
+              /><span>{{ user.full_name }}</span>
             </td>
             <td class="py-3 px-6">{{ user.email }}</td>
             <td class="py-3 px-6">{{ user.role_name }}</td>
@@ -313,9 +311,6 @@ const changePage = (page) => {
   }
 }
 
-const goToDetail = (id) => {
-  router.push({ name: 'admin-users-detail', params: { id: id } })
-}
 // Initial fetch on component mount
 onMounted(() => fetchUsers(0))
 </script>

@@ -2,7 +2,7 @@
 import CompanyList from '@/components/CompanyList.vue'
 import CardExploreJob from '@/components/CardExploreJob.vue'
 import { useRoute } from 'vue-router'
-import { reactive, onMounted, watch } from 'vue'
+import { reactive, onMounted, watch, onBeforeUnmount } from 'vue'
 import axios from 'axios'
 import defaultLogo from '@/assets/logo.svg'
 import CardJob from '@/components/CardJob.vue'
@@ -10,7 +10,11 @@ import CardJob from '@/components/CardJob.vue'
 const route = useRoute()
 
 const state = reactive({
-  company: {},
+  company: {
+    images: []
+  },
+  isModalOpen: false,
+  currentImageIndex: 0,
   jobs: [],
   companies: [],
   isLoading: true
@@ -40,12 +44,56 @@ const fetchJobsByCompany = async () => {
   }
 }
 
+const openImageModal = (index) => {
+  state.currentImageIndex = index
+  state.isModalOpen = true
+}
+
+const closeImageModal = () => {
+  state.isModalOpen = false
+}
+
+const goToImage = (index) => {
+  state.currentImageIndex = index
+}
+
+const previousImage = () => {
+  if (state.currentImageIndex > 0) {
+    state.currentImageIndex -= 1
+  }
+}
+
+const nextImage = () => {
+  if (state.currentImageIndex < state.company.images.length - 1) {
+    state.currentImageIndex += 1
+  }
+}
+const handleKeyDown = (event) => {
+  if (event.key === 'Escape') {
+    closeImageModal()
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', handleKeyDown)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', handleKeyDown)
+})
+
 const fetchCompanyData = async (id) => {
   try {
     const response = await axios.get(`http://localhost:8090/api/companies/${id}`)
     state.company = response.data
     if (state.company.logo)
       state.company.logo = `http://localhost:8090/uploads/${state.company.logo}`
+
+    if (state.company.images) {
+      state.company.images = state.company.images.map(
+        (image) => `http://localhost:8090/uploads/${image}`
+      )
+    }
   } catch (e) {
     console.error(e)
   }
@@ -113,10 +161,86 @@ watch(
     <div class="container mt-12">
       <div class="grid md:grid-cols-12 grid-cols-1 gap-[30px]">
         <div class="lg:col-span-8 md:col-span-7">
+          <div class="grid grid-cols-2 gap-4 mb-6">
+            <div
+              v-for="(image, index) in state.company.images.slice(0, 2)"
+              :key="index"
+              class="relative cursor-pointer"
+              @click="openImageModal(index)"
+            >
+              <img
+                :src="image"
+                alt="Company Image"
+                class="rounded-md shadow dark:shadow-gray-700 w-full h-[150px] object-contain object-center"
+              />
+              <!-- Nếu là ảnh thứ 2, hiển thị lớp phủ -->
+              <div
+                v-if="index === 1 && state.company.images.length > 2"
+                class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center text-white font-bold text-xl"
+              >
+                +{{ state.company.images.length - 2 }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Modal hiển thị tất cả ảnh -->
+          <div
+            v-if="state.isModalOpen"
+            class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
+            @click.self="closeImageModal"
+          >
+            <div class="bg-white p-4 rounded-md shadow-lg max-w-3xl relative w-auto">
+              <!-- Hình ảnh hiện tại -->
+              <img
+                :src="state.company.images[state.currentImageIndex]"
+                alt="Company Image"
+                class="rounded-md"
+                :style="{ height: '600px' }"
+              />
+
+              <!-- Nút mũi tên trái -->
+              <button
+                @click="previousImage"
+                class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-2 shadow"
+                :disabled="state.currentImageIndex === 0"
+              >
+                <i class="pi pi-angle-left"></i>
+              </button>
+
+              <!-- Nút mũi tên phải -->
+              <button
+                @click="nextImage"
+                class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-2 shadow"
+                :disabled="state.currentImageIndex === state.company.images.length - 1"
+              >
+                <i class="pi pi-angle-right"></i>
+              </button>
+
+              <!-- Dấu chấm tròn hiển thị vị trí -->
+              <div class="flex justify-center mt-4">
+                <span
+                  v-for="(image, index) in state.company.images"
+                  :key="index"
+                  @click="goToImage(index)"
+                  class="w-3 h-3 rounded-full mx-1 cursor-pointer"
+                  :class="{
+                    'bg-gray-300': state.currentImageIndex !== index,
+                    'bg-emerald-600': state.currentImageIndex === index
+                  }"
+                ></span>
+              </div>
+            </div>
+          </div>
           <h5 class="text-xl font-semibold">Company Story</h5>
           <p
-            class="text-slate-400 mt-4"
-            style="white-space: pre-line; word-break: break-word; text-align: justify"
+            class="text-slate-400 mt-4 shadow-2xl p-4 bg-white"
+            style="
+              white-space: pre-line;
+              word-break: break-word;
+              text-align: justify;
+              border-radius: 12px;
+              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            "
           >
             {{ state.company.description }}
           </p>
@@ -127,11 +251,11 @@ watch(
         </div>
         <div class="lg:col-span-4 md:col-span-5">
           <div
-            class="bg-slate-50 dark:bg-slate-800 rounded-md shadow dark:shadow-gray-700 p-6 sticky top-20"
+            class="bg-white dark:bg-slate-800 rounded-md shadow dark:shadow-gray-700 p-6 sticky top-20"
           >
             <div class="w-full leading-[0] border-0">
               <iframe
-                src="https://www.google.com/maps/embed/v1/place?key=AIzaSyCVgO8KzHQ8iKcfqXgrMnUIGlD-piWiPpo&q=31+duong+2+Lang+Bao+Chi,Phuong+Thao+Dien,Thanh+pho+Thu+Duc,Thanh+pho+Ho+Chi+Minh,Viet+Nam&zoom=15&language=vi"
+                :src="`https://www.google.com/maps/embed/v1/place?key=AIzaSyCVgO8KzHQ8iKcfqXgrMnUIGlD-piWiPpo&q=${encodeURIComponent(state.company.address)}&zoom=15&language=vi`"
                 frameborder="0"
                 class="w-full h-[350px] rounded-md shadow dark:shadow-gray-700"
                 allowfullscreen

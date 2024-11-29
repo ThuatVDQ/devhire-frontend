@@ -328,8 +328,14 @@ watch(
           </div>
           <h5 class="text-xl font-semibold">Company Story</h5>
           <p
-            class="text-slate-400 mt-4"
-            style="white-space: pre-line; word-break: break-word; text-align: justify"
+            class="text-slate-400 mt-4 shadow-2xl p-4 bg-white"
+            style="
+              white-space: pre-line;
+              word-break: break-word;
+              text-align: justify;
+              border-radius: 12px;
+              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            "
           >
             {{ state.company.description }}
           </p>
@@ -340,11 +346,11 @@ watch(
         </div>
         <div class="lg:col-span-4 md:col-span-5">
           <div
-            class="bg-slate-50 dark:bg-slate-800 rounded-md shadow dark:shadow-gray-700 p-6 sticky top-20"
+            class="bg-white dark:bg-slate-800 rounded-md shadow dark:shadow-gray-700 p-6 sticky top-20"
           >
             <div class="w-full leading-[0] border-0">
               <iframe
-                src="https://www.google.com/maps/embed/v1/place?key=AIzaSyCVgO8KzHQ8iKcfqXgrMnUIGlD-piWiPpo&q=31+duong+2+Lang+Bao+Chi,Phuong+Thao+Dien,Thanh+pho+Thu+Duc,Thanh+pho+Ho+Chi+Minh,Viet+Nam&zoom=15&language=vi"
+                :src="`https://www.google.com/maps/embed/v1/place?key=AIzaSyCVgO8KzHQ8iKcfqXgrMnUIGlD-piWiPpo&q=${encodeURIComponent(state.company.address)}&zoom=15&language=vi`"
                 frameborder="0"
                 class="w-full h-[350px] rounded-md shadow dark:shadow-gray-700"
                 allowfullscreen
@@ -390,9 +396,9 @@ watch(
         >
           <div class="flex space-x-3 items-center">
             <h4 class="text-xl font-semibold text-gray-800">{{ review.full_name }}</h4>
-            <!-- <span class="text-sm text-gray-500">
-            {{ formatReviewDate(review.createdAt) }}
-          </span> -->
+            <span class="text-sm text-gray-500">
+              {{ formatReviewDate(review.created_at) }}
+            </span>
           </div>
           <div class="flex items-center text-yellow-500 mb-2">
             <span

@@ -104,7 +104,7 @@ function formatSalary(amount) {
 
 <template>
   <div
-    class="flex flex-col group relative overflow-hidden bg-white dark:bg-slate-900 shadow hover:shadow-md dark:shadow-gray-700 dark:hover:shadow-gray-700 hover:-mt-2 rounded-md transition-all duration-500"
+    class="flex flex-col group relative overflow-hidden bg-white dark:bg-slate-900 shadow-lg hover:shadow-2xl dark:shadow-gray-700 dark:hover:shadow-xl hover:-mt-2 rounded-md transition-all duration-500"
   >
     <div class="px-6 pt-6 pb-2">
       <div class="flex items-center space-x-2">
