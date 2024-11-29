@@ -139,6 +139,13 @@ onMounted(() => {
             >Contact</RouterLink
           >
         </li>
+        <li>
+          <RouterLink
+            to="/template-cv"
+            :class="[isActiveLink('/template-cv') ? 'text-green-600' : 'hover:text-green-600']"
+            >Create CV</RouterLink
+          >
+        </li>
       </ul>
 
       <div class="hidden md:flex items-center space-x-4 relative">
