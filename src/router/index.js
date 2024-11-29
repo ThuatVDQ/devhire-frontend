@@ -41,6 +41,7 @@ import Notifications from '@/views/Admin/Notifications.vue'
 import RecruiterNotifications from '@/views/Recruiter/RecruiterNotifications.vue'
 import CompanyDetail from '@/views/Admin/CompanyDetail.vue'
 import CreateCVView from '@/views/CreateCVView.vue'
+import LoginWithGoogle from '@/components/LoginWithGoogle.vue'
 
 const routes = [
   {
@@ -225,6 +226,11 @@ const routes = [
         component: UserManagement
       },
       {
+        path: 'users/:id',
+        name: 'admin-users-detail',
+        component: UserDetail
+      },
+      {
         path: 'companies',
         name: 'admin-companies-management',
         component: CompaniesManagement
@@ -250,6 +256,11 @@ const routes = [
         component: JobDetail
       }
     ]
+  },
+  {
+    path: '/auth/callback',
+    name: 'loginCallback',
+    component: LoginWithGoogle
   }
 ]
 
