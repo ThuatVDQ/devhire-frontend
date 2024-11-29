@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import VerifyCodeView from './VerifyCodeView.vue'
 import ResetPassword from '@/components/ResetPassword.vue'
+import LoginWithGoogle from '@/components/LoginWithGoogle.vue'
 import { useRouter } from 'vue-router'
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
@@ -212,6 +213,7 @@ onMounted(() => {})
                 </div>
               </div>
             </form>
+            <LoginWithGoogle :roleId="3" />
           </div>
         </div>
       </div>

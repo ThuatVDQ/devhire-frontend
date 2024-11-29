@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import VerifyCodeView from './../VerifyCodeView.vue'
+import LoginWithGoogle from '@/components/LoginWithGoogle.vue'
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
 import axios from 'axios'
@@ -181,6 +182,7 @@ onMounted(() => {})
                 </div>
               </div>
             </form>
+            <LoginWithGoogle :role_id="2" />
           </div>
         </div>
       </div>
