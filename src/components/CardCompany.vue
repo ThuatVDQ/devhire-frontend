@@ -36,13 +36,13 @@ const logoSource = computed(() => {
       <!-- Tên công ty -->
       <RouterLink
         :to="`/companies/${company.id}`"
-        class="text-lg hover:text-emerald-600 font-semibold"
+        class="text-lg hover:text-emerald-600 line-clamp-1 font-semibold"
       >
         {{ company.name }}
       </RouterLink>
 
       <!-- Mô tả công ty với giới hạn dòng -->
-      <p class="text-slate-400 text-justify line-clamp-4 flex-grow">
+      <p class="text-slate-400 text-justify line-clamp-6">
         {{ company.description }}
       </p>
     </div>
