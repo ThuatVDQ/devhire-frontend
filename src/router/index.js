@@ -226,11 +226,6 @@ const routes = [
         component: UserManagement
       },
       {
-        path: 'users/:id',
-        name: 'admin-users-detail',
-        component: UserDetail
-      },
-      {
         path: 'companies',
         name: 'admin-companies-management',
         component: CompaniesManagement
