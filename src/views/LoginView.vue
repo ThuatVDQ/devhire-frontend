@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import VerifyCodeView from './VerifyCodeView.vue'
 import ResetPassword from '@/components/ResetPassword.vue'
 import LoginWithGoogle from '@/components/LoginWithGoogle.vue'
@@ -76,6 +76,15 @@ const validateEmail = () => {
   }
 }
 
+watch(
+  () => form.value.phone,
+  () => {
+    if (phoneError.value) {
+      phoneError.value = '' // Reset lỗi khi người dùng sửa lại email
+    }
+  }
+)
+
 // Computed để kiểm tra nếu tất cả các trường hợp lệ
 const canSubmit = computed(() => {
   return form.value.phone && form.value.password && !phoneError.value
@@ -83,7 +92,10 @@ const canSubmit = computed(() => {
 
 // Hàm xử lý đăng nhập
 const login = async () => {
-  if (!canSubmit.value) return
+  validateEmail()
+  if (!canSubmit.value) {
+    return
+  }
 
   isSubmitting.value = true
   try {
@@ -133,10 +145,11 @@ onMounted(() => {})
               <h1 class="ml-2 text-2xl font-bold text-blue-600">DevHire</h1>
             </router-link>
             <h5 class="my-6 text-xl font-semibold">Login</h5>
+
             <form @submit.prevent="login">
               <div class="grid grid-cols-1">
                 <div class="mb-4 ltr:text-left rtl:text-right">
-                  <label for="phone" class="font-semibold">Email address</label>
+                  <label for="phone" class="font-semibold">Email address:</label>
                   <input
                     v-model="form.phone"
                     @blur="validatePhoneOrEmail"
@@ -162,17 +175,7 @@ onMounted(() => {})
                   </div>
                 </div>
                 <div class="flex justify-between mb-4">
-                  <div class="inline-flex items-center mb-0">
-                    <input
-                      type="checkbox"
-                      name="remember"
-                      id="remember"
-                      class="form-checkbox rounded border-gray-200 dark:border-gray-800 text-emerald-600 focus:border-emerald-300 focus:ring focus:ring-offset-0 focus:ring-emerald-200 focus:ring-opacity-50 me-2"
-                    />
-                    <label for="remember" class="form-checkbox-label text-slate-400"
-                      >Remember me</label
-                    >
-                  </div>
+                  <div class="inline-flex items-center mb-0"></div>
                   <p class="text-slate-400 mb-0">
                     <a
                       href="#"
@@ -205,6 +208,20 @@ onMounted(() => {})
                     Enable Account
                   </button>
                 </div>
+
+                <div class="flex items-center my-4">
+                  <hr class="flex-grow border-t border-gray-300" />
+                  <h5 class="mx-4 text-lg font-mono text-center">OR</h5>
+                  <hr class="flex-grow border-t border-gray-300" />
+                </div>
+                <button
+                  @click.prevent
+                  class="w-full mb-3 flex items-center justify-center py-2 px-4 bg-white border border-red-300 rounded-lg text-red-500 font-semibold hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 shadow-md"
+                >
+                  <i class="pi pi-google mr-3"></i>
+                  <LoginWithGoogle :roleId="3" />
+                </button>
+
                 <div class="text-center">
                   <span class="text-slate-400 me-2">Don't have an account?</span>
                   <router-link to="/signup" class="text-black dark:text-white font-bold"
@@ -213,7 +230,6 @@ onMounted(() => {})
                 </div>
               </div>
             </form>
-            <LoginWithGoogle :roleId="3" />
           </div>
         </div>
       </div>

@@ -58,6 +58,14 @@ const validateEmail = () => {
     phoneError.value = ''
   }
 }
+watch(
+  () => form.value.phone,
+  () => {
+    if (phoneError.value) {
+      phoneError.value = '' // Reset lỗi khi người dùng sửa lại email
+    }
+  }
+)
 
 // Computed để kiểm tra nếu tất cả các trường hợp lệ
 const canSubmit = computed(() => {
@@ -66,6 +74,7 @@ const canSubmit = computed(() => {
 
 // Hàm xử lý đăng nhập
 const login = async () => {
+  validateEmail()
   if (!canSubmit.value) return
 
   isSubmitting.value = true
@@ -141,17 +150,7 @@ onMounted(() => {})
                   </div>
                 </div>
                 <div class="flex justify-between mb-4">
-                  <div class="inline-flex items-center mb-0">
-                    <input
-                      type="checkbox"
-                      name="remember"
-                      id="remember"
-                      class="form-checkbox rounded border-gray-200 dark:border-gray-800 text-emerald-600 focus:border-emerald-300 focus:ring focus:ring-offset-0 focus:ring-emerald-200 focus:ring-opacity-50 me-2"
-                    />
-                    <label for="remember" class="form-checkbox-label text-slate-400"
-                      >Remember me</label
-                    >
-                  </div>
+                  <div class="inline-flex items-center mb-0"></div>
                   <p class="text-slate-400 mb-0">
                     <a href="" class="text-slate-400">Forgot password?</a>
                   </p>
@@ -174,6 +173,17 @@ onMounted(() => {})
                     Enable Account
                   </button>
                 </div>
+                <div class="flex items-center my-4">
+                  <hr class="flex-grow border-t border-gray-300" />
+                  <h5 class="mx-4 text-lg font-mono text-center">OR</h5>
+                  <hr class="flex-grow border-t border-gray-300" />
+                </div>
+                <button
+                  class="w-full mb-3 flex items-center justify-center py-2 px-4 bg-white border border-red-300 rounded-lg text-red-500 font-semibold hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 shadow-md"
+                >
+                  <i class="pi pi-google mr-3"></i>
+                  <LoginWithGoogle :role_id="2" />
+                </button>
                 <div class="text-center">
                   <span class="text-slate-400 me-2">Don't have an account?</span>
                   <router-link to="/recruiter/signup" class="text-black dark:text-white font-bold"
@@ -182,7 +192,6 @@ onMounted(() => {})
                 </div>
               </div>
             </form>
-            <LoginWithGoogle :role_id="2" />
           </div>
         </div>
       </div>
