@@ -22,17 +22,21 @@
           <!-- Template Name -->
           <h2 class="text-lg font-semibold text-gray-700 mb-2">{{ template.name }}</h2>
           <!-- Thumbnail -->
-          <div
+          <!-- <div
             class="w-full h-56 bg-gray-100 rounded-md flex items-center justify-center text-gray-400"
           >
             <span>Thumbnail</span>
-          </div>
+          </div> -->
 
-          <!-- <component
-            class="w-full h-56 bg-gray-100 rounded-md flex items-center justify-center text-gray-400 overflow-hidden"
-            :is="template.component"
-            :isEditable="isEditMode"
-          /> -->
+          <div
+            class="w-full h-auto bg-gray-100 rounded-md flex items-center justify-center text-gray-400"
+          >
+            <img
+              :src="template.thumbnail"
+              alt="Template Thumbnail"
+              class="w-full h-full object-cover rounded-md"
+            />
+          </div>
         </div>
         <!-- Hover Options -->
         <div
@@ -74,33 +78,44 @@ import CvTemplate2 from '@/components/TemplatesCV/basic.vue'
 import CVTemplate3 from '@/components/TemplatesCV/modern1.vue'
 import CVTemplate4 from '@/components/TemplatesCV/professional1.vue'
 import CVTemplate5 from '@/components/TemplatesCV/professional2.vue'
+import basic1 from '@/assets/thumbnails/1.png'
+import basic2 from '@/assets/thumbnails/2.png'
+import elegant1 from '@/assets/thumbnails/3.png'
+import professional1 from '@/assets/thumbnails/4.png'
+import professional2 from '@/assets/thumbnails/5.png'
+import html2canvas from 'html2canvas'
 import { ref } from 'vue'
 
 const templates = [
   {
     id: 1,
     name: 'Basic 1',
-    component: CvTemplate
+    component: CvTemplate,
+    thumbnail: basic1
   },
   {
     id: 2,
     name: 'Basic 2',
-    component: CvTemplate2
+    component: CvTemplate2,
+    thumbnail: basic2
   },
   {
     id: 3,
     name: 'Elegant 1',
-    component: CVTemplate3
+    component: CVTemplate3,
+    thumbnail: elegant1
   },
   {
     id: 4,
     name: 'Professional 1',
-    component: CVTemplate4
+    component: CVTemplate4,
+    thumbnail: professional1
   },
   {
     id: 5,
     name: 'Professional 2',
-    component: CVTemplate5
+    component: CVTemplate5,
+    thumbnail: professional2
   }
 ]
 

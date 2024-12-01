@@ -232,6 +232,7 @@
 import { reactive, ref, nextTick, watch } from 'vue'
 import jsPDF from 'jspdf'
 import domtoimage from 'dom-to-image'
+import defaultAvatar from '@/assets/profile-avatar3.png'
 
 const props = defineProps({
   isEditable: Boolean
@@ -249,15 +250,15 @@ watch(
 
 const data = reactive({
   personal_info: {
-    photo: null,
-    name: 'Nguyễn Văn B',
+    photo: defaultAvatar,
+    name: 'Trần Ngọc Hân',
     job_title: 'Software Engineer', // Chức vụ thay đổi thành Software Engineer
     summary:
       'Software engineer with 4 years of experience in full-stack web development, specializing in JavaScript frameworks and building scalable web applications.',
     contact: {
       Email: 'nguyenb@example.com', // Thay đổi email thành một email chuyên nghiệp
       Phone: '0123 456 789',
-      Git: 'https://github.com/nguyenb', // Thay đổi GitHub URL
+      Git: 'https://github.com/tranngochan', // Thay đổi GitHub URL
       Address: 'District C, Ho Chi Minh City'
     }
   },

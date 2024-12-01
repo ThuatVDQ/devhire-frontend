@@ -172,7 +172,7 @@ onMounted(() => {
 
             <div
               v-show="isProfileMenuOpen"
-              class="absolute right-0 bg-white border border-gray-200 shadow-lg rounded-lg z-50 profile-dropdown p-4"
+              class="absolute w-auto right-0 bg-white border border-gray-200 shadow-lg rounded-lg z-50 profile-dropdown p-4"
               @mouseenter="showProfileMenu"
               @mouseleave="hideProfileMenu"
             >
@@ -346,6 +346,5 @@ header {
   top: 110%;
   width: max-content;
   z-index: 50;
-  width: 300px;
 }
 </style>

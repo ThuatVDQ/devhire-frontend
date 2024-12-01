@@ -197,13 +197,13 @@ const submitApplication = async () => {
   state.isApplying = true
   try {
     const jobId = route.params.id
+    console.log(jobId)
 
     const formData = new FormData()
     formData.append('file', state.candidate.cv)
     // Thêm letter vào formData
-    if (state.candidate.letter) {
-      formData.append('letter', state.candidate.letter)
-    }
+    formData.append('letter', state.candidate.letter)
+    console.log(formData)
 
     // Gửi POST request đến endpoint phù hợp với jobId
     const response = await axios.post(`http://localhost:8090/api/jobs/${jobId}/apply`, formData, {
@@ -214,6 +214,7 @@ const submitApplication = async () => {
     })
 
     toastr.success(response.data, 'Success')
+    state.job.apply_status = 'IN_PROGRESS'
     closeApplicationForm()
   } catch (error) {
     console.error(error)
@@ -237,7 +238,7 @@ onMounted(() => {
         class="w-16 h-16 border-4 border-t-4 border-gray-300 border-t-emerald-600 rounded-full animate-spin mb-4"
       ></div>
     </div>
-    <div class="container mt-10">
+    <div class="container pt-10">
       <div class="grid md:grid-cols-12 grid-cols-1 gap-[30px]">
         <div class="lg:col-span-8 md:col-span-6">
           <div
@@ -358,24 +359,42 @@ onMounted(() => {
           </div>
           <h5 class="text-lg font-semibold mt-6">Job Description:</h5>
           <p
-            class="mt-4"
-            style="white-space: pre-line; word-break: break-word; text-align: justify"
+            class="mt-4 p-4 bg-white dark:bg-slate-900 rounded-md shadow dark:shadow-gray-700"
+            style="
+              white-space: pre-line;
+              word-break: break-word;
+              text-align: justify;
+              border-radius: 12px;
+              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            "
           >
             {{ state.job.description }}
           </p>
 
           <h5 class="text-lg font-semibold mt-16">Requirements:</h5>
           <p
-            class="mt-4"
-            style="white-space: pre-line; word-break: break-word; text-align: justify"
+            class="mt-4 p-4 bg-white dark:bg-slate-900 rounded-md shadow dark:shadow-gray-700"
+            style="
+              white-space: pre-line;
+              word-break: break-word;
+              text-align: justify;
+              border-radius: 12px;
+              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            "
           >
             {{ state.job.requirement }}
           </p>
 
           <h5 class="text-lg font-semibold mt-16">Benefit:</h5>
           <p
-            class="mt-4"
-            style="white-space: pre-line; word-break: break-word; text-align: justify"
+            class="mt-4 p-4 bg-white dark:bg-slate-900 rounded-md shadow dark:shadow-gray-700"
+            style="
+              white-space: pre-line;
+              word-break: break-word;
+              text-align: justify;
+              border-radius: 12px;
+              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            "
           >
             {{ state.job.benefit }}
           </p>

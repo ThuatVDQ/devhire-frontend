@@ -248,7 +248,7 @@ import { reactive, ref, watch, nextTick } from 'vue'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
 import domtoimage from 'dom-to-image'
-import defaultAvatar from '@/assets/avatar-default.svg'
+import defaultAvatar from '@/assets/profile-avatar.png'
 
 const props = defineProps({ isEditable: Boolean })
 
@@ -278,14 +278,14 @@ function handleImageUpload(event) {
 }
 const data = reactive({
   personal_info: {
-    name: 'Nguyễn Văn A',
+    name: 'Nguyễn Văn Công',
     job_title: 'Software Developer', // Thay đổi từ Sales Staff sang Software Developer
     summary:
       'Experienced software developer with expertise in building web and mobile applications using modern technologies. Proficient in full-stack development, problem-solving, and working in agile environments.',
     contact: {
       email: 'nguyen.a@itcompany.vn', // Thay đổi email
       phone: '(024) 1234 5678',
-      git: 'https://github.com/nguyenvana', // GitHub URL
+      git: 'https://github.com/nguyenvancong', // GitHub URL
       address: 'District B, Hanoi'
     }
   },

@@ -293,7 +293,7 @@ import { reactive, ref, watch, nextTick } from 'vue'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
 import domtoimage from 'dom-to-image'
-import defaultAvatar from '@/assets/avatar-default.svg'
+import defaultAvatar from '@/assets/profile-avatar4.png'
 
 // Dữ liệu
 const template = ref(null)
@@ -312,14 +312,14 @@ watch(
 
 const data = reactive({
   personal_info: {
-    name: 'Nguyễn Văn A',
+    name: 'Lê Thuỷ Tiên',
     job_title: 'Software Engineer', // Thay đổi chức vụ thành Software Engineer
     summary:
       'Software Engineer with 3 years of experience in building scalable web applications using JavaScript, Node.js, and React. Strong problem-solving skills and experience with both front-end and back-end development.',
     contact: {
       email: 'nguyen.a@itcompany.vn', // Thay đổi email thành một email chuyên nghiệp
       phone: '(024) 6680 5588',
-      git: 'https://github.com/nguyenvana', // Cập nhật GitHub URL
+      git: 'https://github.com/lethuytien', // Cập nhật GitHub URL
       address: 'District A, Hanoi'
     }
   },
@@ -340,6 +340,16 @@ const data = reactive({
         'Developed and maintained web applications using JavaScript, Node.js, and React.',
         'Collaborated with front-end and back-end teams to design, develop, and optimize software solutions.',
         'Built and maintained RESTful APIs and integrated them with front-end applications.'
+      ]
+    },
+    {
+      company: 'Intel Inc.', // Công ty thay thành công ty công nghệ
+      title: 'Software Developer', // Chức danh thay thành Software Developer
+      duration: '02/2023 - now',
+      details: [
+        'Developed and maintained web applications using React, Node.js, and Express.',
+        'Collaborated with front-end and back-end teams to deliver high-quality software.',
+        'Optimized application performance, reducing load times by 25%.'
       ]
     }
   ],

@@ -377,7 +377,7 @@ import { reactive, ref, watch, nextTick } from 'vue'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
 import domtoimage from 'dom-to-image'
-import defaultAvatar from '@/assets/avatar-default.svg'
+import defaultAvatar from '@/assets/profile-avatar5.png'
 
 const props = defineProps({ isEditable: Boolean })
 
@@ -394,14 +394,15 @@ watch(
 
 const data = reactive({
   personal_info: {
-    name: 'Nguyễn Văn A',
+    name: 'Nguyễn Thành Nam',
+    photo: defaultAvatar,
     job_title: 'Full Stack Developer', // Chức vụ thay thành Full Stack Developer
     summary:
       'Full Stack Developer with 4 years of experience in developing web applications using JavaScript, Node.js, React, and modern web technologies. Proficient in both front-end and back-end development, database management, and API design.',
     contact: {
       email: 'nguyen.a@itcompany.vn', // Thay đổi email thành một email chuyên nghiệp
       phone: '(024) 6680 5588',
-      website: 'https://github.com/nguyenvana', // Thay đổi link website thành GitHub của lập trình viên
+      website: 'https://github.com/nguyenthanhnam', // Thay đổi link website thành GitHub của lập trình viên
       address: 'District A, Hanoi'
     }
   },

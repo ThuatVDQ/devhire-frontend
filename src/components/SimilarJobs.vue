@@ -20,7 +20,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="container lg:mt-24 mt-16 bg-white">
+  <div class="lg:mt-24 mt-16 bg-slate-50">
     <div class="grid grid-cols-1 pb-8 text-center">
       <h3 class="mb-4 md:text-[26px] md:leading-normal text-2xl leading-normal font-semibold">
         Related Vacancies

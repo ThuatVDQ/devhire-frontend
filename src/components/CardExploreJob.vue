@@ -1,9 +1,13 @@
+<script setup lang="ts">
+import { RouterLink } from 'vue-router'
+</script>
+
 <template>
   <div class="container-fluid md:mt-12">
     <div class="container">
       <div class="grid grid-cols-1">
         <div
-          class="relative overflow-hidden lg:px-8 px-6 py-10 rounded-xl shadow-lg dark:shadow-gray-700"
+          class="relative overflow-hidden bg-white lg:px-8 px-6 py-10 rounded-xl shadow-lg dark:shadow-gray-700"
         >
           <div class="grid md:grid-cols-12 grid-cols-1 items-center gap-[30px]">
             <div class="lg:col-span-8 md:col-span-7">
@@ -21,13 +25,14 @@
               <div
                 class="relative z-1 flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-2"
               >
-                <a
+                <RouterLink
+                  to="/jobs"
                   class="btn bg-emerald-600 hover:bg-emerald-700 border-emerald-600 dark:border-emerald-600 text-white rounded-md border-1 inline-block text-[15px] font-semibold tracking-[.025em] leading-[28px] px-5 py-1"
                   href=""
-                  >Apply Now</a
-                >
+                  >Apply Now
+                </RouterLink>
                 <a
-                  class="btn bg-emerald-600/5 hover:bg-emerald-600 border-emerald-600/10 hover:border-emerald-600 text-emerald-600 hover:text-white rounded-md border-1 inline-block text-[15px] font-semibold tracking-[.025em] leading-[28px] px-5 py-1"
+                  class="btn cursor-pointer bg-emerald-600/5 hover:bg-emerald-600 border-emerald-600/10 hover:border-emerald-600 text-emerald-600 hover:text-white rounded-md border-1 inline-block text-[15px] font-semibold tracking-[.025em] leading-[28px] px-5 py-1"
                   >Learn More</a
                 >
               </div>

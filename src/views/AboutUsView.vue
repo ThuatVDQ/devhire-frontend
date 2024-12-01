@@ -1,6 +1,7 @@
 <script setup>
 import Card from '../components//Card.vue'
 import CardExploreJob from '../components/CardExploreJob.vue'
+import { RouterLink } from 'vue-router'
 
 // Counter data
 const counterItems = [
@@ -126,13 +127,12 @@ const faqs = [
               </li>
             </ul>
             <div class="mt-6">
-              <button
-                class="px-6 py-2 rounded-md bg-emerald-600 hover:bg-emerald-700 border-emerald-600 hover:border-emerald-700 text-white"
-                type="submit"
+              <RouterLink
+                to="/contact"
+                class="btn bg-emerald-600 hover:bg-emerald-700 border-emerald-600 hover:border-emerald-700 text-white mt-2 rounded-md inline-flex items-center px-4 py-2"
               >
-                <i class="pi pi-envelope mr-2"></i>
-                Contact us
-              </button>
+                <i class="pi pi-envelope pr-1"></i>Contact us
+              </RouterLink>
             </div>
           </div>
         </div>

@@ -234,6 +234,7 @@
                 <i class="pi pi-trash"></i> Remove
               </button>
             </div>
+            <div class="flex-1 border-b border-gray-800 my-2"></div>
           </li>
           <button v-if="isEdit" @click="addExperience" class="text-emerald-800 rounded float-right">
             <i class="pi pi-plus-circle"></i> Add Experience
@@ -256,7 +257,7 @@ import { reactive, ref, watch, nextTick } from 'vue'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
 import domtoimage from 'dom-to-image'
-import defaultAvatar from '@/assets/avatar-default.svg'
+import defaultAvatar from '@/assets/profile-avatar2.png'
 
 // Dữ liệu
 const template = ref(null)
@@ -275,7 +276,7 @@ watch(
 
 const data = reactive({
   personal_info: {
-    name: 'Nguyễn Văn A',
+    name: 'Nguyễn Thuỳ Linh',
     job_title: 'Software Developer', // Chức vụ thay thành Software Developer
     summary:
       'Software developer with 3 years of experience in developing web applications using modern technologies like JavaScript, React, and Node.js. Proficient in both front-end and back-end development, with strong problem-solving skills.',
@@ -299,6 +300,16 @@ const data = reactive({
       company: 'Tech Solutions Inc.', // Công ty thay thành công ty công nghệ
       title: 'Software Developer', // Chức danh thay thành Software Developer
       duration: '08/2020 - 08/2022',
+      details: [
+        'Developed and maintained web applications using React, Node.js, and Express.',
+        'Collaborated with front-end and back-end teams to deliver high-quality software.',
+        'Optimized application performance, reducing load times by 25%.'
+      ]
+    },
+    {
+      company: 'Intel Inc.', // Công ty thay thành công ty công nghệ
+      title: 'Software Developer', // Chức danh thay thành Software Developer
+      duration: '02/2023 - now',
       details: [
         'Developed and maintained web applications using React, Node.js, and Express.',
         'Collaborated with front-end and back-end teams to deliver high-quality software.',
