@@ -13,7 +13,7 @@
             ? 'bg-blue-600 text-white border-blue-600'
             : 'bg-white text-gray-700 border-gray-300'
         ]"
-        class="cursor-pointer px-4 py-1 rounded-full text-sm w-24 text-center"
+        class="cursor-pointer px-4 py-1 rounded-full text-sm w-24 text-center border"
       >
         {{ filter.label }}
       </span>
@@ -28,7 +28,7 @@
             ? 'bg-blue-600 text-white border-blue-600'
             : 'bg-white text-gray-700 border-gray-300'
         ]"
-        class="cursor-pointer px-4 py-1 rounded-full text-sm w-24 text-center"
+        class="cursor-pointer px-4 py-1 rounded-full text-sm w-24 text-center border"
       >
         {{ filter.label }}
       </span>
@@ -67,7 +67,7 @@
         <p class="text-gray-500 text-lg text-center">No results found. Please try again.</p>
       </div>
       <table v-else class="min-w-full bg-white">
-        <thead class="bg-gray-50">
+        <thead class="bg-gray-100">
           <tr>
             <th class="text-gray-500"></th>
             <th class="py-3 text-left text-xs font-medium text-gray-500 uppercase">Job Title</th>
@@ -115,7 +115,13 @@
             </td>
             <td class="py-4 px-6 text-sm text-gray-700">{{ job.type }}</td>
             <td class="py-4 px-6 text-sm text-gray-700">
-              {{ job.salary_start }} - {{ job.salary_end }} {{ job.currency }}
+              {{
+                job.salary_start && job.salary_end
+                  ? job.salary_start > 1000000 && job.salary_end > 1000000
+                    ? `${(job.salary_start / 1000000).toFixed(1)} - ${(job.salary_end / 1000000).toFixed(1)}Tr ${job.currency}`
+                    : `${job.salary_start} - ${job.salary_end} ${job.currency}`
+                  : 'Negotiable'
+              }}
             </td>
             <td class="py-4 px-6 text-sm text-gray-700">
               <div class="flex items-center justify-start space-x-2">
@@ -134,7 +140,7 @@
                 <div v-else class="text-sm text-gray-400">No applications</div>
               </div>
             </td>
-            <td class="py-4 px-6 text-sm text-gray-700">
+            <td class="py-4 px-2 text-sm text-gray-700">
               <div
                 v-if="job.status !== 'OPEN' && job.status !== 'HOT'"
                 @click="goToEditJob(job.id)"

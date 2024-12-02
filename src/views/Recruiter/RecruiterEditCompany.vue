@@ -1,6 +1,6 @@
 <template>
   <div class="container mx-auto p-4">
-    <div v-if="!isCompanyExist && !isSigningUp" class="text-center bg-gray-100 p-4 rounded-lg">
+    <div v-if="!isCompanyExist && !isSigningUp" class="text-center bg-white p-4 rounded-lg">
       <p class="text-red-700 text-lg">There is currently no registered company in the system.</p>
       <button
         @click="isSigningUp = true"
@@ -11,7 +11,7 @@
     </div>
 
     <!-- Form Đăng Ký hoặc Chỉnh Sửa Công Ty -->
-    <form v-else @submit.prevent="handleSubmit" class="bg-gray-100 rounded-lg p-4">
+    <form v-else @submit.prevent="handleSubmit" class="bg-white rounded-lg p-4">
       <div class="flex items-center">
         <div class="relative inline-block">
           <img

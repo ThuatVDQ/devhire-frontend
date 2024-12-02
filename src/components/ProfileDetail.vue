@@ -61,6 +61,40 @@ const fetchCV = async () => {
   }
 }
 
+async function downloadCV(cvId, job_title) {
+  try {
+    const response = await axios.get(`http://localhost:8090/api/cv/${cvId}/download`, {
+      responseType: 'blob',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+
+    const url = window.URL.createObjectURL(new Blob([response.data]))
+    const link = document.createElement('a')
+    link.href = url
+
+    const contentDisposition = response.headers['content-disposition']
+    console.log('contentDisposition:', contentDisposition)
+
+    let fileName = ``
+    if (contentDisposition && contentDisposition.includes('filename=')) {
+      fileName = contentDisposition.split('filename=')[1].split(';')[0].trim().replace(/"/g, '')
+    }
+    const fileExtension = fileName.split('.').pop()
+    fileName = `CV_${job_title}.${fileExtension}`
+    link.setAttribute('download', fileName)
+    document.body.appendChild(link)
+    link.click()
+
+    // Xóa URL sau khi hoàn tất tải xuống để giải phóng bộ nhớ
+    window.URL.revokeObjectURL(url)
+    document.body.removeChild(link)
+  } catch (error) {
+    toastr.error('Error downloading CV:', error)
+  }
+}
+
 onMounted(() => {
   fetchDataUser()
   fetchCV()
@@ -115,12 +149,13 @@ const openPopup = () => {
             <div
               v-for="(cv, index) in data.cv"
               :key="index"
-              class="cv-item p-4 bg-white dark:bg-gray-700 rounded-lg shadow-md"
+              class="cv-item p-4 bg-white dark:bg-gray-700 rounded-lg shadow-md mb-4"
             >
               <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
                 {{ cv.job_title }}
               </h3>
               <button
+                @click="downloadCV(cv.cv_id, cv.job_title)"
                 class="mt-2 inline-block px-4 py-2 bg-blue-500 text-white rounded-md shadow-md hover:bg-blue-600"
               >
                 Download CV

@@ -146,7 +146,7 @@ onBeforeUnmount(() => {
         <slot />
       </main>
       <!-- Content Area -->
-      <div class="flex-1 bg-gray-100 overflow-y-auto">
+      <div class="flex-1 bg-white overflow-y-auto">
         <RouterView />
       </div>
     </div>

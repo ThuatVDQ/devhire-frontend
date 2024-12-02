@@ -1,5 +1,5 @@
 <template>
-  <header class="mb-6">
+  <header class="">
     <h1 class="text-3xl font-semibold text-white bg-blue-700 px-11 py-10">Dashboard</h1>
   </header>
   <section class="p-11 bg-gray-100 min-h-screen">
