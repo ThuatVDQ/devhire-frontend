@@ -7,7 +7,8 @@ import 'toastr/build/toastr.min.css'
 import EditAvatar from '@/components/EditAvatar.vue'
 
 const data = reactive({
-  user: {}
+  user: {},
+  cv: {}
 })
 
 const showAvatarPopup = ref(false)
@@ -46,8 +47,23 @@ const updateUserInf = async () => {
   }
 }
 
+const fetchCV = async () => {
+  try {
+    const response = await axios.get('http://localhost:8090/api/users/getApplications', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    console.log(response.data)
+    data.cv = response.data.applications
+  } catch (e) {
+    console.error(e)
+  }
+}
+
 onMounted(() => {
   fetchDataUser()
+  fetchCV()
   const message = sessionStorage.getItem('message')
 
   if (message) {
@@ -94,51 +110,21 @@ const openPopup = () => {
             </div>
           </div>
           <div
-            class="mt-3 bg-slate-50 dark:bg-slate-800 rounded-md shadow dark:shadow-gray-700 p-6"
+            class="mt-3 bg-slate-50 dark:bg-slate-800 rounded-md shadow dark:shadow-gray-700 p-3"
           >
-            <div class="flex justify-between mt-3">
-              <span class="text-slate-600 font-medium">Social: </span>
-              <ul class="list-none ltr:text-right rtl:text-left space-x-0.5">
-                <li class="inline">
-                  <a
-                    class="p-2 border-2 border-gray-200 dark:border-gray-700 rounded-md hover:border-emerald-600 dark:hover:border-emerald-600 hover:bg-emerald-600 dark:hover:bg-emerald-600 hover:text-white dark:text-white text-slate-400"
-                    :href="data.user.facebook_url"
-                  >
-                    <i class="pi pi-facebook"></i>
-                  </a>
-                </li>
-                <li class="inline">
-                  <a
-                    class="p-2 border-2 border-gray-200 dark:border-gray-700 rounded-md hover:border-emerald-600 dark:hover:border-emerald-600 hover:bg-emerald-600 dark:hover:bg-emerald-600 hover:text-white dark:text-white text-slate-400"
-                    :href="data.user.linkedin_url"
-                  >
-                    <i class="pi pi-linkedin"></i>
-                  </a>
-                </li>
-                <li class="inline">
-                  <a
-                    class="p-2 border-2 border-gray-200 dark:border-gray-700 rounded-md hover:border-emerald-600 dark:hover:border-emerald-600 hover:bg-emerald-600 dark:hover:bg-emerald-600 hover:text-white dark:text-white text-slate-400"
-                    :href="data.user.github_url"
-                  >
-                    <i class="pi pi-github"></i>
-                  </a>
-                </li>
-              </ul>
-            </div>
             <div
-              class="mt-3 w-full bg-white dark:bg-slate-900 p-3 rounded-md shadow dark:shadow-gray-700"
+              v-for="(cv, index) in data.cv"
+              :key="index"
+              class="cv-item p-4 bg-white dark:bg-gray-700 rounded-lg shadow-md"
             >
-              <div class="flex items-center mb-3">
-                <i class="pi pi-file"></i>
-                <span class="font-medium ms-2">{{ data.user.resume }}</span>
-              </div>
-              <a
-                class="p-2 bg-emerald-600 hover:bg-emerald-700 border-emerald-600 dark:border-emerald-600 text-white rounded-md w-full flex items-center justify-center"
-                :href="data.user.resume"
-                target="_blank"
+              <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
+                {{ cv.job_title }}
+              </h3>
+              <button
+                class="mt-2 inline-block px-4 py-2 bg-blue-500 text-white rounded-md shadow-md hover:bg-blue-600"
               >
-                <i class="pi pi-file"></i>Download CV
-              </a>
+                Download CV
+              </button>
             </div>
           </div>
         </div>

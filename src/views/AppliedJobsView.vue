@@ -39,7 +39,6 @@ const fetchData = async (page = 0) => {
     })
     totalPages.value = response.data.totalPages
     currentPage.value = page
-    console.log('Favorite jobs:', jobs.value)
   } catch (error) {
     console.error('Error fetching favorite jobs:', error)
   } finally {
