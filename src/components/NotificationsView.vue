@@ -30,6 +30,13 @@
           v-if="!notification.is_read"
           class="w-3 h-3 bg-blue-500 rounded-full flex-shrink-0 ml-2"
         ></div>
+        <button
+          v-if="notification.is_read"
+          @click.stop="deleteNotification(notification.id)"
+          class="text-red-500 ml-2"
+        >
+          <i class="pi pi-times"></i>
+        </button>
       </li>
     </ul>
     <div v-if="notifications.length === 0" class="text-center text-gray-500 py-4">
@@ -49,7 +56,7 @@ const formatTimeAgo = (dateString) => {
 }
 
 // Props
-defineProps({
+const props = defineProps({
   notifications: {
     type: Array,
     required: true,
@@ -68,8 +75,6 @@ const markAsRead = async (notification) => {
         }
       }
     )
-
-    console.log('Response:', response.data)
 
     // Cập nhật trạng thái "đã đọc" của thông báo
     if (notification) {
@@ -95,12 +100,30 @@ const markAllAsRead = async (notifications) => {
       }
     )
 
-    console.log('Response:', response.data)
     for (const notification of notifications) {
       notification.is_read = true
     }
   } catch (error) {
     console.error('Error marking all notifications as read:', error)
+  }
+}
+
+const deleteNotification = async (notificationId) => {
+  try {
+    const token = localStorage.getItem('token')
+    await axios.delete(`http://localhost:8090/api/notifications/${notificationId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    const index = props.notifications.findIndex(
+      (notification) => notification.id === notificationId
+    )
+    if (index !== -1) {
+      props.notifications.splice(index, 1) // Xóa thông báo trong mảng
+    }
+  } catch (error) {
+    console.error('Error deleting notification:', error)
   }
 }
 </script>

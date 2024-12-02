@@ -30,8 +30,6 @@ const fetchNotifications = async () => {
     })
 
     notifications.value = response.data || []
-    console.log(notifications.value)
-    console.log(response.data)
   } catch (error) {
     console.error('Error fetching notifications:', error)
   }
