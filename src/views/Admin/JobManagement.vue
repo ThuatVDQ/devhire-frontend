@@ -105,7 +105,7 @@
             </th>
             <th class="py-3 px-6">Title</th>
             <th class="py-3 px-6">Company</th>
-            <th class="py-3 px-6">Created At</th>
+            <th class="py-3 px-6">Deadline</th>
             <th class="py-3 px-6">Location</th>
             <th class="py-3 px-6">Status</th>
             <th class="py-3 px-6">Actions</th>
@@ -263,7 +263,7 @@ const toggleTypeFilter = (status) => {
 const jobs = ref([])
 const currentPage = ref(0)
 const totalPages = ref(1)
-const pageSize = ref(5) // Số lượng công việc mỗi trang
+const pageSize = ref(10) // Số lượng công việc mỗi trang
 const selectAllCheckbox = ref(false)
 const isLoading = ref(false)
 const selectedJobIds = ref([])

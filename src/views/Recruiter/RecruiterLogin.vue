@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import VerifyCodeView from './../VerifyCodeView.vue'
 import LoginWithGoogle from '@/components/LoginWithGoogle.vue'

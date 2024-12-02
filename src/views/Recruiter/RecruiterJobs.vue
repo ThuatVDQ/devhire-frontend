@@ -217,7 +217,7 @@ const jobs = ref([]) // Store job data
 const searchQuery = ref('') // Store search query
 const currentPage = ref(0) // Current page
 const totalPages = ref(0)
-const pageSize = ref(3)
+const pageSize = ref(10)
 
 const selectedStatus = ref('')
 const statusFilters = ref([

@@ -136,8 +136,8 @@ const fetchMonthlyJobs = async () => {
       labels: labels,
       datasets: [
         {
-          label: 'Applications',
-          backgroundColor: '#2196F3',
+          label: 'Jobs',
+          backgroundColor: '#4CAF50',
           data: data
         }
       ]

@@ -62,7 +62,7 @@ const scrollToTop = () => {
 }
 </script>
 <template>
-  <div class="container py-24">
+  <div class="container py-24 bg-gray-100">
     <div class="bg-gradient-to-r from-green-500 to-green-700 rounded-t-lg p-6 text-white">
       <h2 class="text-2xl font-bold">Favorite Jobs</h2>
       <p class="mt-2">
@@ -89,7 +89,7 @@ const scrollToTop = () => {
       </div>
     </div>
 
-    <div v-else class="bg-gray-200 rounded-b-lg">
+    <div v-else class="rounded-b-lg">
       <div class="grid lg:grid-cols-2 md:grid-cols-2 grid-cols-1 mt-8 gap-[30px] auto-rows-fr">
         <CardJob v-for="job in jobs" :key="job.id" :job="job" />
       </div>

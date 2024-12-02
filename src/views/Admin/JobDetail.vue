@@ -71,18 +71,45 @@
   <div v-if="job" class="lg:grid lg:grid-cols-12 gap-8 p-10">
     <!-- Main Job Description Section -->
     <div class="lg:col-span-8">
-      <h5 class="text-lg font-semibold mt-6">Job Description:</h5>
-      <p class="mt-4" style="white-space: pre-line; word-break: break-word; text-align: justify">
+      <h5 class="text-lg font-semibold">Job Description:</h5>
+      <p
+        class="mt-4 p-4 bg-white dark:bg-slate-900 rounded-md shadow dark:shadow-gray-700"
+        style="
+          white-space: pre-line;
+          word-break: break-word;
+          text-align: justify;
+          border-radius: 12px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        "
+      >
         {{ job.description }}
       </p>
 
       <h5 class="text-lg font-semibold mt-16">Requirements:</h5>
-      <p class="mt-4" style="white-space: pre-line; word-break: break-word; text-align: justify">
+      <p
+        class="mt-4 p-4 bg-white dark:bg-slate-900 rounded-md shadow dark:shadow-gray-700"
+        style="
+          white-space: pre-line;
+          word-break: break-word;
+          text-align: justify;
+          border-radius: 12px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        "
+      >
         {{ job.requirement }}
       </p>
 
       <h5 class="text-lg font-semibold mt-16">Benefits:</h5>
-      <p class="mt-4" style="white-space: pre-line; word-break: break-word; text-align: justify">
+      <p
+        class="mt-4 p-4 bg-white dark:bg-slate-900 rounded-md shadow dark:shadow-gray-700"
+        style="
+          white-space: pre-line;
+          word-break: break-word;
+          text-align: justify;
+          border-radius: 12px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        "
+      >
         {{ job.benefit }}
       </p>
     </div>
@@ -145,7 +172,9 @@
                 <span class="text-emerald-600 font-medium text-sm">
                   {{
                     job.salary_start && job.salary_end
-                      ? `${job.salary_start} - ${job.salary_end} ${job.currency}`
+                      ? job.salary_start > 1000000 && job.salary_end > 1000000
+                        ? `${(job.salary_start / 1000000).toFixed(1)}Tr - ${(job.salary_end / 1000000).toFixed(1)}Tr ${job.currency}`
+                        : `${job.salary_start} - ${job.salary_end} ${job.currency}`
                       : 'Negotiable'
                   }}
                 </span>

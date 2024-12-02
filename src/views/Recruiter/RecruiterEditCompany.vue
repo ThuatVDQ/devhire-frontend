@@ -284,10 +284,11 @@ const uploadImages = async () => {
 
   // Thêm danh sách ảnh cũ
   formData.append('oldImages', JSON.stringify(oldImages.value))
+  console.log(oldImages.value)
 
   // Thêm các file ảnh mới
   newImages.value.forEach((imageObj) => {
-    formData.append('newImages', imageObj.file) // Chỉ gửi `file` từ đối tượng { file, base64 }
+    formData.append('newImages', imageObj.file)
   })
 
   try {

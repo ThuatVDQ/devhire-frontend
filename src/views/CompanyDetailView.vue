@@ -290,7 +290,7 @@ watch(
                 :src="state.company.images[state.currentImageIndex]"
                 alt="Company Image"
                 class="rounded-md"
-                :style="{ height: '600px' }"
+                :style="{ height: '600px', width: 'auto' }"
               />
 
               <!-- Nút mũi tên trái -->

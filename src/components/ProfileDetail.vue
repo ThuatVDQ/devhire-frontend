@@ -21,6 +21,7 @@ async function fetchDataUser() {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     })
+    console.log(response.data)
     data.user = response.data
     if (data.user.avatar_url) {
       currentAvatar.value = `http://localhost:8090/uploads/${data.user.avatar_url}`

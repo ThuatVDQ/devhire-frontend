@@ -16,6 +16,7 @@
             <th class="py-3 px-6">Phone</th>
             <th class="py-3 px-6">Address</th>
             <th class="py-3 px-6">Scale</th>
+            <th class="py-3 px-6">Total Jobs</th>
           </tr>
         </thead>
         <tbody class="text-gray-700 text-base">
@@ -24,12 +25,12 @@
             :key="company.id"
             class="border-b border-gray-200 hover:bg-gray-100"
           >
-            <td class="py-3 px-6 flex items-center">
+            <td class="py-3 px-6 overflow-hidden text-ellipsis">
               <img
                 :src="`http://localhost:8090/uploads/${company.logo}`"
                 alt="Logo"
                 @error="(e) => (e.target.src = defaultAvatar)"
-                class="w-6 h-6 rounded-full mr-2"
+                class="w-10 h-10 rounded-full mr-2"
               />
               <span class="cursor-pointer" @click="goToDetail(company.id)">{{ company.name }}</span>
             </td>
@@ -37,6 +38,7 @@
             <td class="py-3 px-6">{{ company.phone }}</td>
             <td class="py-3 px-6">{{ company.address }}</td>
             <td class="py-3 px-6">{{ company.scale }}</td>
+            <td class="py-3 px-6">{{ company.totalJob }}</td>
           </tr>
         </tbody>
       </table>
@@ -117,7 +119,6 @@ const fetchCompanies = async (page = 0) => {
         Authorization: 'Bearer ' + localStorage.getItem('token')
       }
     })
-
     // Update state
     companies.value = response.data.companies
     totalPages.value = response.data.totalPages

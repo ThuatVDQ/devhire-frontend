@@ -652,7 +652,7 @@ async function fetchCategories() {
                         class="w-full px-5 py-3 border-b border-gray-200 outline-none focus:border-green-500"
                       />
 
-                      <ul class="max-h-48 overflow-y-auto">
+                      <ul class="max-h-32 overflow-y-auto">
                         <li
                           v-for="city in filteredCities"
                           :key="city.code"

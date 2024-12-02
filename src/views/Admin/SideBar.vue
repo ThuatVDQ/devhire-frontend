@@ -65,6 +65,14 @@
               {{ unreadCount }}
             </span>
           </RouterLink>
+
+          <span
+            @click="logout"
+            class="flex items-center p-2 rounded transition duration-200 hover:bg-gray-700 cursor-pointer hover:text-red-700"
+          >
+            <i class="pi pi-sign-out mr-3"></i>
+            <span>Log Out</span>
+          </span>
         </nav>
       </div>
     </div>
@@ -79,6 +87,7 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { initializeWebSocket, disconnectWebSocket } from '@/utils/websocket'
+import { useRouter, RouterLink } from 'vue-router'
 import axios from 'axios'
 
 const isCollapsed = ref(false) // Trạng thái của sidebar
@@ -127,6 +136,13 @@ const handleNewNotification = () => {
 
 const viewNotifications = () => {
   newNotification.value = false // Khi xem thông báo, đặt cờ về false
+}
+const router = useRouter()
+const logout = () => {
+  // Xóa token và username khỏi localStorage
+  localStorage.removeItem('token')
+  localStorage.removeItem('username')
+  router.push('/admin/login') // Thay đổi đường dẫn đăng nhập nếu cần
 }
 
 onMounted(() => {
