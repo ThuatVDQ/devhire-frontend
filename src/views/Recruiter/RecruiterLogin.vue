@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import VerifyCodeView from './../VerifyCodeView.vue'
+import ResetPassword from '@/components/ResetPassword.vue'
 import LoginWithGoogle from '@/components/LoginWithGoogle.vue'
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
@@ -17,27 +18,44 @@ const form = ref({
 const showPassword = ref(false)
 const showVerifyPopup = ref(false)
 
-const openVerifyPopup = async () => {
+const showResetPasswordPopup = ref(false)
+const currentMessageType = ref('')
+
+const openVerifyPopup = async (messageType) => {
+  currentMessageType.value = messageType
   if (!form.value.phone) {
     toastr.error('Please enter your email address.')
     return
   }
+  isSubmitting.value = true
   try {
-    const response = await axios.post(
-      'http://localhost:8090/api/users/resend?email=' + form.value.phone
-    )
+    const endpoint = `http://localhost:8090/api/users/resend?email=${form.value.phone}`
+
+    const response = await axios.post(endpoint)
 
     if (response.status === 200) {
       showVerifyPopup.value = true
     }
   } catch (error) {
     toastr.error(error.response.data, 'Error')
+  } finally {
+    isSubmitting.value = false
   }
 }
 
 function onVerified() {
-  toastr.success('Enable successful!')
-  showVerifyPopup.value = false
+  if (currentMessageType.value === 'forgotPassword') {
+    showVerifyPopup.value = false
+    showResetPasswordPopup.value = true
+  } else {
+    toastr.success('Enable successful!')
+    showVerifyPopup.value = false
+  }
+}
+
+function onPasswordReset() {
+  toastr.success('Password reset successful!')
+  showResetPasswordPopup.value = false // Đóng popup đặt lại mật khẩu
 }
 
 const togglePasswordVisibility = () => {
@@ -152,7 +170,12 @@ onMounted(() => {})
                 <div class="flex justify-between mb-4">
                   <div class="inline-flex items-center mb-0"></div>
                   <p class="text-slate-400 mb-0">
-                    <a href="" class="text-slate-400">Forgot password?</a>
+                    <a
+                      href="#"
+                      @click.prevent="openVerifyPopup('forgotPassword')"
+                      class="text-slate-400"
+                      >Forgot password?</a
+                    >
                   </p>
                 </div>
                 <div class="mb-4">
@@ -169,7 +192,11 @@ onMounted(() => {})
                   />
                 </div>
                 <div class="mb-4 text-center">
-                  <button @click="openVerifyPopup" type="button" class="text-blue-500 underline">
+                  <button
+                    @click="openVerifyPopup('enableAccount')"
+                    type="button"
+                    class="text-blue-500 underline"
+                  >
                     Enable Account
                   </button>
                 </div>
@@ -211,7 +238,15 @@ onMounted(() => {})
   <VerifyCodeView
     :show="showVerifyPopup"
     :email="form.phone"
+    :messageType="currentMessageType"
     @close="showVerifyPopup = false"
     @verified="onVerified"
+  />
+
+  <ResetPassword
+    :show="showResetPasswordPopup"
+    :email="form.phone"
+    @close="showResetPasswordPopup = false"
+    @passwordReset="onPasswordReset"
   />
 </template>
