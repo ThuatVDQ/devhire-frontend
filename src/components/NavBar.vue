@@ -70,7 +70,7 @@ onMounted(() => {
 
 <template>
   <header class="bg-white shadow-lg">
-    <nav class="container py-4 flex justify-between items-center mx-0">
+    <nav class="container py-4 flex justify-between items-center">
       <RouterLink to="/" class="flex items-center">
         <img src="@/assets/logo.svg" alt="DevHire Logo" class="w-12 h-12" />
         <h1 class="ml-2 text-2xl font-bold text-green-600">DevHire</h1>

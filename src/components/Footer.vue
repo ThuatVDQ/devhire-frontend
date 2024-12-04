@@ -20,7 +20,7 @@
                   <li class="inline-block">
                     <a
                       class="text-gray-300 hover:text-gray-400 duration-500 ease-in-out font-medium me-4"
-                      href="/index"
+                      href="/"
                       >Home</a
                     >
                   </li>
@@ -33,15 +33,16 @@
                   </li>
                   <li class="inline-block mt-[10px] md:mt-0">
                     <a
+                      @click.prevent="showLoginPrompt"
                       class="text-gray-300 hover:text-gray-400 duration-500 ease-in-out font-medium me-4"
-                      href="/index-three"
+                      href="#"
                       >Create a job</a
                     >
                   </li>
                   <li class="inline-block mt-[10px] md:mt-0">
                     <a
                       class="text-gray-300 hover:text-gray-400 duration-500 ease-in-out font-medium me-4"
-                      href="/aboutus"
+                      href="/about"
                       >About us</a
                     >
                   </li>
@@ -68,7 +69,7 @@
               <i class="text-red-600"></i> by <a class="text-reset" href="" target="_blank">aa</a>.
             </p>
           </div>
-          <ul class="list-none ltr:md:text-right rtl:md:text-left text-center space-x-0.5">
+          <!-- <ul class="list-none ltr:md:text-right rtl:md:text-left text-center space-x-0.5">
             <li class="inline">
               <a
                 class="btn btn-icon btn-sm border-2 border-gray-800 dark:border-gray-700 rounded-md hover:border-emerald-600 dark:hover:border-emerald-600 hover:bg-emerald-600 dark:hover:bg-emerald-600 text-white"
@@ -124,9 +125,17 @@
                 href=""
               ></a>
             </li>
-          </ul>
+          </ul> -->
         </div>
       </div>
     </div>
   </footer>
 </template>
+<script setup>
+import toastr from 'toastr'
+import 'toastr/build/toastr.min.css'
+
+const showLoginPrompt = () => {
+  toastr.info('Please log in as an employer to create a job.', 'Login Required')
+}
+</script>

@@ -190,6 +190,16 @@ const routes = [
         ]
       },
       {
+        path: 'about',
+        name: 'recruiter-about',
+        component: AboutUsView
+      },
+      {
+        path: 'contact',
+        name: 'recruiter-contact',
+        component: ContactView
+      },
+      {
         path: 'request-quote',
         name: 'pricing',
         component: PricingView

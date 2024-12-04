@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import Footer from '@/components/Footer.vue'
+import RecruiterFooter from '@/components/RecruiterFooter.vue'
 import { RouterView } from 'vue-router'
 import { initializeWebSocket, disconnectWebSocket } from '@/utils/websocket'
 import axios from 'axios'
@@ -16,7 +17,8 @@ const menuItems = [
   { name: 'Post Job', path: '/recruiter/post-job', icon: 'pi pi-plus' },
   { name: 'Jobs', path: '/recruiter/jobs', icon: 'pi pi-briefcase' },
   { name: 'Settings', path: '/recruiter/settings/profile', icon: 'pi pi-cog' },
-  { name: 'Notifications', path: '/recruiter/notifications', icon: 'pi pi-bell' }
+  { name: 'Notifications', path: '/recruiter/notifications', icon: 'pi pi-bell' },
+  { name: 'Contact Us', path: '/recruiter/contact', icon: 'pi pi-envelope' }
 ]
 
 // Lọc menuItems theo từ khóa tìm kiếm
@@ -156,7 +158,7 @@ onBeforeUnmount(() => {
       <!-- Sidebar Placeholder -->
       <div :class="isCollapsed ? 'w-0' : 'w-64'"></div>
       <!-- Thay đổi chiều rộng theo Sidebar -->
-      <Footer class="flex-1 bg-gray-800 text-white text-center py-4" />
+      <RecruiterFooter class="flex-1 bg-gray-800 text-white text-center py-4" />
     </div>
   </div>
 </template>
