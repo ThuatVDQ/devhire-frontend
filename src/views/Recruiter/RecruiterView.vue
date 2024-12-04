@@ -5,6 +5,19 @@ import RecruiterFooter from '@/components/RecruiterFooter.vue'
 import { RouterView } from 'vue-router'
 import { initializeWebSocket, disconnectWebSocket } from '@/utils/websocket'
 import axios from 'axios'
+import toastr from 'toastr'
+import 'toastr/build/toastr.min.css'
+
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+onMounted(() => {
+  const token = localStorage.getItem('token')
+  if (!token || token === 'null') {
+    toastr.error('Please login to access this page', 'Error')
+    router.push('/recruiter/login')
+  }
+})
 
 const isCollapsed = ref(false) // Trạng thái thu hẹp/mở rộng của sidebar
 const toggleSidebar = () => {
