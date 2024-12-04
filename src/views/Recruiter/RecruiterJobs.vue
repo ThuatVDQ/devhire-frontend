@@ -401,7 +401,6 @@ async function downloadCVs(jobId, title) {
     link.click()
     window.URL.revokeObjectURL(url)
     document.body.removeChild(link)
-    toastr.success('Download successful!')
   } catch (error) {
     console.error('Error downloading CVs:', error)
     toastr.error('Download failed. Please try again.')

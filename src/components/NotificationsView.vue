@@ -85,7 +85,6 @@ const markAsRead = async (notification) => {
   }
 }
 const markAllAsRead = async (notifications) => {
-  console.log('Marking all notifications as read...', notifications[0].is_read)
   try {
     const token = localStorage.getItem('token') // Lấy token từ localStorage
 
@@ -99,7 +98,6 @@ const markAllAsRead = async (notifications) => {
         }
       }
     )
-
     for (const notification of notifications) {
       notification.is_read = true
     }
