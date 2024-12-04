@@ -373,4 +373,38 @@ const scrollToTop = () => {
     behavior: 'smooth'
   })
 }
+
+async function downloadCVs(jobId, title) {
+  try {
+    const response = await axios.get(
+      `http://localhost:8090/api/job-application/${jobId}/download-cv`,
+      {
+        responseType: 'blob',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      }
+    )
+    const url = window.URL.createObjectURL(new Blob([response.data]))
+    const link = document.createElement('a')
+    link.href = url
+    const contentDisposition = response.headers['content-disposition']
+    let fileName = ``
+    if (contentDisposition && contentDisposition.includes('filename=')) {
+      fileName = contentDisposition.split('filename=')[1].split(';')[0].trim().replace(/"/g, '')
+    }
+    const fileNameWithoutExtension = fileName.split('.').slice(0, -1).join('.')
+    const fileExtension = fileName.split('.').pop()
+    fileName = `${fileNameWithoutExtension}_${title}.${fileExtension}`
+    link.setAttribute('download', fileName)
+    document.body.appendChild(link)
+    link.click()
+    window.URL.revokeObjectURL(url)
+    document.body.removeChild(link)
+    toastr.success('Download successful!')
+  } catch (error) {
+    console.error('Error downloading CVs:', error)
+    toastr.error('Download failed. Please try again.')
+  }
+}
 </script>

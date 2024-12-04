@@ -336,56 +336,6 @@ function validateForm() {
   return isValid
 }
 
-async function submitForm() {
-  if (!validateForm()) {
-    return
-  }
-
-  try {
-    const data = {
-      title: details.title,
-      description: inf.description,
-      salary_start: inf.salaryStart,
-      salary_end: inf.salaryEnd,
-      type: inf.type,
-      currency: inf.currency,
-      experience: inf.experience,
-      position: inf.position,
-      level: inf.level,
-      requirement: inf.requirements,
-      benefit: inf.benefits,
-      deadline: inf.selectedDate,
-      slots: inf.slots,
-      category: {
-        id: details.selectedCategoryId
-      },
-      addresses: address.addresses.map((addr) => ({
-        country: 'Việt Nam',
-        street: addr.street,
-        city: addr.selectedCityName,
-        district: addr.selectedDistrictName
-      })),
-      skills: inf.skills.map((skill) => ({
-        name: skill.name
-      }))
-    }
-    console.log(data)
-
-    const response = await axios.post('http://localhost:8090/api/jobs', data, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
-    })
-    toastr.success(response.data, 'Success')
-    setTimeout(() => {
-      window.location.href = '/recruiter/jobs'
-    }, 1000)
-  } catch (error) {
-    console.error()
-    toastr.error(JSON.stringify(error.response.data), 'Error')
-  }
-}
-
 function handleSubmit() {
   if (!validateForm()) {
     return
