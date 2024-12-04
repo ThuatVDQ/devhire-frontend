@@ -232,7 +232,7 @@ function formatSalary(amount) {
     <a
       v-if="job.is_favorite !== null"
       :class="[
-        'h-9 w-9 inline-flex items-center justify-center rounded-full hover:bg-emerald-600 border-emerald-600/10 hover:border-emerald-600 absolute top-0 end-0 m-3',
+        'h-9 w-9 inline-flex items-center justify-center rounded-full hover:text-white hover:bg-emerald-600 border-emerald-600/10 hover:border-emerald-600 absolute top-0 end-0 m-3',
         job.is_favorite ? 'bg-emerald-600 text-white' : 'bg-emerald-600/5 text-emerald-600'
       ]"
       href=""
