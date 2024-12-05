@@ -56,12 +56,12 @@
   <div class="mx-auto px-11 py-4">
     <!-- Filter Bar (above search bar) -->
 
-    <div class="bg-white shadow-md rounded-lg overflow-hidden">
+    <div class="bg-white shadow-md rounded-lg overflow-hidden mb-12">
       <div v-if="!jobs.length" class="">
         <img
           :src="icon_sad"
           alt="Empty Jobs"
-          class="mx-auto mb-4"
+          class="mx-auto mb-6"
           style="width: 300px; height: auto"
         />
         <p class="text-gray-500 text-lg text-center">No results found. Please try again.</p>

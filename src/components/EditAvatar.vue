@@ -99,6 +99,11 @@ const emit = defineEmits(['close', 'notification'])
 
 const handleImageUpload = (event) => {
   const file = event.target.files[0]
+  //check file exists and is image
+  if (!file || !file.type.includes('image')) {
+    toastr.error('Please select an image file!')
+    return
+  }
   if (file) {
     const reader = new FileReader()
     reader.onload = (e) => {
