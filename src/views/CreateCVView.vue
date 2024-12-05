@@ -85,6 +85,7 @@ import professional1 from '@/assets/thumbnails/4.png'
 import professional2 from '@/assets/thumbnails/5.png'
 import html2canvas from 'html2canvas'
 import { ref } from 'vue'
+import toastr from 'toastr'
 
 const templates = [
   {
@@ -135,8 +136,20 @@ function closePreview() {
 }
 
 function useTemplate(template) {
-  selectedTemplate = template
-  isEditMode.value = true
-  showPreview.value = true
+  console.log(template)
+  const token = localStorage.getItem('token')
+  if (template.id === 1 || template.id === 2) {
+    selectedTemplate = template
+    isEditMode.value = true
+    showPreview.value = true
+  } else {
+    if (token) {
+      selectedTemplate = template
+      isEditMode.value = true
+      showPreview.value = true
+    } else {
+      toastr.info('Please login to use this template', 'Error')
+    }
+  }
 }
 </script>
