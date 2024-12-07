@@ -341,6 +341,13 @@ function handleSubmit() {
     return
   }
 
+  const date = new Date(inf.selectedDate)
+
+  date.setHours(15)
+  date.setMinutes(59)
+  date.setSeconds(59)
+
+  const formattedDate = date.toISOString().slice(0, 19)
   const data = {
     title: details.title,
     description: inf.description,
@@ -353,7 +360,7 @@ function handleSubmit() {
     level: inf.level,
     requirement: inf.requirements,
     benefit: inf.benefits,
-    deadline: inf.selectedDate,
+    deadline: formattedDate,
     slots: inf.slots,
     category: {
       id: details.selectedCategoryId
@@ -368,6 +375,7 @@ function handleSubmit() {
       name: skill.name
     }))
   }
+  console.log('Data:', data.deadline)
   emit('submit', data)
 }
 
@@ -375,6 +383,10 @@ onMounted(async () => {
   flatpickr(document.querySelector('#deadline'), {
     dateFormat: 'Y-m-d',
     minDate: 'today',
+    time_24hr: true,
+    defaultHour: 8,
+    defaultMinute: 0,
+    defaultSeconds: 0,
     onChange: (selectedDates, dateStr) => {
       inf.selectedDate = dateStr
     }
