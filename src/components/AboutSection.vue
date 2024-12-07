@@ -1,6 +1,34 @@
 <script setup>
 import Card from './Card.vue'
 import { RouterLink } from 'vue-router'
+import { useRouter } from 'vue-router'
+import toastr from 'toastr'
+import 'toastr/build/toastr.min.css'
+
+const router = useRouter()
+
+function logout() {
+  // Xóa token trong localStorage
+  localStorage.removeItem('token')
+  localStorage.removeItem('username')
+
+  router.push('/signup')
+}
+
+function completeProfile() {
+  const token = localStorage.getItem('token')
+  const username = localStorage.getItem('username')
+
+  // Kiểm tra nếu có token và username
+  if (token && username) {
+    // Chuyển hướng đến trang settings
+    router.push('/settings')
+  } else {
+    toastr.error('Please login to complete your profile')
+    // Chuyển hướng đến trang login
+    router.push('/login')
+  }
+}
 </script>
 
 <template>
@@ -18,19 +46,21 @@ import { RouterLink } from 'vue-router'
       <div class="grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 mt-6 gap-[30px]">
         <Card
           title="Create Account"
-          description="The phrasal sequence of the is now so that many campaign and benefit"
+          description="Sign up and create your account to start exploring IT job opportunities or hiring top tech talent."
           icon="pi pi-user-plus"
-          link="/register"
+          link="/signup"
+          @click="logout"
         />
         <Card
           title="Complete Your Profile"
-          description="The phrasal sequence of the is now so that many campaign and benefit"
+          description="Complete your profile to improve your chances of finding the perfect IT job or candidate."
           icon="pi pi-verified"
-          link="/profile"
+          link="/"
+          @click="completeProfile"
         />
         <Card
           title="Apply Job or Hire"
-          description="The phrasal sequence of the is now so that many campaign and benefit"
+          description="Browse IT job listings or find the best tech professionals to join your team."
           icon="pi pi-folder-open"
           link="/jobs"
         />

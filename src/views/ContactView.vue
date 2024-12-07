@@ -118,7 +118,7 @@
               <label
                 for=""
                 class="text-emerald-600 hover:text-emerald-600 after:bg-emerald-600 transition duration-500"
-                >contact@example.com</label
+                >contact@devhire.com</label
               >
             </div>
           </div>
@@ -133,13 +133,16 @@
           </div>
           <div class="content mt-7">
             <h5 class="title h5 text-lg font-semibold">Location</h5>
-            <p class="text-slate-400 mt-3">C/54 Northwest Freeway, Suite 558, Houston, USA 485</p>
+            <p class="text-slate-400 mt-3">
+              01 Đ. Võ Văn Ngân, Linh Chiểu, Thủ Đức, Hồ Chí Minh, Việt Nam
+            </p>
             <div class="mt-5">
-              <label
-                for=""
+              <a
+                href="https://www.google.com/maps?q=01+Đ.+Võ+Văn+Ngân,+Linh+Chiểu,+Thủ+Đức,+Hồ+Chí+Minh,+Việt+Nam"
+                target="_blank"
                 class="text-emerald-600 hover:text-emerald-600 after:bg-emerald-600 transition duration-500"
-                >View on Google map</label
-              >
+                >View on Google map
+              </a>
             </div>
           </div>
         </div>

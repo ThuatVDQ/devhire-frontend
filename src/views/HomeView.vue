@@ -10,7 +10,6 @@ import CategorySection from '@/components/CategorySection.vue'
 <template>
   <HeroSection />
   <AboutSection />
-  <CategorySection />
   <PopularJobs />
   <Banner />
   <BestCompanies />
