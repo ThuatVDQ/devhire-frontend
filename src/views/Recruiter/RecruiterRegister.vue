@@ -125,7 +125,7 @@ function onVerified() {
               <img :src="logo" alt="logo" class="w-8 h-8" />
               <h1 class="ml-2 text-2xl font-bold text-blue-600">DevHire</h1>
             </router-link>
-            <h5 class="my-6 text-xl font-semibold">Sign up</h5>
+            <h5 class="my-6 text-xl font-semibold">Sign up for Recruiter</h5>
             <form @submit.prevent="register">
               <div class="grid grid-cols-1">
                 <div class="mb-4 ltr:text-left rtl:text-right">

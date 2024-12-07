@@ -140,17 +140,7 @@ onMounted(() => {})
                   </div>
                 </div>
                 <div class="flex justify-between mb-4">
-                  <div class="inline-flex items-center mb-0">
-                    <input
-                      type="checkbox"
-                      name="remember"
-                      id="remember"
-                      class="form-checkbox rounded border-gray-200 dark:border-gray-800 text-emerald-600 focus:border-emerald-300 focus:ring focus:ring-offset-0 focus:ring-emerald-200 focus:ring-opacity-50 me-2"
-                    />
-                    <label for="remember" class="form-checkbox-label text-slate-400"
-                      >Remember me</label
-                    >
-                  </div>
+                  <div class="inline-flex items-center mb-0"></div>
                   <p class="text-slate-400 mb-0">
                     <a href="" class="text-slate-400">Forgot password?</a>
                   </p>

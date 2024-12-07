@@ -138,7 +138,7 @@ onMounted(() => {})
               <img :src="logo" alt="logo" class="w-8 h-8" />
               <h1 class="ml-2 text-2xl font-bold text-blue-600">DevHire</h1>
             </div>
-            <h5 class="my-6 text-xl font-semibold">Login</h5>
+            <h5 class="my-6 text-xl font-semibold">Login for Recruiter</h5>
             <form @submit.prevent="login">
               <div class="grid grid-cols-1">
                 <div class="mb-4 ltr:text-left rtl:text-right">
