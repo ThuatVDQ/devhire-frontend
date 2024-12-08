@@ -6,9 +6,39 @@
   </header>
 
   <section class="p-6">
+    <div class="flex justify-between mb-8">
+      <div class="relative w-full max-w-lg flex">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+          <i class="pi pi-search text-gray-400"></i>
+        </span>
+        <input
+          type="text"
+          @keydown.enter="searchByKeyword"
+          v-model="keyword"
+          placeholder="Search by..."
+          class="border rounded-xl p-2 pl-10 w-full text-sm border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <button
+          @click="searchByKeyword"
+          class="bg-emerald-600 text-white px-4 rounded-2xl ml-4 text-sm hover:bg-emerald-700"
+        >
+          Search
+        </button>
+      </div>
+    </div>
+
     <!-- Companies Table -->
     <div class="overflow-x-auto bg-white shadow-md rounded-lg">
-      <table class="min-w-full text-left">
+      <div v-if="!companies.length" class="p-12">
+        <img
+          :src="icon_sad"
+          alt="Empty Saved Jobs"
+          class="mx-auto mb-4"
+          style="width: 300px; height: auto"
+        />
+        <p class="text-gray-500 text-lg text-center">No results found. Please try again.</p>
+      </div>
+      <table v-else class="min-w-full text-left">
         <thead>
           <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
             <th class="py-3 px-6">Name</th>
@@ -93,17 +123,29 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 import defaultAvatar from '../../assets/logo.svg'
+import icon_sad from '@/assets/icon-sad.png'
 
 const router = useRouter()
 // State
 const companies = ref([])
 const currentPage = ref(0)
+const keyword = ref('')
 const totalPages = ref(1)
 const pageSize = ref(5)
+
+const searchByKeyword = () => {
+  fetchCompanies(0)
+}
+
+watch(keyword, (newKeyword) => {
+  if (newKeyword === '') {
+    fetchCompanies(0)
+  }
+})
 
 // Fetch Companies API
 const fetchCompanies = async (page = 0) => {
@@ -113,7 +155,11 @@ const fetchCompanies = async (page = 0) => {
       limit: pageSize.value
     }
 
-    const response = await axios.get('http://localhost:8090/api/companies', {
+    if (keyword.value.trim() !== '') {
+      params.keyword = keyword.value.trim() // Thêm từ khóa tìm kiếm
+    }
+
+    const response = await axios.get('http://localhost:8090/api/companies/search', {
       params: params,
       headers: {
         Authorization: 'Bearer ' + localStorage.getItem('token')
@@ -125,6 +171,8 @@ const fetchCompanies = async (page = 0) => {
     currentPage.value = page
   } catch (error) {
     companies.value = []
+    totalPages.value = 0
+    currentPage.value = 0
     console.error('Error fetching companies:', error)
   }
 }

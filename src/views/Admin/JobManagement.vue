@@ -34,25 +34,29 @@
         {{ filter.label }}
       </span>
     </div>
+    <div class="flex justify-between mt-2">
+      <div class="relative w-full max-w-sm flex">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+          <i class="pi pi-search text-gray-400"></i>
+        </span>
+        <input
+          type="text"
+          @keydown.enter="searchByKeyword"
+          v-model="searchQuery"
+          placeholder="Search by..."
+          class="border rounded-xl p-2 pl-10 w-full text-sm border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <button
+          @click="searchByKeyword"
+          class="bg-emerald-600 text-white px-4 rounded-2xl ml-4 text-sm hover:bg-emerald-700"
+        >
+          Search
+        </button>
+      </div>
+    </div>
   </div>
 
   <section class="px-6 pb-6">
-    <!-- Search Section -->
-    <!-- <div class="flex items-center justify-between mb-4">
-      <div class="relative w-1/3">
-        <input
-          type="text"
-          placeholder="Search jobs..."
-          v-model="searchQuery"
-          @input=""
-          class="w-full px-4 py-2 border border-gray-300 rounded-md pl-10"
-        />
-        <i
-          class="pi pi-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-        ></i>
-      </div>
-    </div> -->
-
     <div class="flex justify-end mb-4">
       <button
         class="bg-green-500 text-white px-4 py-2 rounded-2xl mr-2"
@@ -61,13 +65,13 @@
         Approve All
       </button>
       <button
-        class="bg-red-500 text-white px-4 py-2 rounded-2xl mr-2"
+        class="bg-red-600 text-white px-4 py-2 rounded-2xl mr-2"
         @click="handleBulkAction('reject')"
       >
         Reject All
       </button>
       <button
-        class="bg-blue-500 text-white px-4 py-2 rounded-2xl"
+        class="bg-gray-500 text-white px-4 py-2 rounded-2xl"
         @click="handleBulkAction('close')"
       >
         Close All
@@ -234,6 +238,7 @@ import icon_sad from '@/assets/icon-sad.png'
 
 const router = useRouter()
 
+const searchQuery = ref('')
 const selectedStatus = ref('')
 const statusFilters = ref([
   { label: 'Hot', value: 'HOT' },
@@ -260,6 +265,10 @@ const toggleTypeFilter = (status) => {
   fetchData(0)
 }
 
+const searchByKeyword = () => {
+  fetchData(0) // Gọi lại API từ trang đầu tiên
+}
+
 const jobs = ref([])
 const currentPage = ref(0)
 const totalPages = ref(1)
@@ -284,6 +293,10 @@ const fetchData = async (page = 0) => {
     // Thêm status nếu có
     if (selectedType.value) {
       params.type = selectedType.value
+    }
+
+    if (searchQuery.value.trim() !== '') {
+      params.keyword = searchQuery.value.trim() // Thêm từ khóa tìm kiếm
     }
     const response = await axios.get('http://localhost:8090/api/admin/getAllJobs', {
       params: params,
