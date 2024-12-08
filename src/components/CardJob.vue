@@ -31,8 +31,8 @@ const emit = defineEmits(['removeFavorite'])
 
 const differenceInDays = computed(() => {
   const currentDate = new Date()
-  const deadline = new Date(state.job.deadline)
-  const differenceInTime = deadline.getTime() - currentDate.getTime()
+  const updatedDate = new Date(state.job.updated_at)
+  const differenceInTime = currentDate.getTime() - updatedDate.getTime()
   return Math.floor(differenceInTime / (1000 * 3600 * 24))
 })
 
@@ -137,7 +137,7 @@ function formatSalary(amount) {
 
           <!-- Company Name with Ellipsis -->
           <div class="max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap">
-            <span class="text-gray-400">{{ state.job.company.name }}</span>
+            <span class="text-gray-600">{{ state.job.company.name }}</span>
           </div>
 
           <!-- Application Period -->
@@ -161,8 +161,8 @@ function formatSalary(amount) {
             >
               {{ state.job.type }}
             </span>
-            <span class="inline-block text-sm text-red-400">
-              {{ differenceInDays > 0 ? `Remaining ${differenceInDays} days` : 'Expired' }}
+            <span class="inline-block text-sm text-gray-400">
+              {{ differenceInDays > 0 ? `Posted ${differenceInDays} days ago` : 'Just posted' }}
             </span>
           </div>
 
