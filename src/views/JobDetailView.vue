@@ -252,7 +252,18 @@ onMounted(() => {
             />
 
             <div class="md:ms-4 md:mt-0 mt-6">
-              <h5 class="text-xl font-semibold">{{ state.job.title }}</h5>
+              <div class="flex items-center justify-between">
+                <h5 class="text-xl font-semibold">{{ state.job.title }}</h5>
+                <span
+                  class="bg-teal-100 text-teal-600 font-medium text-sm py-2 px-4 rounded-lg shadow-md transition-colors duration-300 hover:bg-teal-200"
+                >
+                  {{
+                    state.job.salary_start && state.job.salary_end
+                      ? `${state.job.salary_start} - ${state.job.salary_end} ${state.job.currency}`
+                      : 'Negotiable'
+                  }}
+                </span>
+              </div>
               <div class="mt-3">
                 <RouterLink
                   :to="`/companies/${state.job.company?.id}`"
@@ -454,15 +465,15 @@ onMounted(() => {
                   </div>
                 </li>
                 <li class="flex items-center mt-3">
-                  <i class="pi pi-dollar"></i>
+                  <i class="pi pi-lightbulb"></i>
                   <div class="ms-4">
-                    <p class="font-medium">Salary:</p>
-                    <span class="text-emerald-600 font-medium text-sm">
-                      {{
-                        state.job.salary_start && state.job.salary_end
-                          ? `${state.job.salary_start} - ${state.job.salary_end} ${state.job.currency}`
-                          : 'Negotiable'
-                      }}
+                    <p class="font-medium">Skills:</p>
+                    <span
+                      v-for="(skill, index) in state.job.skills"
+                      :key="index"
+                      class="text-emerald-600 font-medium text-sm"
+                    >
+                      {{ skill.name }}<span v-if="index < state.job.skills.length - 1"> - </span>
                     </span>
                   </div>
                 </li>
@@ -471,7 +482,7 @@ onMounted(() => {
                   <div class="ms-4">
                     <p class="font-medium">Date posted:</p>
                     <span class="text-emerald-600 font-medium text-sm">{{
-                      formatDate(state.job.deadline)
+                      formatDate(state.job.updated_at)
                     }}</span>
                   </div>
                 </li>
