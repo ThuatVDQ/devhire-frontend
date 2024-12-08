@@ -207,11 +207,21 @@ const selectJobType = (type) => {
 // Clear selected location
 const clearLocation = () => {
   selectedCity.value = ''
+  emit('search', {
+    keyword: keyword.value,
+    location: selectedCity.value,
+    type: selectedJobType.value
+  })
 }
 
 // Clear selected job type
 const clearJobType = () => {
   selectedJobType.value = ''
+  emit('search', {
+    keyword: keyword.value,
+    location: selectedCity.value,
+    type: selectedJobType.value
+  })
 }
 
 const onSearch = () => {
@@ -222,13 +232,15 @@ const onSearch = () => {
   })
 }
 
-// watch([keyword, selectedCity, selectedJobType], () => {
-//   emit('search', {
-//     keyword: keyword.value,
-//     location: selectedCity.value,
-//     type: selectedJobType.value
-//   })
-// })
+watch([keyword], () => {
+  if (keyword.value === '') {
+    emit('search', {
+      keyword: keyword.value,
+      location: selectedCity.value,
+      type: selectedJobType.value
+    })
+  }
+})
 </script>
 
 <style scoped>

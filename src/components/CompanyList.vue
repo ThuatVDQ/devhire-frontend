@@ -36,6 +36,8 @@ const searchCompanies = async (keyword, page = 0) => {
     currentPage.value = page
   } catch (error) {
     companies.value = []
+    totalPages.value = 0
+    currentPage.value = 0
     console.error('Error searching companies:', error)
   } finally {
     isLoading.value = false

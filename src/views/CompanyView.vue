@@ -2,7 +2,7 @@
 import CompanyList from '@/components/CompanyList.vue'
 import CardExploreJob from '@/components/CardExploreJob.vue'
 import Accordion from '@/components/Accordion.vue'
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 const openAccordion = ref(null)
 
@@ -12,8 +12,13 @@ const handleToggleAccordion = (index) => {
 
 const keyword = ref('')
 const searchKeyword = ref('')
+watch([keyword], () => {
+  if (keyword.value === '') {
+    triggerSearch()
+  }
+})
 const triggerSearch = () => {
-  searchKeyword.value = keyword.value.trim() // Chỉ gửi keyword đã được xác nhận
+  searchKeyword.value = keyword.value.trim()
 }
 </script>
 
