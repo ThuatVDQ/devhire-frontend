@@ -9,6 +9,10 @@ const props = defineProps({
   companyId: {
     type: String,
     required: true
+  },
+  isAdmin: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -116,7 +120,7 @@ onMounted(() => {
     </div>
 
     <!-- Submit Review Form -->
-    <div class="mt-8 p-6 bg-white rounded-lg shadow-md">
+    <div v-if="!props.isAdmin" class="mt-8 p-6 bg-white rounded-lg shadow-md">
       <h4 class="text-lg font-semibold text-gray-800 mb-4">Submit Your Review</h4>
 
       <div class="space-y-4">
