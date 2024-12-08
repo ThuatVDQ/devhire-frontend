@@ -1,11 +1,12 @@
 <script setup>
-import { reactive, onMounted, ref, onBeforeUnmount } from 'vue'
+import { reactive, onMounted, ref, onBeforeUnmount, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import SimilarJobs from '@/components/SimilarJobs.vue'
 import axios from 'axios'
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
 import defaultLogo from '../assets/logo.svg'
+import Reviews from '@/components/ReviewCompany.vue'
 
 const route = useRoute()
 
@@ -27,8 +28,13 @@ const state = reactive({
     phone: '',
     cv: null,
     letter: ''
-  }
+  },
+  currentTab: 'overview'
 })
+
+const changeTab = (tab) => {
+  state.currentTab = tab
+}
 
 const openImageModal = (index) => {
   state.currentImageIndex = index
@@ -224,6 +230,15 @@ const submitApplication = async () => {
   }
 }
 
+watch(
+  () => route.params.id, // Watch for changes in the id parameter
+  (newId, oldId) => {
+    if (newId !== oldId) {
+      fetchJobData(newId) // Fetch new job data when id changes
+    }
+  }
+)
+
 onMounted(() => {
   fetchJobData(route.params.id)
   fileInput.value = document.getElementById('file-upload')
@@ -368,47 +383,86 @@ onMounted(() => {
               </div>
             </div>
           </div>
-          <h5 class="text-lg font-semibold mt-6">Job Description:</h5>
-          <p
-            class="mt-4 p-4 bg-white dark:bg-slate-900 rounded-md shadow dark:shadow-gray-700"
-            style="
-              white-space: pre-line;
-              word-break: break-word;
-              text-align: justify;
-              border-radius: 12px;
-              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            "
-          >
-            {{ state.job.description }}
-          </p>
+          <div class="flex justify-start border-b-2 border-gray-200 mb-6 mt-6">
+            <button
+              @click="changeTab('overview')"
+              :class="[
+                state.currentTab === 'overview'
+                  ? 'text-emerald-600 border-b-2 border-emerald-600'
+                  : 'text-gray-600 hover:text-emerald-600'
+              ]"
+              class="py-2 px-6 font-semibold text-lg transition-all duration-300"
+            >
+              Overview
+            </button>
+            <button
+              @click="changeTab('reviews')"
+              :class="[
+                state.currentTab === 'reviews'
+                  ? 'text-emerald-600 border-b-2 border-emerald-600'
+                  : 'text-gray-600 hover:text-emerald-600'
+              ]"
+              class="py-2 px-6 font-semibold text-lg transition-all duration-300"
+            >
+              Reviews
+              <span
+                v-if="state.job.company.totalReviews > 0"
+                :class="[
+                  state.currentTab === 'reviews'
+                    ? 'bg-emerald-500 text-white'
+                    : 'bg-gray-300 text-gray-600',
+                  'ml-2 text-sm px-2 py-1 rounded-full font-semibold'
+                ]"
+                >{{ state.job.company.totalReviews }}</span
+              >
+            </button>
+          </div>
+          <div v-if="state.currentTab === 'overview'">
+            <h5 class="text-lg font-semibold mt-6">Job Description:</h5>
+            <p
+              class="mt-4 p-4 bg-white dark:bg-slate-900 rounded-md shadow dark:shadow-gray-700"
+              style="
+                white-space: pre-line;
+                word-break: break-word;
+                text-align: justify;
+                border-radius: 12px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+              "
+            >
+              {{ state.job.description }}
+            </p>
 
-          <h5 class="text-lg font-semibold mt-16">Requirements:</h5>
-          <p
-            class="mt-4 p-4 bg-white dark:bg-slate-900 rounded-md shadow dark:shadow-gray-700"
-            style="
-              white-space: pre-line;
-              word-break: break-word;
-              text-align: justify;
-              border-radius: 12px;
-              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            "
-          >
-            {{ state.job.requirement }}
-          </p>
+            <h5 class="text-lg font-semibold mt-16">Requirements:</h5>
+            <p
+              class="mt-4 p-4 bg-white dark:bg-slate-900 rounded-md shadow dark:shadow-gray-700"
+              style="
+                white-space: pre-line;
+                word-break: break-word;
+                text-align: justify;
+                border-radius: 12px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+              "
+            >
+              {{ state.job.requirement }}
+            </p>
 
-          <h5 class="text-lg font-semibold mt-16">Benefit:</h5>
-          <p
-            class="mt-4 p-4 bg-white dark:bg-slate-900 rounded-md shadow dark:shadow-gray-700"
-            style="
-              white-space: pre-line;
-              word-break: break-word;
-              text-align: justify;
-              border-radius: 12px;
-              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            "
-          >
-            {{ state.job.benefit }}
-          </p>
+            <h5 class="text-lg font-semibold mt-16">Benefit:</h5>
+            <p
+              class="mt-4 p-4 bg-white dark:bg-slate-900 rounded-md shadow dark:shadow-gray-700"
+              style="
+                white-space: pre-line;
+                word-break: break-word;
+                text-align: justify;
+                border-radius: 12px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+              "
+            >
+              {{ state.job.benefit }}
+            </p>
+          </div>
+          <div v-else>
+            <Reviews :companyId="state.job.company.id" />
+          </div>
         </div>
         <div class="lg:col-span-4 md:col-span-6">
           <div

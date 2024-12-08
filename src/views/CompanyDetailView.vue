@@ -1,5 +1,5 @@
 <script setup>
-import CompanyList from '@/components/CompanyList.vue'
+import CardCompany from '@/components/CardCompany.vue'
 import CardExploreJob from '@/components/CardExploreJob.vue'
 import { useRoute } from 'vue-router'
 import { reactive, onMounted, watch, onBeforeUnmount } from 'vue'
@@ -7,6 +7,7 @@ import axios from 'axios'
 import defaultLogo from '../assets/logo.svg'
 import CardJob from '@/components/CardJob.vue'
 import { formatDistanceToNow, parseISO } from 'date-fns'
+import Reviews from '@/components/ReviewCompany.vue'
 
 const route = useRoute()
 
@@ -17,54 +18,13 @@ const state = reactive({
   isModalOpen: false,
   currentImageIndex: 0,
   jobs: [],
-  reviews: [],
-  totalPages: 0,
-  currentPage: 0,
   companies: [],
-  isLoading: true
+  isLoading: true,
+  currentTab: 'vacancies'
 })
 
-const newReview = reactive({
-  rating: 0,
-  comment: ''
-})
-
-const setRating = (star) => {
-  newReview.rating = star
-}
-
-const hoverRating = (star) => {
-  // Temporarily set rating to the hovered star for visual effect
-  newReview.hoverRating = star
-}
-
-const clearHover = () => {
-  // Clear the temporary hover rating
-  newReview.hoverRating = null
-}
-
-const submitReview = async () => {
-  try {
-    // Assuming you have a function to submit the review to the server
-    await axios.post(
-      `http://localhost:8090/api/reviews/${route.params.id}`,
-      {
-        rating: newReview.rating,
-        comment: newReview.comment
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
-      }
-    )
-    // Reset the form after submitting
-    newReview.rating = 0
-    newReview.comment = ''
-    fetchCompanyReviews(route.params.id)
-  } catch (error) {
-    console.error('Error submitting review:', error)
-  }
+const changeTab = (tab) => {
+  state.currentTab = tab
 }
 
 const openImageModal = (index) => {
@@ -108,8 +68,14 @@ onBeforeUnmount(() => {
 const fetchCompanies = async () => {
   try {
     const response = await axios.get('http://localhost:8090/api/companies')
-    state.companies = response.data
-    console.log('Companies fetched:', response.data)
+    state.companies = response.data.companies
+      .reduce((acc, company) => {
+        if (String(company.id) !== String(route.params.id)) {
+          acc.push(company)
+        }
+        return acc
+      }, [])
+      .slice(0, 4)
   } catch (error) {
     console.error('Failed to fetch companies:', error)
   }
@@ -133,7 +99,6 @@ const fetchCompanyData = async (id) => {
   try {
     const response = await axios.get(`http://localhost:8090/api/companies/${id}`)
     state.company = response.data
-    console.log('Company fetched:', response.data)
     if (state.company.logo)
       state.company.logo = `http://localhost:8090/uploads/${state.company.logo}`
 
@@ -147,55 +112,10 @@ const fetchCompanyData = async (id) => {
   }
 }
 
-const fetchCompanyReviews = async (companyId, page = 0, limit = 10) => {
-  try {
-    const response = await axios.get(`http://localhost:8090/api/reviews/${companyId}`, {
-      params: {
-        page,
-        limit
-      }
-    })
-    console.log('Company reviews:', response.data)
-    const data = response.data
-    state.reviews = data.company_reviews || []
-    state.totalPages = data.totalPages
-    state.isLoading = false
-  } catch (error) {
-    console.error('Error fetching company reviews:', error)
-    state.isLoading = false
-  }
-}
-
-const formatReviewDate = (createdAt) => {
-  const date = parseISO(createdAt)
-  const distance = formatDistanceToNow(date, { addSuffix: true })
-
-  // If the review is older than 1 year, display the full date
-  const oneYearAgo = new Date()
-  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1)
-  if (date < oneYearAgo) {
-    return new Intl.DateTimeFormat('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    }).format(date)
-  }
-
-  return distance
-}
-
-const loadMoreReviews = () => {
-  if (state.currentPage < state.totalPages - 1) {
-    state.currentPage += 1
-    fetchCompanyReviews(route.params.companyId, state.currentPage)
-  }
-}
-
 onMounted(async () => {
   state.isLoading = true
   await fetchCompanies()
   fetchCompanyData(route.params.id)
-  fetchCompanyReviews(route.params.id)
   state.isLoading = false
   fetchJobsByCompany()
 })
@@ -205,7 +125,8 @@ watch(
   () => route.params.id,
   (newId) => {
     fetchCompanyData(newId)
-    fetchCompanyReviews(newId)
+    fetchJobsByCompany()
+    fetchCompanies()
     window.scrollTo(0, 0)
   }
 )
@@ -339,9 +260,51 @@ watch(
           >
             {{ state.company.description }}
           </p>
-          <h5 class="text-xl font-semibold mt-6">Vacancies:</h5>
-          <div class="grid lg:grid-cols-2 grid-cols-1 gap-6 mt-6">
-            <CardJob v-for="job in state.jobs" :key="job.id" :job="job" />
+          <div class="flex justify-start border-b-2 border-gray-200 mb-6 mt-6">
+            <button
+              @click="changeTab('vacancies')"
+              :class="[
+                state.currentTab === 'vacancies'
+                  ? 'text-emerald-600 border-b-2 border-emerald-600'
+                  : 'text-gray-600 hover:text-emerald-600'
+              ]"
+              class="py-2 px-6 font-semibold text-lg transition-all duration-300"
+            >
+              Vacancies
+            </button>
+            <button
+              @click="changeTab('reviews')"
+              :class="[
+                state.currentTab === 'reviews'
+                  ? 'text-emerald-600 border-b-2 border-emerald-600 '
+                  : 'text-gray-600 hover:text-emerald-600'
+              ]"
+              class="py-2 px-6 font-semibold text-lg transition-all duration-300 flex items-center"
+            >
+              Reviews
+              <span
+                v-if="state.company.totalReviews > 0"
+                :class="[
+                  state.currentTab === 'reviews'
+                    ? 'bg-emerald-500 text-white'
+                    : 'bg-gray-300 text-gray-600',
+                  'ml-2 text-sm px-2 py-1 rounded-full font-semibold'
+                ]"
+                >{{ state.company.totalReviews }}</span
+              >
+            </button>
+          </div>
+
+          <!-- Vacancies Tab Content -->
+          <div v-if="state.currentTab === 'vacancies'">
+            <div class="grid lg:grid-cols-2 grid-cols-1 gap-6 mt-6">
+              <CardJob v-for="job in state.jobs" :key="job.id" :job="job" />
+            </div>
+          </div>
+
+          <!-- Reviews Tab Content -->
+          <div v-if="state.currentTab === 'reviews'">
+            <Reviews :companyId="route.params.id" />
           </div>
         </div>
         <div class="lg:col-span-4 md:col-span-5">
@@ -383,89 +346,6 @@ watch(
       </div>
     </div>
 
-    <div class="container mt-14">
-      <!-- Reviews Section -->
-      <h3 class="text-2xl font-semibold text-gray-800 mb-6">Reviews</h3>
-
-      <!-- Display Reviews if available -->
-      <div v-if="state.reviews.length" class="space-y-6">
-        <div
-          v-for="(review, index) in state.reviews"
-          :key="index"
-          class="review-card bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-all duration-300"
-        >
-          <div class="flex space-x-3 items-center">
-            <h4 class="text-xl font-semibold text-gray-800">{{ review.full_name }}</h4>
-            <span class="text-sm text-gray-500">
-              {{ formatReviewDate(review.created_at) }}
-            </span>
-          </div>
-          <div class="flex items-center text-yellow-500 mb-2">
-            <span
-              v-for="star in 5"
-              :key="star"
-              class="text-xl"
-              :class="{
-                'text-yellow-400': review.rating >= star,
-                'text-gray-300': review.rating < star
-              }"
-              >★</span
-            >
-          </div>
-          <p class="text-gray-700">{{ review.comment }}</p>
-        </div>
-
-        <!-- Pagination Button -->
-        <button
-          v-if="state.currentPage < state.totalPages - 1"
-          @click="loadMoreReviews"
-          class="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors"
-        >
-          Load More Reviews
-        </button>
-      </div>
-
-      <!-- Submit Review Form -->
-      <div class="mt-8 p-6 bg-white rounded-lg shadow-md">
-        <h4 class="text-xl font-semibold text-gray-800 mb-4">Submit Your Review</h4>
-
-        <div class="space-y-4">
-          <!-- Rating System with 5 stars -->
-          <div class="flex items-center">
-            <span
-              v-for="star in 5"
-              :key="star"
-              @click="setRating(star)"
-              class="text-3xl cursor-pointer"
-              :class="{
-                'text-yellow-400': newReview.rating >= star,
-                'text-gray-300': newReview.rating < star
-              }"
-            >
-              ★
-            </span>
-          </div>
-
-          <!-- Review Textarea -->
-          <textarea
-            v-model="newReview.comment"
-            placeholder="Write your review here..."
-            class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            rows="4"
-          ></textarea>
-
-          <!-- Submit Button -->
-          <button
-            @click="submitReview"
-            :disabled="!newReview.rating || !newReview.comment"
-            class="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50"
-          >
-            Send Review
-          </button>
-        </div>
-      </div>
-    </div>
-
     <div class="container lg:mt-24 mb-16">
       <div class="grid grid-cols-1 pb-8 text-center">
         <div class="mb-4 md:text-[26px] md:leading-normal text-2xl leading-normal font-semibold">
@@ -476,7 +356,9 @@ watch(
           reviews on over 30000+ companies worldwide.
         </p>
       </div>
-      <CompanyList :companies="state.companies" :pagination="false" />
+      <div class="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 mt-8 gap-[30px]">
+        <CardCompany v-for="company in state.companies" :key="company.id" :company="company" />
+      </div>
     </div>
     <CardExploreJob />
   </section>
