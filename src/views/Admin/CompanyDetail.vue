@@ -6,6 +6,7 @@ import { reactive, onMounted, watch, onBeforeUnmount } from 'vue'
 import axios from 'axios'
 import defaultLogo from '@/assets/logo.svg'
 import CardJob from '@/components/CardJob.vue'
+import Reviews from '@/components/ReviewCompany.vue'
 
 const route = useRoute()
 
@@ -17,8 +18,13 @@ const state = reactive({
   currentImageIndex: 0,
   jobs: [],
   companies: [],
-  isLoading: true
+  isLoading: true,
+  currentTab: 'vacancies'
 })
+
+const changeTab = (tab) => {
+  state.currentTab = tab
+}
 
 const fetchCompanies = async () => {
   try {
@@ -124,7 +130,7 @@ watch(
     <div class="absolute inset-0 bg-emerald-900/60"></div>
   </section>
   <section class="relative mb:pb-24 pb-16 -mt-16 z-1">
-    <div class="container">
+    <div class="p-14">
       <div class="grid grid-cols-1">
         <div
           class="md:flex justify-between items-center shadow dark:shadow-gray-700 rounded-md p-6 bg-white dark:bg-slate-900"
@@ -158,7 +164,7 @@ watch(
         </div>
       </div>
     </div>
-    <div class="container mt-12">
+    <div class="p-14">
       <div class="grid md:grid-cols-12 grid-cols-1 gap-[30px]">
         <div class="lg:col-span-8 md:col-span-7">
           <div class="grid grid-cols-2 gap-4 mb-6">
@@ -244,9 +250,51 @@ watch(
           >
             {{ state.company.description }}
           </p>
-          <h5 class="text-xl font-semibold mt-6">Vacancies:</h5>
-          <div class="grid lg:grid-cols-2 grid-cols-1 gap-6 mt-6">
-            <CardJob v-for="job in state.jobs" :key="job.id" :job="job" />
+          <div class="flex justify-start border-b-2 border-gray-200 mb-6 mt-6">
+            <button
+              @click="changeTab('vacancies')"
+              :class="[
+                state.currentTab === 'vacancies'
+                  ? 'text-emerald-600 border-b-2 border-emerald-600'
+                  : 'text-gray-600 hover:text-emerald-600'
+              ]"
+              class="py-2 px-6 font-semibold text-lg transition-all duration-300"
+            >
+              Vacancies
+            </button>
+            <button
+              @click="changeTab('reviews')"
+              :class="[
+                state.currentTab === 'reviews'
+                  ? 'text-emerald-600 border-b-2 border-emerald-600 '
+                  : 'text-gray-600 hover:text-emerald-600'
+              ]"
+              class="py-2 px-6 font-semibold text-lg transition-all duration-300 flex items-center"
+            >
+              Reviews
+              <span
+                v-if="state.company.totalReviews > 0"
+                :class="[
+                  state.currentTab === 'reviews'
+                    ? 'bg-emerald-500 text-white'
+                    : 'bg-gray-300 text-gray-600',
+                  'ml-2 text-sm px-2 py-1 rounded-full font-semibold'
+                ]"
+                >{{ state.company.totalReviews }}</span
+              >
+            </button>
+          </div>
+
+          <!-- Vacancies Tab Content -->
+          <div v-if="state.currentTab === 'vacancies'">
+            <div class="grid lg:grid-cols-2 grid-cols-1 gap-6 mt-6">
+              <CardJob v-for="job in state.jobs" :key="job.id" :job="job" />
+            </div>
+          </div>
+
+          <!-- Reviews Tab Content -->
+          <div v-if="state.currentTab === 'reviews'">
+            <Reviews :companyId="route.params.id" :isAdmin="true" />
           </div>
         </div>
         <div class="lg:col-span-4 md:col-span-5">
