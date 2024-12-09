@@ -34,7 +34,7 @@
         {{ filter.label }}
       </span>
     </div>
-    <div class="flex justify-between mt-2">
+    <div class="flex justify-between mt-6">
       <div class="relative w-full max-w-sm flex">
         <span class="absolute inset-y-0 left-0 flex items-center pl-3">
           <i class="pi pi-search text-gray-400"></i>
@@ -228,7 +228,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import axios from 'axios'
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
@@ -276,6 +276,10 @@ const pageSize = ref(10) // Số lượng công việc mỗi trang
 const selectAllCheckbox = ref(false)
 const isLoading = ref(false)
 const selectedJobIds = ref([])
+
+watch(searchQuery, () => {
+  if (searchQuery.value === '') fetchData(0)
+})
 
 const fetchData = async (page = 0) => {
   isLoading.value = true

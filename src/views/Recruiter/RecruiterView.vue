@@ -147,7 +147,7 @@ onBeforeUnmount(() => {
                 <i :class="item.icon" class="mr-3"></i>
                 <span>{{ item.name }}</span>
                 <span
-                  v-if="item.name === 'Notifications' && newNotification"
+                  v-if="item.name === 'Notifications' && unreadCount > 0"
                   class="absolute right-2 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center"
                 >
                   {{ unreadCount }}
