@@ -109,7 +109,7 @@
             </th>
             <th class="py-3 px-6">Title</th>
             <th class="py-3 px-6">Company</th>
-            <th class="py-3 px-6">Deadline</th>
+            <th class="py-3 px-6">Date posted</th>
             <th class="py-3 px-6">Location</th>
             <th class="py-3 px-6">Status</th>
             <th class="py-3 px-6">Actions</th>
@@ -130,7 +130,7 @@
               </span>
             </td>
             <td class="py-3 px-6">{{ job.company.name }}</td>
-            <td class="py-3 px-6">{{ formatDate(job.deadline) }}</td>
+            <td class="py-3 px-6">{{ formatDate(job.created_at) }}</td>
             <td class="py-3 px-6">
               {{ job.addresses.map((address) => address.city).join(', ') }}
             </td>

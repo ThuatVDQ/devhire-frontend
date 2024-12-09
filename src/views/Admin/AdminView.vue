@@ -24,7 +24,7 @@ onMounted(() => {
   const token = localStorage.getItem('token')
   if (!token || token === 'null') {
     toastr.error('Please login to access this page', 'Error')
-    router.push('/recruiter/login')
+    router.push('/admin/login')
   }
 })
 </script>
