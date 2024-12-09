@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, onMounted, ref, onBeforeUnmount, watch } from 'vue'
+import { reactive, onMounted, ref, onBeforeUnmount, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import SimilarJobs from '@/components/SimilarJobs.vue'
 import axios from 'axios'
@@ -243,6 +243,13 @@ onMounted(() => {
   fetchJobData(route.params.id)
   fileInput.value = document.getElementById('file-upload')
   fetchCandidateData()
+})
+
+const differenceInDays = computed(() => {
+  const currentDate = new Date()
+  const deadline = new Date(state.job.deadline)
+  const differenceInTime = deadline.getTime() - currentDate.getTime()
+  return Math.floor(differenceInTime / (1000 * 3600 * 24))
 })
 </script>
 
@@ -535,9 +542,11 @@ onMounted(() => {
                   <i class="pi pi-clock"></i>
                   <div class="ms-4">
                     <p class="font-medium">Date posted:</p>
-                    <span class="text-emerald-600 font-medium text-sm">{{
-                      formatDate(state.job.updated_at)
-                    }}</span>
+                    <span class="text-emerald-600 font-medium text-sm"
+                      >{{
+                        `${formatDate(state.job.created_at)} - Remaining:  ${differenceInDays} days`
+                      }}
+                    </span>
                   </div>
                 </li>
               </ul>
