@@ -251,6 +251,13 @@ const differenceInDays = computed(() => {
   const differenceInTime = deadline.getTime() - currentDate.getTime()
   return Math.floor(differenceInTime / (1000 * 3600 * 24))
 })
+
+function formatSalary(amount) {
+  if (amount >= 1000000) {
+    return `${amount / 1000000}M`
+  }
+  return amount
+}
 </script>
 
 <template>
@@ -281,7 +288,7 @@ const differenceInDays = computed(() => {
                 >
                   {{
                     state.job.salary_start && state.job.salary_end
-                      ? `${state.job.salary_start} - ${state.job.salary_end} ${state.job.currency}`
+                      ? `${formatSalary(state.job.salary_start)} - ${formatSalary(state.job.salary_end)} ${state.job.currency}`
                       : 'Negotiable'
                   }}
                 </span>
@@ -555,7 +562,7 @@ const differenceInDays = computed(() => {
         </div>
       </div>
     </div>
-    <SimilarJobs />
+    <SimilarJobs :id="route.params.id" />
   </section>
   <div
     v-if="state.isFormVisible"

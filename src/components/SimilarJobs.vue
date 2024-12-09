@@ -1,8 +1,15 @@
 <script setup>
-import { reactive, onMounted } from 'vue'
-import JobList from './JobList.vue'
+import { reactive, onMounted, defineProps } from 'vue'
+import CardJob from './CardJob.vue'
 import CardExploreJob from './CardExploreJob.vue'
 import axios from 'axios'
+
+const props = defineProps({
+  id: {
+    type: Number,
+    required: true
+  }
+})
 
 const state = reactive({
   jobs: [],
@@ -11,7 +18,12 @@ const state = reactive({
 
 onMounted(async () => {
   try {
-    const response = await axios.get('http://localhost:8090/api/jobs')
+    const response = await axios.get(`http://localhost:8090/api/jobs/related`, {
+      params: {
+        jobId: props.id
+      }
+    })
+    console.log(response.data)
     state.jobs = response.data
   } catch (e) {
     console.error(e)
@@ -30,7 +42,11 @@ onMounted(async () => {
         reviews on over 30000+ companies worldwide.
       </p>
     </div>
-    <JobList :jobs="state.jobs" :pagination="false" />
+    <div
+      class="container grid lg:grid-cols-2 md:grid-cols-2 grid-cols-1 mt-8 gap-[30px] auto-rows-fr"
+    >
+      <CardJob v-for="job in state.jobs" :key="job.id" :job="job" />
+    </div>
   </div>
   <CardExploreJob />
 </template>
