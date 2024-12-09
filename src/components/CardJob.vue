@@ -31,7 +31,7 @@ const emit = defineEmits(['removeFavorite'])
 
 const differenceInDays = computed(() => {
   const currentDate = new Date()
-  const updatedDate = new Date(state.job.updated_at)
+  const updatedDate = new Date(state.job.created_at)
   const differenceInTime = currentDate.getTime() - updatedDate.getTime()
   return Math.floor(differenceInTime / (1000 * 3600 * 24))
 })
@@ -119,11 +119,17 @@ function formatSalary(amount) {
         <div class="ms-3 ml-6">
           <!-- Job Title -->
           <RouterLink
+            v-if="!state.job.is_close"
             class="inline-block text-[16px] font-semibold hover:text-emerald-600 transition-all duration-500 me-1"
             :to="`/jobs/${state.job.id}`"
           >
             {{ state.job.title }}
           </RouterLink>
+
+          <!-- Hiển thị span thay thế nếu job đã đóng -->
+          <span v-else class="inline-block text-[16px] font-semibold">
+            {{ state.job.title }}
+          </span>
 
           <span
             class="bg-emerald-600/10 inline-block text-emerald-600 text-xs px-2.5 py-0.5 font-semibold rounded-full me-1"
@@ -212,7 +218,9 @@ function formatSalary(amount) {
           <i class="pi pi-map-marker mr-2"></i>{{ address.city }}
         </span>
       </div>
+      <span v-if="state.job.is_close" class="text-lg text-gray-400">Job Closed</span>
       <a
+        v-else
         class="btn btn-sm rounded-md md:ms-2 w-full lg:w-auto lg:mt-0 mt-4 px-4 py-1 flex items-center justify-center"
         :class="{
           'bg-gray-400 text-white cursor-default': state.job.apply_status !== null,
