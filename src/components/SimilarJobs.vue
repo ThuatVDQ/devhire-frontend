@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, onMounted, defineProps } from 'vue'
+import { reactive, onMounted, defineProps, watch } from 'vue'
 import CardJob from './CardJob.vue'
 import CardExploreJob from './CardExploreJob.vue'
 import axios from 'axios'
@@ -16,18 +16,30 @@ const state = reactive({
   isLoading: true
 })
 
-onMounted(async () => {
+const fetchJobs = async (jobId) => {
   try {
     const response = await axios.get(`http://localhost:8090/api/jobs/related`, {
       params: {
-        jobId: props.id
+        jobId
       }
     })
-    console.log(response.data)
     state.jobs = response.data
   } catch (e) {
-    console.error(e)
+    console.error('Failed to fetch related jobs:', e)
   }
+}
+
+watch(
+  () => props.id,
+  async (newVal, oldVal) => {
+    if (newVal !== oldVal) {
+      fetchJobs(newVal)
+    }
+  }
+)
+
+onMounted(async () => {
+  fetchJobs(props.id)
 })
 </script>
 
