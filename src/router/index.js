@@ -48,6 +48,9 @@ const routes = [
     path: '/',
     name: 'main',
     component: CandidateView,
+    meta: {
+      title: 'DevHire - Top IT jobs for you'
+    },
     children: [
       {
         path: '',
@@ -131,6 +134,9 @@ const routes = [
   {
     path: '/recruiter',
     component: RecruiterView,
+    meta: {
+      title: 'Hire the best IT professionals in Việt Nam with DevHire'
+    },
     children: [
       {
         path: '',
@@ -209,21 +215,33 @@ const routes = [
   {
     path: '/recruiter/login',
     name: 'recruiter-login',
-    component: RecruiterLogin
+    component: RecruiterLogin,
+    meta: {
+      title: 'Login for Recruiter'
+    }
   },
   {
     path: '/recruiter/signup',
     name: 'recruiter-signup',
-    component: RecruiterRegister
+    component: RecruiterRegister,
+    meta: {
+      title: 'Sign-up for Recruiter'
+    }
   },
   {
     path: '/admin/login',
     name: 'admin-login',
-    component: Login
+    component: Login,
+    meta: {
+      title: 'Login for Admin'
+    }
   },
   {
     path: '/admin',
     component: AdminView,
+    meta: {
+      title: 'Admin - DevHire'
+    },
     children: [
       {
         path: 'dashboard',
@@ -283,6 +301,14 @@ const router = createRouter({
       return { top: 0 }
     }
   }
+})
+
+router.beforeEach((to, from, next) => {
+  // Cập nhật title nếu có meta.title trong route
+  if (to.meta.title) {
+    document.title = to.meta.title
+  }
+  next()
 })
 
 export default router
