@@ -63,11 +63,54 @@
     <!-- Modal for Preview -->
     <div
       v-if="showPreview"
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40 overflow-y-auto"
       @click.self="closePreview"
     >
       <div class="bg-white rounded-lg shadow-lg w-3/5 max-h-[90vh] p-6 relative overflow-y-auto">
-        <component :is="selectedTemplate.component" :isEditable="isEditMode" />
+        <component
+          :is="selectedTemplate.component"
+          :isEditable="isEditMode"
+          @download="onDownloadCV"
+          @save="onSaveCV"
+        />
+      </div>
+    </div>
+
+    <div
+      v-if="showModal"
+      class="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center z-50"
+    >
+      <div class="bg-white rounded-2xl w-1/4">
+        <h3
+          class="text-xl text-white font-semibold py-4 text-center bg-emerald-700 rounded-tl-2xl rounded-tr-2xl"
+        >
+          Enter CV Name
+        </h3>
+        <div class="p-4">
+          <input
+            v-model="cvName"
+            type="text"
+            placeholder="Enter CV name"
+            class="border border-gray-500 rounded-xl px-4 py-2 w-full mb-4"
+          />
+          <div class="flex justify-end space-x-2 text-sm">
+            <button
+              v-if="!isUpload"
+              @click="showModal = false"
+              class="bg-red-600 text-white px-6 py-2 rounded-full hover:bg-red-700 ml-2"
+            >
+              Cancel
+            </button>
+            <button
+              @click="saveCV"
+              :disabled="isUpload"
+              class="bg-emerald-600 text-white px-6 py-2 rounded-full hover:bg-emerald-700"
+              :class="{ 'bg-gray-400 hover:bg-gray-400': isUpload }"
+            >
+              Save
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -84,8 +127,10 @@ import elegant1 from '@/assets/thumbnails/3.png'
 import professional1 from '@/assets/thumbnails/4.png'
 import professional2 from '@/assets/thumbnails/5.png'
 import html2canvas from 'html2canvas'
-import { ref } from 'vue'
+import { ref, reactive } from 'vue'
 import toastr from 'toastr'
+import 'toastr/build/toastr.min.css'
+import axios from 'axios'
 
 const templates = [
   {
@@ -124,6 +169,11 @@ let selectedTemplate = null
 const showPreview = ref(false)
 const isEditMode = ref(false)
 
+const isUpload = ref(false)
+const showModal = ref(false)
+const cvName = ref('')
+const file = ref(null)
+
 function previewTemplate(template) {
   selectedTemplate = template
   console.log(selectedTemplate.component)
@@ -150,6 +200,49 @@ function useTemplate(template) {
     } else {
       toastr.info('Please login to use this template', 'Error')
     }
+  }
+}
+
+function onDownloadCV(data) {
+  try {
+    console.log(data)
+    const fileName = `CV_${data.name}.pdf` // Use the user's name for the file name
+    data.file.save(fileName) // Trigger the download
+  } catch (error) {
+    console.error('Error downloading CV:', error)
+  }
+}
+
+function onSaveCV(data) {
+  showModal.value = true
+  file.value = data.file.output('blob')
+}
+
+function saveCV() {
+  isUpload.value = true
+  try {
+    if (cvName.value == '') {
+      toastr.error('Please enter a CV name', 'Error') // Show an error message if the CV name is empty
+      return
+    }
+    // Get the PDF as a blob
+
+    const formData = new FormData()
+    formData.append('file', file.value, 'CV.pdf') // Add the generated PDF
+    formData.append('cvName', cvName.value) // Attach user ID
+
+    // Send the PDF to the backend to save it
+    const response = axios.post('http://localhost:8090/api/cv/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+  } catch (error) {
+    toastr.error('Failed to save CV', 'Error')
+    console.error('Error saving CV:', error)
+  } finally {
+    isUpload.value = false
   }
 }
 </script>

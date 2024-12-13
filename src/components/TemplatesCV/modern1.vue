@@ -362,18 +362,25 @@
         </div>
       </div>
     </div>
-    <button
-      v-if="isEdit"
-      @click="downloadStyledPDF"
-      class="mt-6 bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"
-    >
-      Download CV
-    </button>
+    <div v-if="isEdit" class="flex space-x-4">
+      <button
+        @click="downloadCV"
+        class="mt-6 bg-blue-500 text-white px-4 py-2 rounded-2xl hover:bg-blue-600"
+      >
+        Download CV
+      </button>
+      <button
+        @click="saveCV"
+        class="mt-6 bg-emerald-600 text-white px-4 py-2 rounded-2xl hover:bg-emerald-700"
+      >
+        Save CV
+      </button>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { reactive, ref, watch, nextTick } from 'vue'
+import { reactive, ref, watch, nextTick, defineEmits } from 'vue'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
 import domtoimage from 'dom-to-image'
@@ -382,6 +389,7 @@ import defaultAvatar from '@/assets/profile-avatar5.png'
 const props = defineProps({ isEditable: Boolean })
 
 const template = ref(null)
+const emit = defineEmits(['download', 'save'])
 const isEdit = ref(false)
 
 watch(
@@ -510,7 +518,7 @@ function removeCertification(index) {
   data.certifications.splice(index, 1)
 }
 
-async function downloadStyledPDF() {
+async function generatePDF() {
   isEdit.value = false // Set to preview mode
   await nextTick()
 
@@ -541,11 +549,23 @@ async function downloadStyledPDF() {
     const pdfHeight = (element.scrollHeight * pdfWidth) / element.offsetWidth
 
     pdf.addImage(dataUrl, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST')
-    pdf.save(`CV_${data.personal_info.name}.pdf`)
+    return pdf
   } catch (error) {
     console.error('Lỗi khi tạo PDF:', error)
   } finally {
     isEdit.value = props.isEditable
   }
+}
+async function saveCV() {
+  emit('save', {
+    file: await generatePDF()
+  })
+}
+
+async function downloadCV() {
+  emit('download', {
+    name: data.personal_info.name,
+    file: await generatePDF()
+  })
 }
 </script>
