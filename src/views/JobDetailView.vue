@@ -29,7 +29,9 @@ const state = reactive({
     cv: null,
     letter: ''
   },
-  currentTab: 'overview'
+  currentTab: 'overview',
+  isChoosingNewCV: 'old',
+  latestCV: null
 })
 
 const changeTab = (tab) => {
@@ -153,7 +155,6 @@ const fetchJobData = async (id) => {
       headers
     })
     state.job = response.data
-    console.log(state.job)
     if (state.job.company.logo)
       state.job.company.logo = `http://localhost:8090/uploads/${state.job.company.logo}`
 
@@ -194,22 +195,15 @@ const closeApplicationForm = () => {
 }
 
 const submitApplication = async () => {
-  const fileInput = document.getElementById('file-upload')
-  if (!fileInput.files.length) {
-    toastr.error('Please upload a file.')
-    fileInput.focus()
-    return
-  }
   state.isApplying = true
   try {
     const jobId = route.params.id
-    console.log(jobId)
 
     const formData = new FormData()
     formData.append('file', state.candidate.cv)
     // Thêm letter vào formData
     formData.append('letter', state.candidate.letter)
-    console.log(formData)
+    formData.append('cvId', state.latestCV ? state.latestCV.id : 0)
 
     // Gửi POST request đến endpoint phù hợp với jobId
     const response = await axios.post(`http://localhost:8090/api/jobs/${jobId}/apply`, formData, {
@@ -221,6 +215,7 @@ const submitApplication = async () => {
 
     toastr.success(response.data, 'Success')
     state.job.apply_status = 'IN_PROGRESS'
+    fetchLastedCV()
     closeApplicationForm()
   } catch (error) {
     console.error(error)
@@ -243,6 +238,7 @@ onMounted(() => {
   fetchJobData(route.params.id)
   fileInput.value = document.getElementById('file-upload')
   fetchCandidateData()
+  fetchLastedCV()
 })
 
 const differenceInDays = computed(() => {
@@ -257,6 +253,35 @@ function formatSalary(amount) {
     return `${amount / 1000000}M`
   }
   return amount
+}
+
+const fetchLastedCV = async () => {
+  try {
+    if (`Bearer ${localStorage.getItem('token')}` == 'Bearer null') {
+      return
+    }
+    const response = await axios.get('http://localhost:8090/api/cv/latest', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    state.latestCV = response.data
+  } catch (error) {
+    console.log(error)
+    state.latestCV = null
+    state.isChoosingNewCV = 'new'
+    console.log(state.latestCV)
+  }
+}
+
+async function viewCV(cv_url) {
+  if (!cv_url) {
+    toastr.error('No CV found', 'Error')
+    return
+  }
+  const baseUrl = 'http://localhost:8090/uploads/' // Change this base URL as needed
+  const fullUrl = `${baseUrl}${cv_url}`
+  window.open(fullUrl, '_blank')
 }
 </script>
 
@@ -576,34 +601,75 @@ function formatSalary(amount) {
       </h3>
       <form @submit.prevent="submitApplication" class="p-6">
         <div class="mb-6">
-          <label class="block text-sm font-medium mb-2">Upload CV *</label>
-          <div
-            class="flex items-center justify-center border-2 border-dashed border-gray-300 rounded-md p-4 cursor-pointer hover:bg-gray-100"
-            @click="triggerFileUpload"
-            @dragover.prevent
-            @dragenter.prevent
-            @dragleave.prevent
-            @drop.prevent="handleFileDrop"
-          >
-            <input
-              ref="fileInput"
-              id="file-upload"
-              type="file"
-              @change="handleFileUploadNew"
-              class="hidden"
-              accept=".pdf, .jpeg, .jpg, .png, .gif"
-            />
-            <span class="text-sm text-gray-500">
-              Drag and drop your file here or click to browse
-            </span>
+          <label class="block text-sm font-medium mb-2">Choose CV *</label>
+          <div class="items-center mb-4">
+            <div
+              v-if="state.latestCV !== null"
+              class="shadow rounded-md p-6 mb-4"
+              :class="{ 'bg-gray-50': state.isChoosingNewCV !== 'old' }"
+            >
+              <div class="flex items-center mb-3">
+                <input
+                  type="radio"
+                  id="oldCV"
+                  v-model="state.isChoosingNewCV"
+                  value="old"
+                  class="mr-2"
+                />
+                <label for="oldCV" class="text-sm font-medium">Select Old CV</label>
+              </div>
+              <!-- Section to select an old CV -->
+              <div class="ml-4 w-full flex items-center">
+                <span class="font-semibold text-gray-700 mr-3">Latest CV:</span>
+                <span class="text-blue-600 cursor-pointer" @click="viewCV(state.latestCV.cv_url)">{{
+                  state.latestCV?.name
+                }}</span>
+              </div>
+            </div>
+            <div
+              class="shadow rounded-md p-6"
+              :class="{ 'bg-gray-50': state.isChoosingNewCV !== 'new' }"
+            >
+              <div class="flex items-center mb-3">
+                <input
+                  type="radio"
+                  id="newCV"
+                  v-model="state.isChoosingNewCV"
+                  value="new"
+                  class="mr-2"
+                />
+                <label for="newCV" class="text-sm font-medium mr-4">Upload CV</label>
+              </div>
+              <div
+                v-bind:class="{ 'pointer-events-none opacity-50': state.isChoosingNewCV !== 'new' }"
+                class="flex items-center justify-center border-2 border-dashed border-gray-300 rounded-md p-4 cursor-pointer hover:bg-gray-100"
+                @click="triggerFileUpload"
+                @dragover.prevent
+                @dragenter.prevent
+                @dragleave.prevent
+                @drop.prevent="handleFileDrop"
+              >
+                <input
+                  ref="fileInput"
+                  id="file-upload"
+                  type="file"
+                  @change="handleFileUploadNew"
+                  class="hidden"
+                  accept=".pdf, .jpeg, .jpg, .png, .gif"
+                />
+                <span class="text-sm text-gray-500">
+                  Drag and drop your file here or click to browse
+                </span>
+              </div>
+              <span
+                class="mt-2 block text-sm font-medium text-blue-600 truncate bg-blue-100 p-2 rounded-md"
+                v-if="state.candidate.cv"
+              >
+                {{ state.candidate.cv.name }}
+              </span>
+              <p class="text-xs text-gray-500 mt-2">Supported formats: pdf, img. Max size: 10MB</p>
+            </div>
           </div>
-          <span
-            class="mt-2 block text-sm font-medium text-blue-600 truncate bg-blue-100 p-2 rounded-md"
-            v-if="state.candidate.cv"
-          >
-            {{ state.candidate.cv.name }}
-          </span>
-          <p class="text-xs text-gray-500 mt-2">Supported formats: pdf, img. Max size: 10MB</p>
         </div>
 
         <div class="mb-4">
