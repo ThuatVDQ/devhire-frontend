@@ -186,7 +186,6 @@ function closePreview() {
 }
 
 function useTemplate(template) {
-  console.log(template)
   const token = localStorage.getItem('token')
   if (template.id === 1 || template.id === 2) {
     selectedTemplate = template
@@ -214,6 +213,10 @@ function onDownloadCV(data) {
 }
 
 function onSaveCV(data) {
+  if (`Bearer ${localStorage.getItem('token')}` == 'Bearer null') {
+    toastr.info('Please login to save CV') // Show an error message if the user is not logged in
+    return
+  }
   showModal.value = true
   file.value = data.file.output('blob')
 }
@@ -225,11 +228,12 @@ function saveCV() {
       toastr.error('Please enter a CV name', 'Error') // Show an error message if the CV name is empty
       return
     }
+
     // Get the PDF as a blob
 
     const formData = new FormData()
     formData.append('file', file.value, 'CV.pdf') // Add the generated PDF
-    formData.append('cvName', cvName.value) // Attach user ID
+    formData.append('name', cvName.value) // Attach user ID
 
     // Send the PDF to the backend to save it
     const response = axios.post('http://localhost:8090/api/cv/upload', formData, {
@@ -238,6 +242,11 @@ function saveCV() {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     })
+
+    toastr.success('CV saved successfully', 'Success')
+    showModal.value = false
+    isUpload.value = false
+    showPreview.value = false
   } catch (error) {
     toastr.error('Failed to save CV', 'Error')
     console.error('Error saving CV:', error)
