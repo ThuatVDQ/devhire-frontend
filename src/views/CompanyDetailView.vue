@@ -67,15 +67,12 @@ onBeforeUnmount(() => {
 
 const fetchCompanies = async () => {
   try {
-    const response = await axios.get('http://localhost:8090/api/companies')
-    state.companies = response.data.companies
-      .reduce((acc, company) => {
-        if (String(company.id) !== String(route.params.id)) {
-          acc.push(company)
-        }
-        return acc
-      }, [])
-      .slice(0, 4)
+    const response = await axios.get('http://localhost:8090/api/companies/related', {
+      params: {
+        companyId: route.params.id
+      }
+    })
+    state.companies = response.data
   } catch (error) {
     console.error('Failed to fetch companies:', error)
   }
@@ -356,7 +353,7 @@ watch(
           reviews on over 30000+ companies worldwide.
         </p>
       </div>
-      <div class="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 mt-8 gap-[30px]">
+      <div class="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 mt-8 gap-[30px]">
         <CardCompany v-for="company in state.companies" :key="company.id" :company="company" />
       </div>
     </div>
