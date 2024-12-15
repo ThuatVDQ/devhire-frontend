@@ -49,13 +49,13 @@ const updateUserInf = async () => {
 
 const fetchCV = async () => {
   try {
-    const response = await axios.get('http://localhost:8090/api/users/getApplications', {
+    const response = await axios.get('http://localhost:8090/api/cv/all', {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     })
     console.log(response.data)
-    data.cv = response.data.applications
+    data.cv = response.data
   } catch (e) {
     console.error(e)
   }
@@ -82,7 +82,7 @@ async function downloadCV(cvId, job_title) {
       fileName = contentDisposition.split('filename=')[1].split(';')[0].trim().replace(/"/g, '')
     }
     const fileExtension = fileName.split('.').pop()
-    fileName = `CV_${job_title}.${fileExtension}`
+    fileName = `${job_title}.${fileExtension}`
     link.setAttribute('download', fileName)
     document.body.appendChild(link)
     link.click()
@@ -152,10 +152,10 @@ const openPopup = () => {
               class="cv-item p-4 bg-white dark:bg-gray-700 rounded-lg shadow-md mb-4"
             >
               <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
-                {{ cv.job_title }}
+                {{ cv.name }}
               </h3>
               <button
-                @click="downloadCV(cv.cv_id, cv.job_title)"
+                @click="downloadCV(cv.id, cv.name)"
                 class="mt-2 inline-block px-4 py-2 bg-blue-500 text-white rounded-md shadow-md hover:bg-blue-600"
               >
                 Download CV
