@@ -80,14 +80,13 @@ const fetchCompanies = async () => {
 
 const fetchJobsByCompany = async () => {
   try {
-    const token = localStorage.getItem('token')
-
-    const response = await axios.get('http://localhost:8090/api/jobs/company/' + route.params.id, {
-      headers: token ? { Authorization: `Bearer ${token}` } : {}
+    const response = await axios.get('http://localhost:8090/api/jobs/candidate/company', {
+      params: { companyId: route.params.id }
     })
 
     state.jobs = response.data
   } catch (error) {
+    state.jobs = []
     console.error('Error fetching jobs:', error)
   }
 }
@@ -294,7 +293,10 @@ watch(
 
           <!-- Vacancies Tab Content -->
           <div v-if="state.currentTab === 'vacancies'">
-            <div class="grid lg:grid-cols-2 grid-cols-1 gap-6 mt-6">
+            <div v-if="state.jobs.length === 0" class="text-center mt-6">
+              <p>No job vacancies are currently available.</p>
+            </div>
+            <div v-else class="grid lg:grid-cols-2 grid-cols-1 gap-6 mt-6">
               <CardJob v-for="job in state.jobs" :key="job.id" :job="job" />
             </div>
           </div>
