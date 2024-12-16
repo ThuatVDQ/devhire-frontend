@@ -168,7 +168,13 @@ function formatSalary(amount) {
               {{ state.job.type }}
             </span>
             <span class="inline-block text-sm text-gray-400">
-              {{ differenceInDays > 0 ? `Posted ${differenceInDays} days ago` : 'Just posted' }}
+              {{
+                differenceInDays >= 30
+                  ? `Posted ${Math.floor(differenceInDays / 30)} month${Math.floor(differenceInDays / 30) > 1 ? 's' : ''} ago`
+                  : differenceInDays > 0
+                    ? `Posted ${differenceInDays} day${differenceInDays > 1 ? 's' : ''} ago`
+                    : 'Just posted'
+              }}
             </span>
           </div>
 
