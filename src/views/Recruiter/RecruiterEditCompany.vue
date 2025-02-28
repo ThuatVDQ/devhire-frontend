@@ -120,55 +120,95 @@
     </form>
 
     <div v-if="isCompanyExist" class="p-4">
-      <label for="images" class="block mb-2 text-sm font-medium text-gray-700">Images</label>
-      <div class="relative">
-        <!-- Input thực tế nhưng bị ẩn -->
-        <input
-          type="file"
-          id="images"
-          multiple
-          accept="image/*"
-          @change="handleImageSelection"
-          class="hidden"
-          ref="fileInput"
-        />
-        <!-- Nút giả lập -->
-        <div
-          class="border-2 border-dashed border-gray-300 rounded-md p-6 text-center cursor-pointer hover:bg-gray-100"
-          @click="triggerFileInput"
-          @dragover.prevent
-          @dragenter.prevent
-          @dragleave.prevent
-          @drop.prevent="handleFileDrop"
+      <div class="mb-4">
+        <label for="license" class="block mb-2 text-sm font-medium text-gray-700"
+          >Company License</label
         >
-          Drag and drop your file here or click to browse
-        </div>
-      </div>
-      <div v-if="selectedImages.length" class="grid grid-cols-3 gap-4 mt-4">
-        <div
-          v-for="(image, index) in selectedImages"
-          :key="index"
-          class="relative group border border-gray-300 rounded-md overflow-hidden"
-        >
-          <img
-            :src="typeof image === 'string' ? image : URL.createObjectURL(image)"
-            alt="Company Image"
-            class="w-full h-[150px] object-contain object-center border border-gray-300"
+        <div class="relative">
+          <input
+            type="file"
+            id="license"
+            accept="application/pdf, image/*"
+            @change="handleLicenseSelection"
+            class="hidden"
+            ref="licenseInput"
           />
-          <button
-            @click.prevent="removeImage(index)"
-            class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+          <div
+            class="border-2 border-dashed border-gray-300 rounded-md p-6 text-center cursor-pointer hover:bg-gray-100"
+            @click="triggerLicenseInput"
           >
-            &times;
-          </button>
+            Drag and drop your license file here or click to browse
+          </div>
         </div>
+        <div v-if="selectedLicense" class="mt-4 flex items-center gap-4">
+          <img
+            :src="
+              typeof selectedLicense === 'string'
+                ? selectedLicense
+                : URL.createObjectURL(selectedLicense)
+            "
+            alt="Company Image"
+            class="h-[150px] object-contain object-center border border-gray-300"
+          />
+        </div>
+        <button
+          @click="uploadLicense"
+          class="mt-4 bg-emerald-600 text-white font-bold py-2 px-4 rounded"
+        >
+          Upload License
+        </button>
       </div>
-      <button
-        @click="uploadImages"
-        class="mt-4 bg-emerald-600 text-white font-bold py-2 px-4 rounded"
-      >
-        Upload Images
-      </button>
+      <div>
+        <label for="images" class="block mb-2 text-sm font-medium text-gray-700">Images</label>
+        <div class="relative">
+          <!-- Input thực tế nhưng bị ẩn -->
+          <input
+            type="file"
+            id="images"
+            multiple
+            accept="image/*"
+            @change="handleImageSelection"
+            class="hidden"
+            ref="fileInput"
+          />
+          <!-- Nút giả lập -->
+          <div
+            class="border-2 border-dashed border-gray-300 rounded-md p-6 text-center cursor-pointer hover:bg-gray-100"
+            @click="triggerFileInput"
+            @dragover.prevent
+            @dragenter.prevent
+            @dragleave.prevent
+            @drop.prevent="handleFileDrop"
+          >
+            Drag and drop your file here or click to browse
+          </div>
+        </div>
+        <div v-if="selectedImages.length" class="grid grid-cols-3 gap-4 mt-4">
+          <div
+            v-for="(image, index) in selectedImages"
+            :key="index"
+            class="relative group border border-gray-300 rounded-md overflow-hidden"
+          >
+            <img
+              :src="typeof image === 'string' ? image : URL.createObjectURL(image)"
+              alt="Company Image"
+              class="w-full h-[150px] object-contain object-center border border-gray-300"
+            />
+            <button
+              @click.prevent="removeImage(index)"
+              class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              &times;
+            </button>
+          </div>
+        </div>
+        <button
+          @click="uploadImages"
+          class="mt-4 bg-emerald-600 text-white font-bold py-2 px-4 rounded"
+        >
+          Upload Images
+        </button>
+      </div>
     </div>
   </div>
 
@@ -198,6 +238,10 @@ const oldImages = ref([]) // Danh sách ảnh cũ
 const newImages = ref([])
 const selectedFileCount = ref(0) // Lưu số lượng tệp đã chọn
 const fileInput = ref(null) // Lưu trữ các ảnh đã chọn
+
+const selectedLicense = ref(null)
+const licenseInput = ref(null)
+const newLicense = ref(null)
 
 const triggerFileInput = () => {
   // Kích hoạt input file khi nhấn nút giả lập
@@ -404,6 +448,9 @@ const fetchCompanyInfo = async () => {
         (image) => `http://localhost:8090/uploads/${image}`
       ) // Hiển thị ảnh cũ trong giao diện
     }
+    if (company.value.business_license) {
+      selectedLicense.value = `http://localhost:8090/uploads/${company.value.business_license}`
+    }
   } catch (error) {
     if (error.response && error.response.status === 404) {
       isCompanyExist.value = false
@@ -426,5 +473,61 @@ onMounted(() => {
 
 const openPopup = () => {
   showAvatarPopup.value = true
+}
+
+const triggerLicenseInput = () => {
+  licenseInput.value.click()
+}
+
+const handleLicenseSelection = (event) => {
+  const file = event.target.files[0]
+
+  if (file && file.type.startsWith('image/')) {
+    const reader = new FileReader()
+
+    reader.onload = (e) => {
+      newLicense.value = { file, base64: e.target.result }
+      selectedLicense.value = e.target.result // Gán Base64 vào selectedLicense
+    }
+
+    reader.readAsDataURL(file) // Đọc ảnh dưới dạng Base64
+  } else {
+    toastr.error('Only image files are allowed.', 'Invalid File')
+  }
+
+  // Reset giá trị input để có thể chọn lại cùng file
+  event.target.value = null
+}
+
+const removeLicense = () => {
+  selectedLicense.value = null
+  licenseInput.value.value = null
+}
+
+const uploadLicense = async () => {
+  if (!selectedLicense.value) {
+    toastr.error('Please select a company license to upload', 'Error')
+    return
+  }
+  const formData = new FormData()
+  formData.append('license', newLicense.value.file)
+
+  try {
+    const response = await axios.post(
+      'http://localhost:8090/api/companies/verify-license',
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      }
+    )
+    toastr.success('License uploaded successfully', 'Success')
+    selectedLicense.value = null
+  } catch (error) {
+    toastr.error('Failed to upload license', 'Error')
+    console.error('Error uploading license:', error)
+  }
 }
 </script>
