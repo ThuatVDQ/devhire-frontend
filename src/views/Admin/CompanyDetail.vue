@@ -17,23 +17,12 @@ const state = reactive({
   isModalOpen: false,
   currentImageIndex: 0,
   jobs: [],
-  companies: [],
   isLoading: true,
   currentTab: 'vacancies'
 })
 
 const changeTab = (tab) => {
   state.currentTab = tab
-}
-
-const fetchCompanies = async () => {
-  try {
-    const response = await axios.get('http://localhost:8090/api/companies')
-    state.companies = response.data
-    console.log('Companies fetched:', response.data)
-  } catch (error) {
-    console.error('Failed to fetch companies:', error)
-  }
 }
 
 const fetchJobsByCompany = async () => {
@@ -107,11 +96,16 @@ const fetchCompanyData = async (id) => {
 
 onMounted(async () => {
   state.isLoading = true
-  await fetchCompanies()
   fetchCompanyData(route.params.id)
   state.isLoading = false
   fetchJobsByCompany()
 })
+
+const viewLicense = () => {
+  const baseUrl = 'http://localhost:8090/uploads/'
+  const fullUrl = `${baseUrl}${state.company.business_license}`
+  window.open(fullUrl, '_blank')
+}
 
 // Theo dõi sự thay đổi của route.params.id để cập nhật dữ liệu khi id thay đổi
 watch(
@@ -164,6 +158,15 @@ watch(
         </div>
       </div>
     </div>
+    <div class="pl-14">
+      <button
+        @click="viewLicense"
+        class="text-blue-600 font-semibold underline transition duration-300 ease-in-out hover:text-blue-700 hover:no-underline focus:outline-none focus:ring-2 focus:ring-blue-400 active:text-blue-800"
+      >
+        View License
+      </button>
+    </div>
+
     <div class="p-14">
       <div class="grid md:grid-cols-12 grid-cols-1 gap-[30px]">
         <div class="lg:col-span-8 md:col-span-7">

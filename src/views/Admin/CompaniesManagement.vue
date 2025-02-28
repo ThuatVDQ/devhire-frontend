@@ -44,6 +44,7 @@
             <th class="py-3 px-6">Name</th>
             <th class="py-3 px-6">Email</th>
             <th class="py-3 px-6">Phone</th>
+            <th class="py-3 px-6">Status</th>
             <th class="py-3 px-6">Address</th>
             <th class="py-3 px-6">Scale</th>
             <th class="py-3 px-6">Total Jobs</th>
@@ -66,6 +67,19 @@
             </td>
             <td class="py-3 px-6">{{ company.email }}</td>
             <td class="py-3 px-6">{{ company.phone }}</td>
+            <td class="py-3 px-6">
+              <span
+                class="px-2 py-1 rounded text-white text-sm font-semibold"
+                :class="{
+                  'bg-yellow-500': company.company_status === 'PENDING',
+                  'bg-green-500': company.company_status === 'ACTIVE',
+                  'bg-red-500': company.company_status === 'REJECTED',
+                  'bg-gray-500': !['PENDING', 'ACTIVE', 'REJECTED'].includes(company.company_status) // Màu mặc định
+                }"
+              >
+                {{ company.company_status }}
+              </span>
+            </td>
             <td class="py-3 px-6">{{ company.address }}</td>
             <td class="py-3 px-6">{{ company.scale }}</td>
             <td class="py-3 px-6">{{ company.totalJob }}</td>
