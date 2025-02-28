@@ -44,7 +44,7 @@ const fetchJobsByCompany = async () => {
       headers: token ? { Authorization: `Bearer ${token}` } : {}
     })
 
-    state.jobs = response.data.slice(0, 4)
+    state.jobs = response.data
   } catch (error) {
     console.error('Error fetching jobs:', error)
   }

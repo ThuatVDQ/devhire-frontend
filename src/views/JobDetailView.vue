@@ -594,164 +594,174 @@ async function viewCV(cv_url) {
     class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
   >
     <div
-      class="bg-white dark:bg-slate-900 shadow-lg w-[500px] max-w-full rounded-3xl overflow-hidden"
+      class="bg-white dark:bg-slate-900 shadow-lg w-[600px] max-w-full overflow-y-auto rounded-3xl"
     >
       <h3 class="text-xl font-semibold bg-emerald-600 text-white p-3 rounded-t-3xl">
         Apply for {{ state.job.title }}
       </h3>
       <form @submit.prevent="submitApplication" class="p-6">
-        <div class="mb-6">
-          <label class="block text-sm font-medium mb-2">Choose CV *</label>
-          <div class="items-center mb-4">
-            <div
-              v-if="state.latestCV !== null"
-              class="shadow rounded-md p-6 mb-4"
-              :class="{ 'bg-gray-50': state.isChoosingNewCV !== 'old' }"
-            >
-              <div class="flex items-center mb-3">
-                <input
-                  type="radio"
-                  id="oldCV"
-                  v-model="state.isChoosingNewCV"
-                  value="old"
-                  class="mr-2"
-                />
-                <label for="oldCV" class="text-sm font-medium">Select Old CV</label>
-              </div>
-              <!-- Section to select an old CV -->
-              <div class="ml-4 w-full flex items-center">
-                <span class="font-semibold text-gray-700 mr-3">Latest CV:</span>
-                <span class="text-blue-600 cursor-pointer" @click="viewCV(state.latestCV.cv_url)">{{
-                  state.latestCV?.name
-                }}</span>
-              </div>
-            </div>
-            <div
-              class="shadow rounded-md p-6"
-              :class="{ 'bg-gray-50': state.isChoosingNewCV !== 'new' }"
-            >
-              <div class="flex items-center mb-3">
-                <input
-                  type="radio"
-                  id="newCV"
-                  v-model="state.isChoosingNewCV"
-                  value="new"
-                  class="mr-2"
-                />
-                <label for="newCV" class="text-sm font-medium mr-4">Upload CV</label>
+        <div
+          class="max-h-[70vh] overflow-y-auto pr-4 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-400 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-gray-500"
+        >
+          <div class="mb-6">
+            <label class="block text-sm font-medium mb-2">Choose CV *</label>
+            <div class="items-center mb-4">
+              <div
+                v-if="state.latestCV !== null"
+                class="shadow rounded-md p-6 mb-4"
+                :class="{ 'bg-gray-50': state.isChoosingNewCV !== 'old' }"
+              >
+                <div class="flex items-center mb-3">
+                  <input
+                    type="radio"
+                    id="oldCV"
+                    v-model="state.isChoosingNewCV"
+                    value="old"
+                    class="mr-2"
+                  />
+                  <label for="oldCV" class="text-sm font-medium">Select Old CV</label>
+                </div>
+                <!-- Section to select an old CV -->
+                <div class="ml-4 w-full flex items-center">
+                  <span class="font-semibold text-gray-700 mr-3">Latest CV:</span>
+                  <span
+                    class="text-blue-600 cursor-pointer"
+                    @click="viewCV(state.latestCV.cv_url)"
+                    >{{ state.latestCV?.name }}</span
+                  >
+                </div>
               </div>
               <div
-                v-bind:class="{ 'pointer-events-none opacity-50': state.isChoosingNewCV !== 'new' }"
-                class="flex items-center justify-center border-2 border-dashed border-gray-300 rounded-md p-4 cursor-pointer hover:bg-gray-100"
-                @click="triggerFileUpload"
-                @dragover.prevent
-                @dragenter.prevent
-                @dragleave.prevent
-                @drop.prevent="handleFileDrop"
+                class="shadow rounded-md p-6"
+                :class="{ 'bg-gray-50': state.isChoosingNewCV !== 'new' }"
               >
-                <input
-                  ref="fileInput"
-                  id="file-upload"
-                  type="file"
-                  @change="handleFileUploadNew"
-                  class="hidden"
-                  accept=".pdf, .jpeg, .jpg, .png, .gif"
-                />
-                <span class="text-sm text-gray-500">
-                  Drag and drop your file here or click to browse
+                <div class="flex items-center mb-3">
+                  <input
+                    type="radio"
+                    id="newCV"
+                    v-model="state.isChoosingNewCV"
+                    value="new"
+                    class="mr-2"
+                  />
+                  <label for="newCV" class="text-sm font-medium mr-4">Upload CV</label>
+                </div>
+                <div
+                  v-bind:class="{
+                    'pointer-events-none opacity-50': state.isChoosingNewCV !== 'new'
+                  }"
+                  class="flex items-center justify-center border-2 border-dashed border-gray-300 rounded-md p-4 cursor-pointer hover:bg-gray-100"
+                  @click="triggerFileUpload"
+                  @dragover.prevent
+                  @dragenter.prevent
+                  @dragleave.prevent
+                  @drop.prevent="handleFileDrop"
+                >
+                  <input
+                    ref="fileInput"
+                    id="file-upload"
+                    type="file"
+                    @change="handleFileUploadNew"
+                    class="hidden"
+                    accept=".pdf, .jpeg, .jpg, .png, .gif"
+                  />
+                  <span class="text-sm text-gray-500">
+                    Drag and drop your file here or click to browse
+                  </span>
+                </div>
+                <span
+                  class="mt-2 block text-sm font-medium text-blue-600 truncate bg-blue-100 p-2 rounded-md"
+                  v-if="state.candidate.cv"
+                >
+                  {{ state.candidate.cv.name }}
                 </span>
+                <p class="text-xs text-gray-500 mt-2">
+                  Supported formats: pdf, img. Max size: 10MB
+                </p>
               </div>
-              <span
-                class="mt-2 block text-sm font-medium text-blue-600 truncate bg-blue-100 p-2 rounded-md"
-                v-if="state.candidate.cv"
-              >
-                {{ state.candidate.cv.name }}
-              </span>
-              <p class="text-xs text-gray-500 mt-2">Supported formats: pdf, img. Max size: 10MB</p>
             </div>
           </div>
-        </div>
 
-        <div class="mb-4">
-          <label class="block text-sm font-medium">Full Name *</label>
-          <input
-            type="text"
-            v-model="state.candidate.name"
-            class="w-full p-2 border rounded-md"
-            placeholder="Full name displayed to employer"
-            required
-            readonly
-          />
-        </div>
-        <div class="grid grid-cols-2 gap-4 mb-4">
-          <div>
-            <label class="block text-sm font-medium">Email *</label>
-            <input
-              type="email"
-              v-model="state.candidate.email"
-              class="w-full p-2 border rounded-md"
-              placeholder="Email displayed to employer"
-              required
-              readonly
-            />
-          </div>
-          <div>
-            <label class="block text-sm font-medium">Phone Number *</label>
+          <div class="mb-4">
+            <label class="block text-sm font-medium">Full Name *</label>
             <input
               type="text"
-              v-model="state.candidate.phone"
+              v-model="state.candidate.name"
               class="w-full p-2 border rounded-md"
-              placeholder="Phone number displayed to employer"
+              placeholder="Full name displayed to employer"
               required
               readonly
             />
           </div>
-        </div>
+          <div class="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <label class="block text-sm font-medium">Email *</label>
+              <input
+                type="email"
+                v-model="state.candidate.email"
+                class="w-full p-2 border rounded-md"
+                placeholder="Email displayed to employer"
+                required
+                readonly
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Phone Number *</label>
+              <input
+                type="text"
+                v-model="state.candidate.phone"
+                class="w-full p-2 border rounded-md"
+                placeholder="Phone number displayed to employer"
+                required
+                readonly
+              />
+            </div>
+          </div>
 
-        <!-- Add Letter Button and Textarea -->
-        <div class="mb-4">
-          <button
-            type="button"
-            @click="toggleLetter"
-            class="py-2 px-4 bg-blue-600 text-white rounded-md"
-          >
-            {{ state.isAddingLetter ? 'Remove Letter' : 'Add Letter' }}
-          </button>
-        </div>
-        <div v-if="state.isAddingLetter" class="mb-4">
-          <label class="block text-sm font-medium">Cover Letter</label>
-          <textarea
-            v-model="state.candidate.letter"
-            rows="4"
-            class="w-full p-2 border rounded-md"
-            placeholder="Write your cover letter here"
-          ></textarea>
-        </div>
+          <!-- Add Letter Button and Textarea -->
+          <div class="mb-4">
+            <button
+              type="button"
+              @click="toggleLetter"
+              class="py-2 px-4 bg-blue-600 text-white rounded-md"
+            >
+              {{ state.isAddingLetter ? 'Remove Letter' : 'Add Letter' }}
+            </button>
+          </div>
+          <div v-if="state.isAddingLetter" class="mb-4">
+            <label class="block text-sm font-medium">Cover Letter</label>
+            <textarea
+              v-model="state.candidate.letter"
+              rows="4"
+              class="w-full p-2 border rounded-md"
+              placeholder="Write your cover letter here"
+            ></textarea>
+          </div>
 
-        <div
-          v-if="state.isApplying"
-          class="fixed inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center z-50"
-        >
           <div
-            class="w-16 h-16 border-4 border-t-4 border-gray-300 border-t-emerald-600 rounded-full animate-spin mb-4"
-          ></div>
-          <p class="text-white text-lg">Please waiting ...</p>
-        </div>
+            v-if="state.isApplying"
+            class="fixed inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center z-50"
+          >
+            <div
+              class="w-16 h-16 border-4 border-t-4 border-gray-300 border-t-emerald-600 rounded-full animate-spin mb-4"
+            ></div>
+            <p class="text-white text-lg">Please waiting ...</p>
+          </div>
 
-        <div v-else class="flex justify-end gap-4">
-          <button
-            type="button"
-            @click="closeApplicationForm"
-            class="py-2 px-4 bg-gray-500 text-white rounded-md"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            class="py-2 px-4 font-[600] rounded-md bg-green-600 hover:bg-green-700 text-white"
-          >
-            Apply
-          </button>
+          <div v-else class="flex justify-end gap-4">
+            <button
+              type="button"
+              @click="closeApplicationForm"
+              class="py-2 px-4 bg-gray-500 text-white rounded-md"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              class="py-2 px-4 font-[600] rounded-md bg-green-600 hover:bg-green-700 text-white"
+            >
+              Apply
+            </button>
+          </div>
         </div>
       </form>
     </div>

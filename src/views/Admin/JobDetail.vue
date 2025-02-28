@@ -274,6 +274,19 @@ async function rejectJob() {
   }
 }
 
+async function closeJob() {
+  try {
+    const response = await axios.post(`http://localhost:8090/api/jobs/${jobId}/close`)
+    if (response.status === 200) {
+      job.value.status = 'CLOSED'
+      toastr.success('Job closed successfully.')
+    }
+  } catch (error) {
+    console.error(error)
+    toastr.error('Failed to close job.')
+  }
+}
+
 function toggleDropdown() {
   isDropdownOpen.value = !isDropdownOpen.value
 }

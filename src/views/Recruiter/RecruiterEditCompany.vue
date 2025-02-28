@@ -371,6 +371,7 @@ const handleSubmit = async () => {
         }
       })
       toastr.success('Created company successfully', 'Success')
+      isCompanyExist.value = true
     }
   } catch (error) {
     if (error.response && Array.isArray(error.response.data)) {
