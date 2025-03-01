@@ -42,6 +42,7 @@
         <thead>
           <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
             <th class="py-3 px-6">Name</th>
+            <th class="py-3 px-6">License</th>
             <th class="py-3 px-6">Email</th>
             <th class="py-3 px-6">Phone</th>
             <th class="py-3 px-6">Status</th>
@@ -64,6 +65,33 @@
                 class="w-10 h-10 rounded-full mr-2"
               />
               <span class="cursor-pointer" @click="goToDetail(company.id)">{{ company.name }}</span>
+            </td>
+            <td class="py-3 px-6">
+              <template v-if="!company.business_license">
+                <!-- Trường hợp chưa có License -->
+                <span class="text-gray-500 italic">Not Available</span>
+              </template>
+
+              <template v-else-if="company.business_license.endsWith('.pdf')">
+                <!-- Hiển thị nút mở PDF -->
+                <a
+                  :href="`http://localhost:8090/uploads/${company.business_license}`"
+                  target="_blank"
+                  class="flex items-center text-blue-600 hover:text-blue-800"
+                >
+                  <i class="pi pi-file-pdf text-red-500 text-2xl mr-2"></i>
+                  <span>View PDF</span>
+                </a>
+              </template>
+
+              <template v-else>
+                <!-- Hiển thị ảnh nếu không phải PDF -->
+                <img
+                  :src="`http://localhost:8090/uploads/${company.business_license}`"
+                  alt="License"
+                  class="w-10 h-10 rounded-full"
+                />
+              </template>
             </td>
             <td class="py-3 px-6">{{ company.email }}</td>
             <td class="py-3 px-6">{{ company.phone }}</td>
