@@ -42,6 +42,7 @@ import RecruiterNotifications from '@/views/Recruiter/RecruiterNotifications.vue
 import CompanyDetail from '@/views/Admin/CompanyDetail.vue'
 import CreateCVView from '@/views/CreateCVView.vue'
 import LoginWithGoogle from '@/components/LoginWithGoogle.vue'
+import CategoriesManagement from '@/views/Admin/CategoriesManagement.vue'
 
 const routes = [
   {
@@ -277,6 +278,11 @@ const routes = [
         path: 'job/:id',
         name: 'admin-detail-job',
         component: JobDetail
+      },
+      {
+        path: 'categories',
+        name: 'admin-categories-management',
+        component: CategoriesManagement
       }
     ]
   },

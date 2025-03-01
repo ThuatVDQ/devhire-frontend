@@ -80,7 +80,7 @@
                   class="flex items-center text-blue-600 hover:text-blue-800"
                 >
                   <i class="pi pi-file-pdf text-red-500 text-2xl mr-2"></i>
-                  <span>View PDF</span>
+                  <span>View License</span>
                 </a>
               </template>
 
