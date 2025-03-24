@@ -43,6 +43,7 @@ import CompanyDetail from '@/views/Admin/CompanyDetail.vue'
 import CreateCVView from '@/views/CreateCVView.vue'
 import LoginWithGoogle from '@/components/LoginWithGoogle.vue'
 import CategoriesManagement from '@/views/Admin/CategoriesManagement.vue'
+import SubscriptionsManagement from '@/views/Admin/SubscriptionsManagement.vue'
 
 const routes = [
   {
@@ -283,6 +284,11 @@ const routes = [
         path: 'categories',
         name: 'admin-categories-management',
         component: CategoriesManagement
+      },
+      {
+        path: 'subscriptions',
+        name: 'admin-subscriptions-management',
+        component: SubscriptionsManagement
       }
     ]
   },

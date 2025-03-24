@@ -102,6 +102,7 @@ const menuItems = [
   { name: 'Users', path: '/admin/users', icon: 'pi pi-users' },
   { name: 'Jobs', path: '/admin/jobs', icon: 'pi pi-briefcase' },
   { name: 'Companies', path: '/admin/companies', icon: 'pi pi-building' },
+  { name: 'Subscriptions', path: '/admin/subscriptions', icon: 'pi pi-credit-card' },
   { name: 'Categories', path: '/admin/categories', icon: 'pi pi-tags' },
   { name: 'Notifications', path: '/admin/notifications', icon: 'pi pi-bell' }
 ]
