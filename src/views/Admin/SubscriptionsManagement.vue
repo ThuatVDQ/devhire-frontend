@@ -85,6 +85,14 @@
                 {{ subscription.status }}
               </span>
             </td>
+            <td class="py-3 px-6 text-center flex gap-4 justify-center">
+              <button
+                @click="openEditSubscriptionModal(subscription)"
+                class="text-blue-500 hover:text-blue-700"
+              >
+                <i class="pi pi-pencil"></i>
+              </button>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -122,7 +130,7 @@ const keyword = ref('')
 const showModal = ref(false)
 const modalTitle = ref('')
 const modalButtonText = ref('')
-const currentSubscription = ref({ name: '', price: 0, duration: 30, status: 'Active' })
+const currentSubscription = ref({ name: '', price: 0, benefit: '', description: '', amount: 0 })
 const isEditing = ref(false)
 
 const fetchSubscriptions = async () => {
@@ -139,7 +147,7 @@ const fetchSubscriptions = async () => {
 
 const openAddSubscriptionModal = () => {
   isEditing.value = false
-  currentSubscription.value = { name: '', price: 0, duration: 30, status: 'Active' }
+  currentSubscription.value = { name: '', price: 0, benefit: '', description: '', amount: 0 }
   modalTitle.value = 'Add New Subscription'
   modalButtonText.value = 'Add'
   showModal.value = true
