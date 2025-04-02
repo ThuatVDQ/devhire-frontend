@@ -29,6 +29,11 @@ const menuItems = [
   { name: 'Dashboard', path: '/recruiter/dashboard', icon: 'pi pi-home' },
   { name: 'Post Job', path: '/recruiter/post-job', icon: 'pi pi-plus' },
   { name: 'Jobs', path: '/recruiter/jobs', icon: 'pi pi-briefcase' },
+  {
+    name: 'Upgrade to MemberVIP',
+    path: '/recruiter/upgrade',
+    icon: 'pi pi-star'
+  }, // Mục nâng cấp VIP
   { name: 'Settings', path: '/recruiter/settings/profile', icon: 'pi pi-cog' },
   { name: 'Notifications', path: '/recruiter/notifications', icon: 'pi pi-bell' },
   { name: 'Contact Us', path: '/recruiter/contact', icon: 'pi pi-envelope' }

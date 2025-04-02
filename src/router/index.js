@@ -208,8 +208,8 @@ const routes = [
         component: ContactView
       },
       {
-        path: 'request-quote',
-        name: 'pricing',
+        path: 'upgrade',
+        name: 'recruiter-upgrade',
         component: PricingView
       }
     ]
