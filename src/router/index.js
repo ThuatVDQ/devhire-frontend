@@ -44,6 +44,7 @@ import CreateCVView from '@/views/CreateCVView.vue'
 import LoginWithGoogle from '@/components/LoginWithGoogle.vue'
 import CategoriesManagement from '@/views/Admin/CategoriesManagement.vue'
 import SubscriptionsManagement from '@/views/Admin/SubscriptionsManagement.vue'
+import PaymentResultView from '@/views/Recruiter/PaymentResultView.vue'
 
 const routes = [
   {
@@ -213,6 +214,11 @@ const routes = [
         component: PricingView
       }
     ]
+  },
+  {
+    path: '/upgrade-result',
+    name: 'recruiter-upgrade-result',
+    component: PaymentResultView
   },
   {
     path: '/recruiter/login',

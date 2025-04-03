@@ -29,7 +29,6 @@ const cardItems = [
     icon: 'pi pi-hourglass'
   }
 ]
-// Biến lưu danh sách gói đăng ký (subscription)
 const subscription = ref([])
 
 // Hàm gọi API lấy danh sách subscription
@@ -81,60 +80,25 @@ const handleSubscribe = async (plan) => {
     console.error('Lỗi khi thanh toán:', error)
   }
 }
+const upgradedSubscriptions = ref([])
 
-// Gọi API khi component được mount
-onMounted(fetchSubscription)
-
-const message = ref('')
-const status = ref('')
-
-// Hàm xử lý kết quả thanh toán
-const handlePaymentResult = () => {
-  // Lấy các tham số từ URL
-  const urlParams = new URLSearchParams(window.location.search)
-
-  // Kiểm tra nếu không có tham số thanh toán thì không làm gì
-  const vnp_ResponseCode = urlParams.get('vnp_ResponseCode')
-  const vnp_TransactionStatus = urlParams.get('vnp_TransactionStatus')
-
-  // Nếu không có tham số thì không xử lý gì
-  if (!vnp_ResponseCode || !vnp_TransactionStatus) {
-    return
-  }
-
-  // Xử lý kết quả thanh toán
-  if (vnp_ResponseCode === '00' && vnp_TransactionStatus === '00') {
-    const subscriptionId = urlParams.get('vnp_OrderInfo') // Giả sử vnp_OrderInfo là ID đăng ký
-    axios
-      .get('http://localhost:8090/api/payments/payment-callback', {
-        params: {
-          vnp_ResponseCode: vnp_ResponseCode,
-          vnp_OrderInfo: subscriptionId
-        },
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
-      })
-      .then((response) => {
-        console.log(response.data)
-        toastr.success('Subscription activated!', 'Success')
-        setTimeout(() => {
-          const cleanUrl = window.location.origin + window.location.pathname
-          window.history.replaceState({}, document.title, cleanUrl) // Xóa tham số
-          window.location.reload() // Reload trang
-        }, 3000) // Chờ 3 giây trước khi reload
-      })
-      .catch((error) => {
-        console.error(error)
-        toastr.error('Error processing subscription.', 'Error')
-      })
-  } else {
-    toastr.error('Payment failed. Please try again.', 'Error') // Hiển thị thông báo lỗi
+// Hàm gọi API lấy danh sách upgraded subscriptions
+const fetchUpgradedSubscriptions = async () => {
+  try {
+    const response = await axios.get('http://localhost:8090/api/subscription/upgraded', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    upgradedSubscriptions.value = response.data
+    console.log('Danh sách upgraded subscriptions:', upgradedSubscriptions.value)
+  } catch (error) {
+    console.error('Lỗi khi tải danh sách upgraded subscriptions:', error)
   }
 }
 
-// Gọi hàm khi component được mount
-onMounted(handlePaymentResult)
+onMounted(fetchUpgradedSubscriptions)
+onMounted(fetchSubscription)
 </script>
 <template>
   <section
@@ -154,6 +118,7 @@ onMounted(handlePaymentResult)
   <section class="relative lg:py-24 py-16">
     <div class="container">
       <div class="grid md:grid-cols-3 grid-cols-1 gap-[30px]">
+        <!-- Hiển thị danh sách gói subscription -->
         <div
           v-for="(plan, index) in subscription"
           :key="index"
@@ -181,13 +146,20 @@ onMounted(handlePaymentResult)
               </li>
             </ul>
 
-            <!-- Nút đăng ký -->
-            <button
-              @click="handleSubscribe(plan)"
-              class="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 border-emerald-600 hover:border-emerald-700 text-white rounded-md"
-            >
-              {{ plan.buttonLabel }}
-            </button>
+            <!-- Kiểm tra nếu gói này đã nâng cấp -->
+            <div v-if="upgradedSubscriptions.some((up) => up.id === plan.id)">
+              <button class="px-6 py-2 bg-gray-400 border-gray-400 text-white rounded-md" disabled>
+                Already Subscribed
+              </button>
+            </div>
+            <div v-else>
+              <button
+                @click="handleSubscribe(plan)"
+                class="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 border-emerald-600 hover:border-emerald-700 text-white rounded-md"
+              >
+                {{ plan.buttonLabel }}
+              </button>
+            </div>
           </div>
         </div>
       </div>
