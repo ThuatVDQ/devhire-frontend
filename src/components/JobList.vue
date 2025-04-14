@@ -28,7 +28,11 @@ const fetchData = async (page = 0) => {
       headers
     })
 
-    jobs.value = response.data.jobs
+    const sortedJobs = response.data.jobs.sort((a, b) => {
+      return (b.is_highlight === true ? 1 : 0) - (a.is_highlight === true ? 1 : 0)
+    })
+
+    jobs.value = sortedJobs
     totalPages.value = response.data.totalPages
     currentPage.value = page
     console.log(jobs.value)

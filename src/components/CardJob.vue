@@ -104,7 +104,11 @@ function formatSalary(amount) {
 
 <template>
   <div
-    class="flex flex-col group relative overflow-hidden bg-white dark:bg-slate-900 shadow-lg hover:shadow-2xl dark:shadow-gray-700 dark:hover:shadow-xl hover:-mt-2 rounded-md transition-all duration-500"
+    :class="[
+      'flex flex-col relative overflow-hidden bg-white dark:bg-slate-900 shadow-md hover:shadow-xl dark:shadow-gray-700 dark:hover:shadow-2xl hover:-mt-2 hover:scale-[1.015] rounded-md transition-all duration-500 border-2',
+      state.job.is_highlight ? 'hover:border-rose-500' : 'hover:border-emerald-600',
+      'border-transparent'
+    ]"
   >
     <div class="px-6 pt-6 pb-2">
       <div class="flex items-center space-x-2">
@@ -122,12 +126,25 @@ function formatSalary(amount) {
             v-if="!state.job.is_close"
             class="inline-block text-[16px] font-semibold hover:text-emerald-600 transition-all duration-500 me-1"
             :to="`/jobs/${state.job.id}`"
-          >
-            {{ state.job.title }}
+            ><div>
+              <span
+                v-if="state.job.is_highlight"
+                class="items-center bg-gradient-to-r from-pink-100 to-rose-200 text-rose-600 text-xs font-bold px-2 py-[2px] rounded-full shadow-sm animate-pulse mr-2"
+              >
+                <i class="pi pi-sparkles text-rose-500 mr-1"></i>HOT
+              </span>
+              {{ state.job.title }}
+            </div>
           </RouterLink>
 
           <!-- Hiển thị span thay thế nếu job đã đóng -->
           <span v-else class="inline-block text-[16px] font-semibold">
+            <span
+              v-if="state.job.is_highlight"
+              class="inline-flex items-center text-rose-500 text-sm font-semibold mr-1"
+            >
+              <i class="pi pi-diamond mr-1"></i>HOT
+            </span>
             {{ state.job.title }}
           </span>
 
