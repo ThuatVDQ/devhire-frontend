@@ -60,7 +60,7 @@
             >
               {{ category.name }}
             </td>
-            <td class="py-3 px-6">{{ category.totalJob }}</td>
+            <td class="py-3 px-6">{{ category.total_jobs }}</td>
             <td class="py-3 px-6 text-center">
               <button
                 @click="openEditCategoryModal(category)"
@@ -106,6 +106,7 @@ const fetchCategories = async () => {
     const response = await axios.get('http://localhost:8090/api/category', {
       headers: { Authorization: 'Bearer ' + localStorage.getItem('token') }
     })
+    console.log(response.data)
     categories.value = response.data
   } catch (error) {
     categories.value = []
