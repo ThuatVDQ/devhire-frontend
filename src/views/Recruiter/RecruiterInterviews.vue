@@ -1,27 +1,30 @@
 <template>
+  <header class="">
+    <h1 class="text-3xl font-semibold text-white bg-blue-700 px-11 py-10">Interview Management</h1>
+  </header>
   <div class="p-8 bg-gray-50 min-h-screen space-y-8">
     <!-- Tiêu đề và breadcrumb -->
-    <div>
-      <h1 class="text-4xl font-semibold text-gray-800">Phỏng vấn</h1>
-    </div>
 
     <!-- Lịch phỏng vấn -->
     <div class="bg-white shadow-2xl rounded-xl p-6">
-      <h2 class="text-2xl font-semibold mb-4 text-gray-800">Lịch phỏng vấn</h2>
+      <h2 class="text-2xl font-semibold mb-4 text-gray-800">Interview Schedule</h2>
       <VueCal
+        class="custom-vuecal"
         :events="events"
-        default-view="month"
+        default-view="week"
+        :disable-views="['years', 'year', 'day']"
         time="24"
-        hide-view-selector
-        locale="vi"
-        class="rounded-lg shadow-xl border border-gray-300 overflow-hidden"
+        locale="en"
+        :min-time="minTime"
+        :max-time="maxTime"
+        style="height: 800px"
         @event-click="handleClick"
       />
     </div>
 
     <!-- Danh sách tin tuyển dụng -->
     <div class="bg-white shadow-2xl rounded-xl p-6">
-      <h2 class="text-2xl font-semibold mb-6 text-gray-800">Danh sách tin tuyển dụng</h2>
+      <h2 class="text-2xl font-semibold mb-6 text-gray-800">List Jobs</h2>
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-emerald-600 text-white">
@@ -86,12 +89,22 @@
                           <td class="px-4 py-2 text-sm">{{ applicant.full_name }}</td>
                           <td class="px-4 py-2 text-sm">{{ applicant.email }}</td>
                           <td class="px-4 py-2 text-sm">
-                            <button
-                              class="bg-indigo-600 text-white text-xs px-3 py-1 rounded hover:bg-indigo-700"
-                              @click="openInterviewPopup(applicant)"
-                            >
-                              Đặt lịch
-                            </button>
+                            <div>
+                              <span
+                                v-if="applicant.is_scheduled"
+                                class="text-green-600 text-xs font-semibold"
+                              >
+                                Already Scheduled
+                              </span>
+
+                              <button
+                                v-else
+                                class="bg-indigo-600 text-white text-xs px-3 py-1 rounded hover:bg-indigo-700"
+                                @click="openInterviewPopup(applicant)"
+                              >
+                                Schedule Interview
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       </tbody>
@@ -107,13 +120,83 @@
     </div>
   </div>
 
-  <CreateInterviewSchedulePopup :isVisible="showPopup" @confirm="onConfirm" @cancel="closeDialog" />
+  <div
+    v-if="selectedEvent"
+    class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+  >
+    <div
+      class="bg-white rounded-2xl w-full max-w-lg shadow-2xl relative transform transition-all scale-95 hover:scale-100 duration-300 ease-out"
+    >
+      <!-- Title with elegance -->
+      <h2
+        class="text-3xl font-semibold mb-6 text-white bg-gradient-to-r bg-blue-500 p-8 rounded-lg"
+      >
+        {{ selectedEvent.title }}
+      </h2>
+
+      <div class="grid gap-4 px-8">
+        <!-- Location -->
+        <div class="grid grid-cols-[140px_1fr] text-lg text-gray-800">
+          <span class="font-medium">Location:</span>
+          <span class="text-gray-700">{{ selectedEvent.location }}</span>
+        </div>
+
+        <!-- Full name -->
+        <div class="grid grid-cols-[140px_1fr] text-lg text-gray-800">
+          <span class="font-medium">Full name:</span>
+          <span class="text-gray-700">{{ selectedEvent.content }}</span>
+        </div>
+
+        <!-- Start time -->
+        <div class="grid grid-cols-[140px_1fr] text-lg text-gray-800">
+          <span class="font-medium">Start:</span>
+          <span class="text-gray-700">{{ formatDateTime(selectedEvent.start) }}</span>
+        </div>
+
+        <!-- End time -->
+        <div class="grid grid-cols-[140px_1fr] text-lg text-gray-800">
+          <span class="font-medium">End:</span>
+          <span class="text-gray-700">{{ formatDateTime(selectedEvent.end) }}</span>
+        </div>
+
+        <!-- Note -->
+        <div class="grid grid-cols-[140px_1fr] text-lg text-gray-800">
+          <span class="font-medium">Note:</span>
+          <span class="text-gray-700">{{ selectedEvent.note }}</span>
+        </div>
+      </div>
+
+      <!-- Close button with smooth hover -->
+      <div class="flex justify-end mt-6 px-8 pb-4">
+        <button
+          class="bg-gradient-to-r bg-yellow-400 mr-4 text-white font-semibold py-2 px-6 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-400 transition duration-300 ease-in-out"
+          @click="editEvent(selectedEvent)"
+        >
+          Edit
+        </button>
+        <button
+          class="bg-gradient-to-r bg-gray-600 text-white font-semibold py-2 px-8 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-300 ease-in-out"
+          @click="selectedEvent = null"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <CreateInterviewSchedulePopup
+    :isVisible="showPopup"
+    :interviewDetails="interviewDetails"
+    @confirm="onConfirm"
+    @cancel="closeDialog"
+    @edit="onEdit"
+  />
 </template>
 
 <script setup>
 import VueCal from 'vue-cal'
 import 'vue-cal/dist/vuecal.css'
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
@@ -126,6 +209,23 @@ const pageSize = ref(10)
 
 const selectedApplicants = ref({})
 const selectedApplicant = ref(null)
+
+const selectedEvent = ref(null)
+
+const handleClick = (event) => {
+  selectedEvent.value = event
+}
+
+const formatDateTime = (dt) => {
+  const d = new Date(dt)
+  return d.toLocaleString('vi-VN', {
+    hour: '2-digit',
+    minute: '2-digit',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  })
+}
 
 // Hàm chọn tất cả ứng viên trong một job
 const toggleAll = (jobId, event) => {
@@ -140,6 +240,24 @@ const toggleAll = (jobId, event) => {
 }
 
 const showPopup = ref(false)
+const interviewDetails = ref({
+  interview_time: '',
+  duration_minutes: 30,
+  location: '',
+  note: '',
+  message: ''
+})
+
+function editEvent(event) {
+  interviewDetails.value.interview_time = event.start
+  interviewDetails.value.duration_minutes = event.duration_minutes
+  interviewDetails.value.location = event.location
+  interviewDetails.value.note = event.note
+  interviewDetails.value.message = 'edit'
+  interviewDetails.value.id = event.id
+  selectedEvent.value = null
+  showPopup.value = true
+}
 
 function openInterviewPopup(applicant) {
   console.log('Open interview popup for:', applicant)
@@ -150,6 +268,13 @@ function openInterviewPopup(applicant) {
 function closeDialog() {
   showPopup.value = false
   selectedApplicant.value = null
+  interviewDetails.value = {
+    interview_time: '',
+    duration_minutes: 30,
+    location: '',
+    note: '',
+    message: ''
+  }
 }
 
 function formatDateTimeToLocal(date) {
@@ -197,11 +322,45 @@ function onConfirm(data) {
     })
 }
 
+function onEdit(data) {
+  const payload = {
+    id: data.id, // cần id để biết đang sửa cái nào
+    interview_time:
+      typeof data.interview_time === 'string'
+        ? data.interview_time.replace(' ', 'T')
+        : formatDateTimeToLocal(data.interview_time),
+
+    duration_minutes: Number(data.duration_minutes),
+    location: String(data.location || '').trim(),
+    note: String(data.note || '').trim()
+  }
+
+  console.log('Edit Payload:', payload)
+
+  axios
+    .post(`http://localhost:8090/api/interview-schedules/${payload.id}`, payload, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    .then((response) => {
+      console.log('Interview schedule updated:', response.data)
+      toastr.success('Lịch phỏng vấn đã được cập nhật thành công!')
+      fetchInterviewSchedules()
+      closeDialog()
+    })
+    .catch((error) => {
+      toastr.error('Có lỗi xảy ra khi cập nhật lịch phỏng vấn!')
+      console.error('Error updating interview schedule:', error)
+    })
+}
+
 async function fetchJobs(page = 0) {
   try {
     const params = {
       page: page,
-      limit: pageSize.value
+      limit: pageSize.value,
+      status: 'CLOSED'
     }
 
     const response = await axios.get('http://localhost:8090/api/jobs/company', {
@@ -239,7 +398,9 @@ const toggleApplicants = async (jobId) => {
           }
         })
         console.log(res.data)
+
         applicants.value[jobId] = res.data
+        console.log('Applicants:', applicants.value[jobId])
       } catch (err) {
         console.error('Error loading applicants:', err)
         applicants.value[jobId] = []
@@ -248,10 +409,8 @@ const toggleApplicants = async (jobId) => {
   }
 }
 
-// Biến lưu lịch phỏng vấn (hiển thị trên lịch)
-const eventss = ref([])
+const events = ref([])
 
-// Gọi API lấy dữ liệu phỏng vấn
 const fetchInterviewSchedules = async () => {
   try {
     const response = await axios.get('http://localhost:8090/api/interview-schedules', {
@@ -263,38 +422,60 @@ const fetchInterviewSchedules = async () => {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     })
-    console.log(response.data)
+
     const rawData = response.data.content || []
 
-    // // Chuyển đổi dữ liệu về định dạng VueCal
-    // eventss.value = rawData.map((item) => ({
-    //   start: item.interviewTime,
-    //   end: item.interviewEndTime || item.interviewTime, // hoặc +1h nếu không có
-    //   title: item.candidateName,
-    //   content: `Position: ${item.jobTitle}`
-    // }))
+    events.value = rawData.map((item) => {
+      const [year, month, day, hour, minute] = item.interview_time
+
+      const startDate = new Date(year, month - 1, day, hour, minute)
+      const endDate = new Date(startDate.getTime() + item.duration_minutes * 60 * 1000)
+
+      const formatDateTime = (date) => {
+        const yyyy = date.getFullYear()
+        const MM = String(date.getMonth() + 1).padStart(2, '0')
+        const dd = String(date.getDate()).padStart(2, '0')
+        const HH = String(date.getHours()).padStart(2, '0')
+        const mm = String(date.getMinutes()).padStart(2, '0')
+        return `${yyyy}-${MM}-${dd} ${HH}:${mm}`
+      }
+
+      return {
+        start: formatDateTime(startDate),
+        end: formatDateTime(endDate),
+        title: `${item.job_title}`,
+        content: `${item.candidate_name}`,
+        location: item.location,
+        note: item.note,
+        duration_minutes: item.duration_minutes,
+        id: item.id
+      }
+    })
   } catch (error) {
     console.error('Failed to fetch schedules:', error)
   }
 }
 
-const events = ref([
-  {
-    start: '2025-04-18 09:00',
-    end: '2025-04-18 10:00',
-    title: 'Phỏng vấn ứng viên A',
-    content: 'Vị trí: Frontend Developer'
-  },
-  {
-    start: '2025-04-20 14:00',
-    end: '2025-04-20 15:00',
-    title: 'Phỏng vấn ứng viên B',
-    content: 'Vị trí: UX Designer'
-  }
-])
+const parseHour = (datetime) => new Date(datetime).getHours()
+
+const minTime = computed(() => {
+  const hours = events.value.map((e) => parseHour(e.start))
+  return `${Math.min(...hours)}:00`
+})
+
+const maxTime = computed(() => {
+  const hours = events.value.map((e) => parseHour(e.end))
+  return `${Math.max(...hours) + 1}:00`
+})
 
 onMounted(() => {
   fetchJobs(currentPage.value)
   fetchInterviewSchedules()
 })
 </script>
+
+<style scoped>
+::v-deep(.custom-vuecal .vuecal__header) {
+  @apply bg-emerald-600 text-white rounded-t-xl px-4 py-3 font-semibold;
+}
+</style>

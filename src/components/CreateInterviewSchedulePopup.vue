@@ -16,7 +16,7 @@
           <input
             ref="datetimeInput"
             type="text"
-            v-model="form.interview_time"
+            v-model="interviewDetails.interview_time"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             placeholder="Select date and time"
           />
@@ -28,7 +28,7 @@
             type="number"
             min="1"
             max="480"
-            v-model="form.duration_minutes"
+            v-model="interviewDetails.duration_minutes"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
         </div>
@@ -39,7 +39,7 @@
           <div class="space-y-2">
             <!-- Select box for predefined locations -->
             <select
-              v-model="form.location"
+              v-model="interviewDetails.location"
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
               <option value="Google Meet">Google Meet</option>
@@ -50,9 +50,9 @@
             </select>
             <!-- Or Input for custom location when "Other" is selected -->
             <input
-              v-if="form.location === 'Other'"
+              v-if="interviewDetails.location === 'Other'"
               type="text"
-              v-model="form.customLocation"
+              v-model="interviewDetails.customLocation"
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
               placeholder="Enter custom location"
             />
@@ -64,7 +64,7 @@
           <textarea
             maxlength="1000"
             rows="4"
-            v-model="form.note"
+            v-model="interviewDetails.note"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
           ></textarea>
         </div>
@@ -79,10 +79,20 @@
           Cancel
         </button>
         <button
+          v-if="interviewDetails.message === 'edit'"
+          @click="editSchedule"
+          class="px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white text-sm"
+        >
+          Save
+        </button>
+
+        <!-- Nút Create khi tạo mới -->
+        <button
+          v-else
           @click="emitConfirm"
           class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm"
         >
-          Save
+          Create
         </button>
       </div>
     </div>
@@ -90,21 +100,43 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits, ref, watch, nextTick } from 'vue'
+import { defineProps, defineEmits, ref, watch, nextTick, onMounted } from 'vue'
 import flatpickr from 'flatpickr'
 import 'flatpickr/dist/flatpickr.css'
 
 const props = defineProps({
-  isVisible: Boolean
+  isVisible: Boolean,
+  interviewDetails: {
+    type: Object,
+    required: true
+  }
 })
 
-const form = ref({
-  interview_time: '',
-  duration_minutes: 30,
-  location: 'Google Meet',
-  customLocation: '',
-  note: ''
-})
+const interviewDetails = ref({ ...props.interviewDetails })
+
+watch(
+  () => props.interviewDetails,
+  (newValue) => {
+    if (newValue && newValue.interview_time) {
+      const localDate = new Date(newValue.interview_time)
+
+      const year = localDate.getFullYear()
+      const month = String(localDate.getMonth() + 1).padStart(2, '0')
+      const day = String(localDate.getDate()).padStart(2, '0')
+      const hour = String(localDate.getHours()).padStart(2, '0')
+      const minute = String(localDate.getMinutes()).padStart(2, '0')
+      const formatted = `${year}-${month}-${day}T${hour}:${minute}`
+
+      interviewDetails.value = {
+        ...newValue,
+        interview_time: formatted
+      }
+    } else {
+      interviewDetails.value = { ...newValue }
+    }
+  },
+  { immediate: true, deep: true }
+)
 
 const datetimeInput = ref(null)
 
@@ -124,7 +156,7 @@ watch(
             defaultMinute: 0,
             defaultSeconds: 0,
             onChange: function (selectedDates, dateStr, instance) {
-              form.value.interview_time = dateStr
+              interviewDetails.value.interview_time = dateStr
             }
           })
         }
@@ -141,9 +173,24 @@ function emitCancel() {
 
 function emitConfirm() {
   // Nếu location là "Other", sẽ dùng giá trị customLocation
-  const location = form.value.location === 'Other' ? form.value.customLocation : form.value.location
+  const location =
+    interviewDetails.value.location === 'Other'
+      ? interviewDetails.value.customLocation
+      : interviewDetails.value.location
   emit('confirm', {
-    ...form.value,
+    ...interviewDetails.value,
+    location // Gửi location là giá trị đã được xử lý
+  })
+}
+
+function editSchedule() {
+  // Nếu location là "Other", sẽ dùng giá trị customLocation
+  const location =
+    interviewDetails.value.location === 'Other'
+      ? interviewDetails.value.customLocation
+      : interviewDetails.value.location
+  emit('edit', {
+    ...interviewDetails.value,
     location // Gửi location là giá trị đã được xử lý
   })
 }
