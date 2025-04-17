@@ -28,6 +28,7 @@
     "sockjs-client": "^1.6.1",
     "toastr": "^2.1.4",
     "vue": "^3.4.29",
+    "vue-cal": "^4.10.2",
     "vue-chartjs": "^5.3.2",
     "vue-router": "^4.3.3"
   },

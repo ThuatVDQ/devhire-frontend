@@ -33,7 +33,12 @@ const menuItems = [
     name: 'Upgrade to MemberVIP',
     path: '/recruiter/upgrade',
     icon: 'pi pi-star'
-  }, // Mục nâng cấp VIP
+  },
+  {
+    name: 'Interview Schedule',
+    path: '/recruiter/interviews',
+    icon: 'pi pi-calendar-clock'
+  },
   { name: 'Settings', path: '/recruiter/settings/profile', icon: 'pi pi-cog' },
   { name: 'Notifications', path: '/recruiter/notifications', icon: 'pi pi-bell' },
   { name: 'Contact Us', path: '/recruiter/contact', icon: 'pi pi-envelope' }
