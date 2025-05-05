@@ -143,7 +143,15 @@ watch(
       inf.type = newJob.type || 'FULL_TIME'
       inf.currency = newJob.currency || 'VND'
       inf.slots = newJob.slots || 1
-      inf.selectedDate = new Date(newJob.deadline).toISOString().split('T')[0] || ''
+      if (Array.isArray(newJob.deadline) && newJob.deadline.length >= 3) {
+        const [year, month, day] = newJob.deadline
+        const yyyy = year
+        const mm = String(month).padStart(2, '0')
+        const dd = String(day).padStart(2, '0')
+        inf.selectedDate = `${yyyy}-${mm}-${dd}`
+      } else {
+        inf.selectedDate = ''
+      }
     }
   },
   { immediate: true }
