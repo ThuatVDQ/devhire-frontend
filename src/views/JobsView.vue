@@ -19,6 +19,6 @@ const handleSearch = (criteria) => {
 <template>
   <SearchBar @search="handleSearch" />
   <JobRecommendation />
-  <JobList :searchCriteria="searchCriteria" />
+  <JobList :searchCriteria="searchCriteria" class="pt-8" />
   <FeatureSection />
 </template>

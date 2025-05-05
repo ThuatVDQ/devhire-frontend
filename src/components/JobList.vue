@@ -152,6 +152,7 @@ const scrollToTop = () => {
     </div>
 
     <div v-else class="container">
+      <h2 class="text-2xl font-semibold my-4">Other Job Opportunities You Can Explore</h2>
       <div class="grid lg:grid-cols-2 md:grid-cols-2 grid-cols-1 mt-8 gap-[30px] auto-rows-fr">
         <CardJob v-for="job in jobs" :key="job.id" :job="job" />
       </div>
