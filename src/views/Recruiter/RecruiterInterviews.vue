@@ -110,7 +110,16 @@
                       </tbody>
                     </table>
                   </div>
+
                   <div v-else class="text-sm text-gray-500 italic">No applicants found.</div>
+                  <div v-if="selectedApplicants[job.id]?.length" class="mt-2 text-right">
+                    <button
+                      class="bg-blue-600 text-white text-sm px-4 py-2 rounded hover:bg-blue-700"
+                      @click="openInterviewPopupMultiple(job.id)"
+                    >
+                      Schedule {{ selectedApplicants[job.id].length }} selected applicants
+                    </button>
+                  </div>
                 </td>
               </tr>
             </template>
@@ -260,7 +269,6 @@ function editEvent(event) {
 }
 
 function openInterviewPopup(applicant) {
-  console.log('Open interview popup for:', applicant)
   selectedApplicant.value = applicant
   showPopup.value = true
 }
@@ -277,6 +285,18 @@ function closeDialog() {
   }
 }
 
+const openInterviewPopupMultiple = (jobId) => {
+  const selected = selectedApplicants.value[jobId] || []
+
+  if (!selected.length) return
+
+  selectedApplicant.value = {
+    applicants: selected
+  }
+  interviewDetails.value.message = 'createMultiple'
+  showPopup.value = true
+}
+
 function formatDateTimeToLocal(date) {
   const d = new Date(date)
   const year = d.getFullYear()
@@ -289,42 +309,8 @@ function formatDateTimeToLocal(date) {
 }
 
 function onConfirm(data) {
+  // Dùng chung payload cho cả hai trường hợp
   const payload = {
-    interview_time:
-      typeof data.interview_time === 'string'
-        ? data.interview_time.replace(' ', 'T')
-        : formatDateTimeToLocal(data.interview_time),
-
-    duration_minutes: Number(data.duration_minutes), // chắc chắn là số
-
-    location: String(data.location || '').trim(),
-    note: String(data.note || '').trim(),
-
-    job_application_id: selectedApplicant.value.id
-  }
-
-  console.log('Payload:', payload)
-
-  axios
-    .post('http://localhost:8090/api/interview-schedules/create', payload, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
-    })
-    .then((response) => {
-      console.log('Interview schedule created:', response.data)
-      toastr.success('Lịch phỏng vấn đã được tạo thành công!')
-      closeDialog()
-    })
-    .catch((error) => {
-      toastr.error('Có lỗi xảy ra khi tạo lịch phỏng vấn!')
-      console.error('Error creating interview schedule:', error)
-    })
-}
-
-function onEdit(data) {
-  const payload = {
-    id: data.id, // cần id để biết đang sửa cái nào
     interview_time:
       typeof data.interview_time === 'string'
         ? data.interview_time.replace(' ', 'T')
@@ -335,22 +321,70 @@ function onEdit(data) {
     note: String(data.note || '').trim()
   }
 
-  console.log('Edit Payload:', payload)
+  if (data.message === 'createMultiple') {
+    const ids = selectedApplicant.value.applicants
+    if (ids.length === 0) {
+      toastr.error('No applicants selected!')
+      return
+    }
+    payload.job_application_ids = ids
+    axios
+      .post('http://localhost:8090/api/interview-schedules/create-bulk', payload, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      })
+      .then((response) => {
+        toastr.success('Interview schedules created successfully!')
+        closeDialog()
+      })
+      .catch((error) => {
+        toastr.error('An error occurred while creating bulk interview schedules!')
+        console.error('Error:', error)
+      })
+  } else {
+    axios
+      .post('http://localhost:8090/api/interview-schedules/create', payload, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      })
+      .then((response) => {
+        toastr.success('Interview schedule created successfully!')
+        closeDialog()
+      })
+      .catch((error) => {
+        toastr.error('An error occurred while creating the interview schedule!')
+        console.error('Error:', error)
+      })
+  }
+}
+
+function onEdit(data) {
+  const payload = {
+    interview_time:
+      typeof data.interview_time === 'string'
+        ? data.interview_time.replace(' ', 'T')
+        : formatDateTimeToLocal(data.interview_time),
+
+    duration_minutes: Number(data.duration_minutes),
+    location: String(data.location || '').trim(),
+    note: String(data.note || '').trim()
+  }
 
   axios
-    .post(`http://localhost:8090/api/interview-schedules/${payload.id}`, payload, {
+    .post(`http://localhost:8090/api/interview-schedules/${data.id}`, payload, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     })
     .then((response) => {
-      console.log('Interview schedule updated:', response.data)
-      toastr.success('Lịch phỏng vấn đã được cập nhật thành công!')
+      toastr.success('Interview schedule updated successfully!')
       fetchInterviewSchedules()
       closeDialog()
     })
     .catch((error) => {
-      toastr.error('Có lỗi xảy ra khi cập nhật lịch phỏng vấn!')
+      toastr.error('An error occurred while updating the interview schedule!')
       console.error('Error updating interview schedule:', error)
     })
 }
@@ -369,7 +403,6 @@ async function fetchJobs(page = 0) {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     })
-    console.log(response.data)
     jobs.value = response.data.jobs
     totalPages.value = response.data.totalPages
     currentPage.value = page
@@ -397,10 +430,8 @@ const toggleApplicants = async (jobId) => {
             Authorization: `Bearer ${localStorage.getItem('token')}`
           }
         })
-        console.log(res.data)
 
         applicants.value[jobId] = res.data
-        console.log('Applicants:', applicants.value[jobId])
       } catch (err) {
         console.error('Error loading applicants:', err)
         applicants.value[jobId] = []
