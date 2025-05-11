@@ -35,6 +35,60 @@
           />
           <span v-if="errors.name" class="text-red-500 text-sm">{{ errors.name }}</span>
         </div>
+        <div
+          class="relative group ml-4 flex items-center text-gray-700 text-lg font-semibold whitespace-nowrap cursor-pointer"
+        >
+          <i class="pi pi-star-fill text-yellow-500 mr-1"></i>
+          <span>Score: {{ company.score?.totalScore?.toFixed(1) }}/100</span>
+          <i class="pi pi-info-circle text-blue-500 ml-2"></i>
+
+          <!-- Tooltip: nằm bên trong .group -->
+          <div
+            class="absolute z-10 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-opacity duration-200 bg-white border border-gray-300 rounded-md shadow-md p-3 text-sm w-max top-full left-0 mt-2"
+          >
+            <div class="grid grid-cols-2 gap-x-2 gap-y-1 items-center">
+              <div class="flex items-center">
+                <i class="pi pi-star text-yellow-500 mr-1"></i>
+                <span>Star Rating:</span>
+              </div>
+              <div class="text-right font-semibold">
+                {{ company.score?.starRating?.toFixed(1) }}
+              </div>
+
+              <div class="flex items-center">
+                <i class="pi pi-briefcase mr-1"></i>
+                <span>Jobs Score:</span>
+              </div>
+              <div class="text-right font-semibold">
+                {{ company.score?.scoreDetails?.jobs?.toFixed(2) }}
+              </div>
+
+              <div class="flex items-center">
+                <i class="pi pi-comments mr-1"></i>
+                <span>Reviews Score:</span>
+              </div>
+              <div class="text-right font-semibold">
+                {{ company.score?.scoreDetails?.reviews?.toFixed(2) }}
+              </div>
+
+              <div class="flex items-center">
+                <i class="pi pi-money-bill mr-1"></i>
+                <span>Salary Score:</span>
+              </div>
+              <div class="text-right font-semibold">
+                {{ company.score?.scoreDetails?.salary?.toFixed(2) }}
+              </div>
+
+              <div class="flex items-center">
+                <i class="pi pi-building mr-1"></i>
+                <span>Scale Score:</span>
+              </div>
+              <div class="text-right font-semibold">
+                {{ company.score?.scoreDetails?.scale?.toFixed(2) }}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="grid grid-cols-2 gap-4 mt-2">
         <div>
@@ -460,9 +514,22 @@ const fetchCompanyInfo = async () => {
   }
 }
 
+const fetchCompanyScore = async () => {
+  try {
+    const response = await axios.get('http://localhost:8090/api/scoring/company', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    company.value.score = response.data
+  } catch (error) {
+    console.error('Error fetching company score:', error)
+  }
+}
 // Fetch data on component mount
 onMounted(() => {
   fetchCompanyInfo()
+  fetchCompanyScore()
   const message = sessionStorage.getItem('message')
 
   if (message) {

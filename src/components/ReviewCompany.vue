@@ -37,9 +37,14 @@ const fetchReviews = async () => {
   }
 }
 
-const formatReviewDate = (createdAt) => {
-  const date = parseISO(createdAt)
-  return formatDistanceToNow(date, { addSuffix: true })
+const formatReviewDate = (created_at) => {
+  try {
+    const [year, month, day, hour, minute, second] = created_at
+    const date = new Date(year, month - 1, day, hour, minute, second)
+    return formatDistanceToNow(date, { addSuffix: true })
+  } catch (e) {
+    return 'Invalid date'
+  }
 }
 
 const loadMoreReviews = () => {
