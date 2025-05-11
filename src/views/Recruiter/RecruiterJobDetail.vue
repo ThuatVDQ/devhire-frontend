@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import EmailTemplatePopup from '@/components/EmailTemplatePopup.vue'
+import ScoreTooltip from '@/components/ScoreTooltip.vue'
 import { emailTemplates } from '@/data/emailTemplates.js'
 import axios from 'axios'
 import toastr from 'toastr'
@@ -10,6 +11,25 @@ import 'toastr/build/toastr.min.css'
 // Router
 const router = useRouter()
 const route = useRoute()
+
+const tooltipVisible = ref(false)
+const tooltipContent = ref('')
+const tooltipPosition = ref({ x: 0, y: 0 })
+
+function showTooltip(event, content) {
+  tooltipVisible.value = true
+  tooltipContent.value = content
+
+  // Hiển thị phía dưới - bên trái
+  tooltipPosition.value = {
+    x: event.clientX - 100, // lùi sang trái 200px
+    y: event.clientY + 10 // xuống dưới 16px
+  }
+}
+
+function hideTooltip() {
+  tooltipVisible.value = false
+}
 
 const actionMenuVisibleData = ref(null)
 const dropdownPortal = ref(null)
@@ -136,7 +156,18 @@ async function fetchCVScore() {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     })
-    console.log('response:', response.data)
+    const scoredData = response.data // [{ applicationId, score }, ...]
+
+    // Gán score vào jobApplications theo từng id khớp với applicationId
+    scoredData.forEach((scoredItem) => {
+      const target = jobApplications.value.find((app) => app.id === scoredItem.applicationId)
+      if (target) {
+        target.score = scoredItem.score
+        target.scoreDetail = scoredItem.scoreDetails
+      }
+    })
+
+    console.log('Updated jobApplications:', jobApplications.value)
   } catch (error) {
     toastr.error('Error fetching job applications:', error)
   } finally {
@@ -316,6 +347,9 @@ function goBack() {
               <th class="py-4 px-6 text-left text-sm font-medium text-gray-700 uppercase w-1/6">
                 Status
               </th>
+              <th class="py-4 px-6 text-left text-sm font-medium text-gray-700 uppercase w-1/6">
+                Score
+              </th>
               <th
                 class="py-4 px-6 text-left text-sm font-medium text-gray-700 uppercase w-1/6"
               ></th>
@@ -333,6 +367,15 @@ function goBack() {
                 {{ formatDate(application.applyDate) }}
               </td>
               <td class="py-4 px-6 text-sm text-gray-700">{{ application.status }}</td>
+              <td class="py-4 px-6 text-sm text-gray-700">
+                <span
+                  class="underline cursor-pointer"
+                  @mouseenter="showTooltip($event, application.scoreDetail)"
+                  @mouseleave="hideTooltip"
+                >
+                  {{ application.score?.toFixed(1) }}
+                </span>
+              </td>
               <td class="py-4 px-6 text-sm text-gray-700 text-right">
                 <button
                   @click="openActionMenu($event, application)"
@@ -443,4 +486,6 @@ function goBack() {
     @templateSelected="handleTemplateSelected"
     @close="closeEmailTemplatePopup"
   />
+
+  <ScoreTooltip :visible="tooltipVisible" :content="tooltipContent" :position="tooltipPosition" />
 </template>
