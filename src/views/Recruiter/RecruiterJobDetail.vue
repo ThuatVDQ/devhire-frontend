@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import EmailTemplatePopup from '@/components/EmailTemplatePopup.vue'
 import { emailTemplates } from '@/data/emailTemplates.js'
@@ -10,6 +10,42 @@ import 'toastr/build/toastr.min.css'
 // Router
 const router = useRouter()
 const route = useRoute()
+
+const actionMenuVisibleData = ref(null)
+const dropdownPortal = ref(null)
+const actionMenuVisible = ref(false)
+
+function openActionMenu(event, application) {
+  if (actionMenuVisible.value) {
+    actionMenuVisible.value = false
+    return
+  }
+  actionMenuVisible.value = true
+  const rect = event.currentTarget.getBoundingClientRect()
+  actionMenuVisibleData.value = {
+    top: rect.top + window.scrollY + 24,
+    left: rect.left + window.scrollX - 130,
+    application: application
+  }
+  console.log('actionMenuVisibleData:', actionMenuVisibleData.value)
+}
+
+function closeActionMenu() {
+  console.log('closeActionMenu')
+  actionMenuVisibleData.value = null
+  actionMenuVisible.value = false
+}
+
+// function handleClickOutside(event) {
+//   if (dropdownPortal.value && !dropdownPortal.value.contains(event.target)) {
+//     closeActionMenu()
+//   }
+// }
+
+// // Xóa listener nếu component bị huỷ
+// onBeforeUnmount(() => {
+//   document.removeEventListener('click', handleClickOutside)
+// })
 
 const jobApplications = ref([])
 const isLoading = ref(true)
@@ -92,8 +128,35 @@ async function fetchJobApplications() {
   }
 }
 
+async function fetchCVScore() {
+  const jobId = route.params.id
+  try {
+    const response = await axios.get(`http://localhost:8090/api/job-application/${jobId}/scored`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    console.log('response:', response.data)
+  } catch (error) {
+    toastr.error('Error fetching job applications:', error)
+  } finally {
+    isLoading.value = false
+  }
+}
+
+function handleAccept() {
+  openEmailTemplatePopup(actionMenuVisibleData.value.application)
+  closeActionMenu()
+}
+
+function handleReject() {
+  updateApplicationStatus(actionMenuVisibleData.value.application.id, 'reject')
+  closeActionMenu()
+}
+
 onMounted(() => {
   fetchJobApplications()
+  fetchCVScore()
 })
 
 const totalPages = computed(() => {
@@ -121,6 +184,12 @@ function prevPage() {
   if (currentPage.value > 1) {
     currentPage.value--
   }
+}
+
+function handleDownloadCV() {
+  const app = actionMenuVisibleData.value.application
+  downloadCV(app.cv_id, app.full_name)
+  closeActionMenu()
 }
 
 async function downloadCV(cvId, candidateName) {
@@ -157,6 +226,12 @@ async function downloadCV(cvId, candidateName) {
   } catch (error) {
     toastr.error('Error downloading CV:', error)
   }
+}
+
+function handleViewCV() {
+  const app = actionMenuVisibleData.value.application
+  viewCV(app.cv_url, app.id)
+  closeActionMenu()
 }
 
 async function viewCV(cv_url, id) {
@@ -244,9 +319,6 @@ function goBack() {
               <th
                 class="py-4 px-6 text-left text-sm font-medium text-gray-700 uppercase w-1/6"
               ></th>
-              <th
-                class="py-4 px-6 text-left text-sm font-medium text-gray-700 uppercase w-1/6"
-              ></th>
             </tr>
           </thead>
           <tbody>
@@ -261,52 +333,13 @@ function goBack() {
                 {{ formatDate(application.applyDate) }}
               </td>
               <td class="py-4 px-6 text-sm text-gray-700">{{ application.status }}</td>
-              <td class="py-4 px-6 text-sm text-gray-700">
-                <div class="flex items-center space-x-6 whitespace-nowrap">
-                  <!-- Download CV -->
-                  <div
-                    class="flex items-center cursor-pointer"
-                    @click="downloadCV(application.cv_id, application.full_name)"
-                  >
-                    <i class="pi pi-download text-gray-500 hover:text-gray-700"></i>
-                    <span class="text-sm text-gray-500 hover:text-gray-700 ml-2">Download CV</span>
-                  </div>
-                  <!-- View CV -->
-                  <div
-                    @click="viewCV(application.cv_url, application.id)"
-                    class="flex items-center cursor-pointer"
-                  >
-                    <i class="pi pi-eye text-gray-500 hover:text-gray-700"></i>
-                    <span class="text-sm text-gray-500 hover:text-gray-700 ml-2">View CV</span>
-                  </div>
-                </div>
-              </td>
-
-              <td class="py-4 px-8 text-sm text-gray-700">
-                <div class="flex space-x-4">
-                  <button
-                    @click="openEmailTemplatePopup(application)"
-                    :disabled="application.status !== 'SEEN'"
-                    :class="{
-                      'bg-gray-300': application.status !== 'SEEN',
-                      'bg-green-600': application.status === 'SEEN'
-                    }"
-                    class="px-4 py-2 text-white rounded-lg"
-                  >
-                    Accept
-                  </button>
-                  <button
-                    @click="updateApplicationStatus(application.id, 'reject')"
-                    :disabled="application.status !== 'SEEN'"
-                    :class="{
-                      'bg-gray-300': application.status !== 'SEEN',
-                      'bg-red-600': application.status === 'SEEN'
-                    }"
-                    class="px-4 py-2 text-white rounded-lg"
-                  >
-                    Reject
-                  </button>
-                </div>
+              <td class="py-4 px-6 text-sm text-gray-700 text-right">
+                <button
+                  @click="openActionMenu($event, application)"
+                  class="text-gray-500 hover:text-gray-700"
+                >
+                  <i class="pi pi-ellipsis-v text-lg"></i>
+                </button>
               </td>
             </tr>
             <tr v-if="paginatedApplications.length === 0">
@@ -354,7 +387,56 @@ function goBack() {
         </button>
       </div>
     </div>
+
+    <!-- Dropdown Portal (Global in DOM) -->
+    <div
+      v-if="actionMenuVisible"
+      ref="dropdownPortal"
+      class="fixed bg-white border rounded-lg shadow-md w-70 z-50"
+      :style="{
+        top: actionMenuVisibleData?.top + 'px',
+        left: actionMenuVisibleData?.left + 'px'
+      }"
+    >
+      <ul class="list-none p-2">
+        <li>
+          <button
+            @click="handleDownloadCV()"
+            class="w-full text-left text-sm text-gray-700 hover:bg-gray-200 px-4 py-2 rounded-md mb-2"
+          >
+            <i class="pi pi-download mr-2"></i> Download CV
+          </button>
+        </li>
+        <li>
+          <button
+            @click="handleViewCV()"
+            class="w-full text-left text-sm text-gray-700 hover:bg-gray-200 px-4 py-2 rounded-md mb-2"
+          >
+            <i class="pi pi-eye mr-2"></i> View CV
+          </button>
+        </li>
+        <li>
+          <button
+            @click="handleAccept()"
+            :disabled="actionMenuVisibleData.application?.status !== 'SEEN'"
+            class="w-full text-left text-sm text-white hover:bg-green-600 bg-green-500 px-4 py-2 rounded-md mb-2 disabled:opacity-50"
+          >
+            Accept
+          </button>
+        </li>
+        <li>
+          <button
+            @click="handleReject()"
+            :disabled="actionMenuVisibleData.application?.status !== 'SEEN'"
+            class="w-full text-left text-sm text-white hover:bg-red-600 bg-red-500 px-4 py-2 rounded-md mb-2 disabled:opacity-50"
+          >
+            Reject
+          </button>
+        </li>
+      </ul>
+    </div>
   </div>
+
   <EmailTemplatePopup
     v-if="isEmailPopupVisible"
     :application="selectedApplication"
