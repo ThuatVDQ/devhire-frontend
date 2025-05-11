@@ -31,8 +31,14 @@ const emit = defineEmits(['removeFavorite'])
 
 const differenceInDays = computed(() => {
   const currentDate = new Date()
-  const updatedDate = new Date(state.job.created_at)
-  const differenceInTime = currentDate.getTime() - updatedDate.getTime()
+  const createdAtArray = state.job.created_at
+
+  if (!Array.isArray(createdAtArray) || createdAtArray.length < 6) return null
+
+  const [year, month, day, hour, minute, second] = createdAtArray
+  const createdDate = new Date(year, month - 1, day, hour, minute, second)
+
+  const differenceInTime = currentDate.getTime() - createdDate.getTime()
   return Math.floor(differenceInTime / (1000 * 3600 * 24))
 })
 

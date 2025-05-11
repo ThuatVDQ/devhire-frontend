@@ -72,7 +72,7 @@
             <td class="py-3 px-6">{{ subscription.id }}</td>
             <td class="py-3 px-6">{{ subscription.name }}</td>
             <td class="py-3 px-6">${{ subscription.price }}</td>
-            <td class="py-3 px-6">{{ subscription.duration }}</td>
+            <td class="py-3 px-6">30</td>
             <td class="py-3 px-6">
               <span
                 :class="

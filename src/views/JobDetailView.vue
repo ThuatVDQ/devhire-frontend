@@ -76,12 +76,19 @@ onBeforeUnmount(() => {
   window.removeEventListener('keydown', handleKeyDown)
 })
 
-const formatDate = (dateString) => {
-  if (!dateString) {
-    return '' // Trả về chuỗi rỗng nếu dateString là null hoặc undefined
+const formatDate = (dateArray) => {
+  console.log('dateArray', dateArray)
+  if (!Array.isArray(dateArray) || dateArray.length < 7) {
+    return ''
   }
 
-  const date = new Date(dateString)
+  // Mảng của bạn: [year, month, day, hour, minute, second, millisecond]
+  const [year, month, day, hour, minute, second, millisecond] = dateArray
+
+  // Chuyển mảng thành đối tượng Date
+  const date = new Date(year, month - 1, day, hour, minute, second, millisecond)
+
+  // Định dạng ngày tháng theo kiểu 'dd-MMM-yyyy'
   return date.toLocaleDateString('en-GB', {
     day: '2-digit',
     month: 'short',
@@ -243,8 +250,14 @@ onMounted(() => {
 
 const differenceInDays = computed(() => {
   const currentDate = new Date()
-  const deadline = new Date(state.job.deadline)
-  const differenceInTime = deadline.getTime() - currentDate.getTime()
+  const deadlineArray = state.job.deadline
+
+  if (!Array.isArray(deadlineArray) || deadlineArray.length < 5) return null
+
+  const [year, month, day, hour, minute] = deadlineArray
+  const deadlineDate = new Date(year, month - 1, day, hour, minute)
+
+  const differenceInTime = deadlineDate.getTime() - currentDate.getTime()
   return Math.floor(differenceInTime / (1000 * 3600 * 24))
 })
 

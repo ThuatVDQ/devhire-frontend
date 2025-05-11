@@ -52,7 +52,9 @@ import { ref } from 'vue'
 
 // Hàm định dạng thời gian thành dạng "x phút trước"
 const formatTimeAgo = (dateString) => {
-  return formatDistanceToNow(new Date(dateString), { addSuffix: true })
+  if (!dateString) return ''
+  const date = new Date(dateString * 1000)
+  return formatDistanceToNow(date, { addSuffix: true })
 }
 
 // Props
