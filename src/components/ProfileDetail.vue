@@ -9,7 +9,8 @@ import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
 
 const data = reactive({
   user: {},
-  cv: {}
+  cv: {},
+  interviews: []
 })
 
 const showAvatarPopup = ref(false)
@@ -23,7 +24,6 @@ async function fetchDataUser() {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     })
-    console.log(response.data)
     data.user = response.data
     if (data.user.avatar_url) {
       currentAvatar.value = `http://localhost:8090/uploads/${data.user.avatar_url}`
@@ -55,7 +55,6 @@ const fetchCV = async () => {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     })
-    console.log(response.data)
     data.cv = response.data
   } catch (e) {
     console.error(e)
@@ -99,6 +98,7 @@ async function downloadCV(cvId, job_title) {
 onMounted(() => {
   fetchDataUser()
   fetchCV()
+  fetchInterviews()
   const message = sessionStorage.getItem('message')
 
   if (message) {
@@ -175,6 +175,33 @@ const onConfirm = async () => {
     toastr.error('An error occurred. Please try again.', 'Error')
   } finally {
     closeDialog()
+  }
+}
+
+const fetchInterviews = async () => {
+  try {
+    const response = await axios.get('http://localhost:8090/api/interview-schedules/user', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    const rawContent = response.data.content || []
+
+    // Chuyển đổi interview_time từ mảng sang Date
+    const processedInterviews = rawContent.map((item) => ({
+      ...item,
+      interview_time: new Date(
+        item.interview_time[0], // year
+        item.interview_time[1] - 1, // month (0-based)
+        item.interview_time[2], // day
+        item.interview_time[3], // hour
+        item.interview_time[4] // minute
+      )
+    }))
+
+    data.interviews = processedInterviews
+  } catch (error) {
+    console.error('Error fetching interviews:', error)
   }
 }
 
@@ -296,6 +323,47 @@ onMounted(checkSubscriptionStatus)
             >
               Save
             </button>
+          </div>
+          <div class="mt-8">
+            <h5 class="text-xl font-semibold mb-4">Interview Schedule</h5>
+
+            <div v-if="data.interviews.length" class="flex flex-col space-y-4">
+              <div
+                v-for="(interview, index) in data.interviews"
+                :key="index"
+                class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 hover:shadow-lg transition duration-300 space-y-3"
+              >
+                <h6 class="text-xl font-semibold text-primary-600 mb-1">
+                  {{ interview.job_title }}
+                </h6>
+
+                <div class="flex items-start text-sm text-gray-700 dark:text-gray-300">
+                  <i class="pi pi-calendar mr-2 text-primary-500 text-base mt-0.5"></i>
+                  <span>{{ new Date(interview.interview_time).toLocaleString() }}</span>
+                </div>
+
+                <div class="flex items-start text-sm text-gray-700 dark:text-gray-300">
+                  <i class="pi pi-clock mr-2 text-yellow-500 text-base mt-0.5"></i>
+                  <span><strong>Duration:</strong> {{ interview.duration_minutes }} mins</span>
+                </div>
+
+                <div class="flex items-start text-sm text-gray-700 dark:text-gray-300">
+                  <i class="pi pi-map-marker mr-2 text-red-500 text-base mt-0.5"></i>
+                  <span>{{ interview.location }}</span>
+                </div>
+
+                <div
+                  v-if="interview.note"
+                  class="text-sm text-gray-600 dark:text-gray-400 pt-1 border-t border-gray-100 dark:border-gray-700 mt-2"
+                >
+                  <strong>Note:</strong> {{ interview.note }}
+                </div>
+              </div>
+            </div>
+
+            <div v-else class="text-gray-500 dark:text-gray-400">
+              No upcoming interviews scheduled.
+            </div>
           </div>
         </div>
       </div>
