@@ -1,5 +1,6 @@
 <script setup>
 import SearchForm from './SearchForm.vue'
+import banner from '../assets/woman_working_homeview.svg'
 </script>
 
 <template>
@@ -13,11 +14,7 @@ import SearchForm from './SearchForm.vue'
         </div>
 
         <div class="md:order-2 order-1">
-          <img
-            src="https://jobstack-shreethemes.vercel.app/static/media/woman_working_2.26b4fe242bd386b51ed8fe80be6ff7bb.svg"
-            alt="Job Search"
-            class="w-full"
-          />
+          <img :src="banner" alt="Job Search" class="w-full" />
         </div>
       </div>
     </div>

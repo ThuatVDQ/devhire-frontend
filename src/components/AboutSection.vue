@@ -4,6 +4,9 @@ import { RouterLink } from 'vue-router'
 import { useRouter } from 'vue-router'
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
+import homeview1 from '../assets/homeview1.jpg'
+import homeview2 from '../assets/homeview2.jpg'
+import homeview3 from '../assets/homeview3.jpg'
 
 const router = useRouter()
 
@@ -73,22 +76,13 @@ function completeProfile() {
             <div class="grid grid-cols-12 gap-6 items-center">
               <div class="col-span-6">
                 <div class="grid grid-cols-1 gap-6">
-                  <img
-                    src="https://jobstack-shreethemes.vercel.app/static/media/ab03.2b6e24b09b3690407ec5.jpg"
-                    alt="image"
-                  />
-                  <img
-                    src="https://jobstack-shreethemes.vercel.app/static/media/ab02.f851a3dde08585493f97.jpg"
-                    alt="image"
-                  />
+                  <img :src="homeview1" alt="image" />
+                  <img :src="homeview2" alt="image" />
                 </div>
               </div>
               <div class="col-span-6">
                 <div class="grid grid-cols-1 gap-6">
-                  <img
-                    src="https://jobstack-shreethemes.vercel.app/static/media/ab01.016884c7bf778010e79c.jpg"
-                    alt="image"
-                  />
+                  <img :src="homeview3" alt="image" />
                 </div>
               </div>
             </div>
