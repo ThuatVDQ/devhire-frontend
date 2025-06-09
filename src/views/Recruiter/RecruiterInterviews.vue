@@ -309,7 +309,6 @@ function formatDateTimeToLocal(date) {
 }
 
 function onConfirm(data) {
-  // Dùng chung payload cho cả hai trường hợp
   const payload = {
     interview_time:
       typeof data.interview_time === 'string'
@@ -320,6 +319,8 @@ function onConfirm(data) {
     location: String(data.location || '').trim(),
     note: String(data.note || '').trim()
   }
+
+  console.log('Payload:', payload)
 
   if (data.message === 'createMultiple') {
     const ids = selectedApplicant.value.applicants
@@ -343,6 +344,7 @@ function onConfirm(data) {
         console.error('Error:', error)
       })
   } else {
+    payload.job_application_id = selectedApplicant.value.id
     axios
       .post('http://localhost:8090/api/interview-schedules/create', payload, {
         headers: {
