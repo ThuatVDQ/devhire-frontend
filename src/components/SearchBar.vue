@@ -109,15 +109,15 @@
       </div>
     </div>
     <div class="bg-white dark:bg-slate-900 shadow-md rounded-lg mx-48">
-      <div class="flex items-center space-x-6 flex-wrap gap-y-4">
+      <div class="flex items-center flex-wrap gap-y-4">
         <div ref="salaryDropdown" class="relative max-w-sm">
           <div
             @click="toggleSalaryDropdown"
-            class="flex items-center justify-between dark:bg-gray-700 p-3 rounded-lg cursor-pointer"
+            class="flex items-center justify-between dark:bg-gray-700 py-3 px-6 rounded-lg cursor-pointer"
           >
             <i class="pi pi-money-bill text-green-700 mr-4 text-lg"></i>
             <span class="text-gray-900 dark:text-white text-lg flex-1">
-              {{ selectedSalaryRange || 'Select salary range' }}
+              {{ selectedSalaryRangeDisplay || 'Select salary range' }}
             </span>
             <button
               v-if="selectedSalaryRange"
@@ -142,13 +142,39 @@
                 id="salaryRangeDisplay"
                 class="text-gray-900 dark:text-white text-xl font-semibold mb-4"
               >
-                ${{ salaryValues[0] }} - ${{ salaryValues[1] }}
+                {{ formattedSalaryRange }}
               </p>
+
+              <div class="flex justify-center mb-4">
+                <button
+                  @click="setCurrency('USD')"
+                  :class="{
+                    'bg-emerald-500 text-white': currentCurrency === 'USD',
+                    'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white':
+                      currentCurrency !== 'USD'
+                  }"
+                  class="px-4 py-2 rounded-l-lg hover:bg-emerald-600 focus:outline-none"
+                >
+                  USD
+                </button>
+                <button
+                  @click="setCurrency('VND')"
+                  :class="{
+                    'bg-emerald-500 text-white': currentCurrency === 'VND',
+                    'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white':
+                      currentCurrency !== 'VND'
+                  }"
+                  class="px-4 py-2 rounded-r-lg hover:bg-emerald-600 focus:outline-none"
+                >
+                  VND
+                </button>
+              </div>
+
               <VueSlider
                 v-model="salaryValues"
-                :min="minSalaryBound"
-                :max="maxSalaryBound"
-                :interval="100"
+                :min="minBound"
+                :max="maxBound"
+                :interval="currentCurrency === 'USD' ? 100 : 1000000"
                 :enable-cross="false"
                 :tooltip="'none'"
                 :process-style="{ backgroundColor: '#10B981' }"
@@ -168,7 +194,7 @@
         <div ref="levelDropdown" class="relative max-w-sm">
           <div
             @click="toggleLevelDropdown"
-            class="flex items-center justify-between dark:bg-gray-700 p-3 rounded-lg cursor-pointer"
+            class="flex items-center justify-between dark:bg-gray-700 py-3 px-6 rounded-lg cursor-pointer"
           >
             <i class="pi pi-chart-line text-green-700 mr-4 text-lg"></i>
             <span class="text-gray-900 dark:text-white text-lg flex-1">
@@ -205,7 +231,7 @@
         <div ref="experienceDropdown" class="relative max-w-sm">
           <div
             @click="toggleExperienceDropdown"
-            class="flex items-center justify-between dark:bg-gray-700 p-3 rounded-lg cursor-pointer"
+            class="flex items-center justify-between dark:bg-gray-700 py-3 px-6 rounded-lg cursor-pointer"
           >
             <i class="pi pi-history text-green-700 mr-4 text-lg"></i>
             <span class="text-gray-900 dark:text-white text-lg flex-1">
@@ -236,15 +262,14 @@
             </ul>
           </div>
         </div>
-        <div class="flex items-center ml-auto space-x-4 order-last">
-          <button
-            v-if="areFiltersActive"
-            @click="clearAllFilters"
-            class="hover:text-red-500 px-3 py-1 rounded-md text-sm"
-          >
-            Clear
-          </button>
-
+        <button
+          v-if="areFiltersActive"
+          @click="clearAllFilters"
+          class="hover:text-red-500 px-3 py-1 rounded-md text-sm"
+        >
+          Clear
+        </button>
+        <div class="flex items-center space-x-4 ml-auto mr-8">
           <i class="pi pi-filter"></i>
           <h4 class="text-xl font-bold text-gray-800 dark:text-gray-200">Filters</h4>
         </div>
@@ -267,10 +292,67 @@ const selectedCity = ref('')
 const selectedJobType = ref('')
 
 // State for Additional Filters
-const selectedSalaryRange = ref('')
-const minSalaryBound = ref(100)
-const maxSalaryBound = ref(10000)
-const salaryValues = ref([minSalaryBound.value, maxSalaryBound.value])
+const selectedSalaryRange = ref('') // This will hold the display string like "USD 100 - 1000"
+const salaryValues = ref([0, 0]) // Initialize with some default, will be set by currency
+const currentCurrency = ref('') // Default currency
+
+// --- Computed Properties ---
+const minBound = computed(() => {
+  return currentCurrency.value === 'USD' ? 100 : 5000000
+})
+
+const maxBound = computed(() => {
+  return currentCurrency.value === 'USD' ? 10000 : 100000000
+})
+
+const formattedSalaryRange = computed(() => {
+  const [min, max] = salaryValues.value
+  if (currentCurrency.value === 'USD') {
+    return `$${min} - $${max}`
+  } else {
+    // Format VND as "X M" for millions
+    const formatVND = (value) => {
+      if (value >= 1000000) {
+        return `${value / 1000000}M`
+      }
+      // For values less than a million, format traditionally with Vietnamese locale
+      return value.toLocaleString('vi-VN')
+    }
+    return `${formatVND(min)} - ${formatVND(max)}`
+  }
+})
+
+const selectedSalaryRangeDisplay = computed(() => {
+  if (selectedSalaryRange.value) {
+    return `${currentCurrency.value} ${selectedSalaryRange.value}`
+  }
+  return 'Select salary range' // Default display when nothing is selected
+})
+
+// --- Watchers ---
+watch(
+  currentCurrency,
+  (newCurrency) => {
+    if (currentCurrency.value === '') {
+      salaryValues.value = [0, 1000000000] // Reset to default values when no currency is selected
+    } else {
+      // Set salary values based on the selected currency
+      salaryValues.value = [minBound.value, maxBound.value]
+    }
+  },
+  { immediate: true }
+) // Run this on component mount
+
+const setCurrency = (currency) => {
+  currentCurrency.value = currency
+}
+
+const clearSalary = () => {
+  selectedSalaryRange.value = ''
+  salaryValues.value = [0, 1000000000]
+  currentCurrency.value = ''
+  onSearch()
+}
 
 const levels = ref(['Fresher', 'Junior', 'Senior', 'Manager'])
 const selectedLevels = ref([]) // CHANGED: Changed from ref('') to ref([]) for multiple selections
@@ -409,33 +491,19 @@ const selectJobType = (type) => {
 
 // Salary Filter methods
 const applySalaryFilter = () => {
-  // Thanh trượt sẽ tự động cập nhật salaryValues
   selectedSalaryRange.value = `$${salaryValues.value[0]} - $${salaryValues.value[1]}`
   isSalaryDropdownOpen.value = false
   onSearch()
 }
 
-const clearSalary = () => {
-  selectedSalaryRange.value = ''
-  salaryValues.value = [minSalaryBound.value, maxSalaryBound.value]
-  onSearch()
-}
-
 const areFiltersActive = computed(() => {
   return (
-    salaryValues.value[0] !== 100 ||
-    salaryValues.value[1] !== 10000 ||
+    currentCurrency.value !== '' ||
+    selectedSalaryRange.value !== '' ||
     selectedLevels.value.length > 0 ||
     selectedExperience.value !== ''
   )
 })
-
-// NEW: Level Filter methods for Checkboxes
-const applyLevelFilter = () => {
-  // selectedLevels is already updated by v-model
-  isLevelDropdownOpen.value = false
-  onSearch() // Trigger search with updated selectedLevels
-}
 
 const clearLevel = () => {
   selectedLevels.value = [] // Clear the array
@@ -484,6 +552,7 @@ const onSearch = () => {
     location: selectedCity.value,
     type: selectedJobType.value,
     salary: { min: salaryValues.value[0], max: salaryValues.value[1] },
+    currency: currentCurrency.value,
     level: selectedLevels.value, // Now an array
     experience: selectedExperience.value
       ? experiences.value.find((e) => e.display === selectedExperience.value)?.value
@@ -491,16 +560,14 @@ const onSearch = () => {
   })
 }
 
-// Watch all relevant filters to trigger search when changed or cleared
-// Note: For checkbox/multi-select, `selectedLevels` array itself changing will trigger watch
-watch(
-  [keyword, selectedCity, selectedJobType, salaryValues, selectedLevels, selectedExperience],
-  () => {
+watch(keyword, (newValue, oldValue) => {
+  if (newValue === '') {
     onSearch()
   }
-)
-watch([keyword, selectedCity, selectedJobType], () => {
-  onSearch() // Auto-search for these direct inputs/selections
+})
+
+watch([selectedLevels, selectedExperience], () => {
+  onSearch()
 })
 </script>
 

@@ -23,7 +23,7 @@ const fetchData = async (page = 0) => {
     // Cấu hình headers chỉ khi có token
     const headers = token ? { Authorization: `Bearer ${token}` } : {}
 
-    const response = await axios.get('http://localhost:8090/api/jobs', {
+    const response = await axios.post('http://localhost:8090/api/jobs/filter', {
       params: { page, limit: pageSize.value },
       headers
     })
@@ -35,7 +35,6 @@ const fetchData = async (page = 0) => {
     jobs.value = sortedJobs
     totalPages.value = response.data.totalPages
     currentPage.value = page
-    console.log(jobs.value)
   } catch (error) {
     jobs.value = []
     console.error('Error fetching jobs:', error)
@@ -73,21 +72,41 @@ const fetchFavorites = async (page = 0) => {
   }
 }
 
+const convertToJobFilterDTO = (criteria) => {
+  return {
+    keyword: criteria.keyword || '',
+    company_name: criteria.keyword || '',
+
+    cities: criteria.location ? [criteria.location] : [],
+    districts: [],
+
+    salary_min: criteria.salary?.min ?? null,
+    salary_max: criteria.salary?.max ?? null,
+    currency: criteria.currency ? [criteria.currency] : ['USD', 'VND'], // hoặc để trống nếu không có
+
+    types: criteria.type ? [criteria.type] : [],
+
+    levels: criteria.level || [],
+    experiences: criteria.experience ? [criteria.experience] : [],
+    positions: [],
+    categories: [],
+    skills: criteria.skills
+  }
+}
+
 const fetchSearchData = async (page = 0, criteria = {}) => {
   isLoading.value = true
   try {
     // Lấy token từ localStorage
     const token = localStorage.getItem('token')
-
+    const jobFilterDTO = convertToJobFilterDTO(criteria)
+    console.log('Job Filter DTO:', jobFilterDTO)
     // Cấu hình headers chỉ khi có token
     const headers = token ? { Authorization: `Bearer ${token}` } : {}
-    const response = await axios.get('http://localhost:8090/api/jobs/search', {
+    const response = await axios.post('http://localhost:8090/api/jobs/filter', jobFilterDTO, {
       params: {
         page,
-        limit: pageSize.value,
-        keyword: criteria.keyword,
-        location: criteria.location,
-        jobType: criteria.type
+        limit: pageSize.value
       },
       headers
     })
@@ -106,6 +125,7 @@ watch(
   () => props.searchCriteria,
   (newCriteria) => {
     currentPage.value = 0
+    console.log('Search criteria changed:', newCriteria)
     fetchSearchData(currentPage.value, newCriteria)
   },
   { immediate: true }
@@ -122,7 +142,7 @@ const changePage = (page) => {
   }
 }
 onMounted(() => {
-  fetchData(currentPage.value)
+  fetchSearchData(currentPage.value, props.searchCriteria)
 })
 
 const scrollToTop = () => {

@@ -60,6 +60,41 @@ const logout = () => {
   router.push('/login')
 }
 
+const itSkills = ref([
+  'Vue.js',
+  'React',
+  'Angular',
+  'Node.js',
+  'Python',
+  'Java',
+  'C#',
+  'PHP',
+  'Ruby',
+  'Go',
+  'Swift',
+  'Kotlin',
+  'Rust',
+  'TypeScript',
+  'SQL',
+  'NoSQL',
+  'AWS',
+  'Azure',
+  'Docker',
+  'Kubernetes'
+])
+
+const jobTitles = ref([
+  'Frontend Developer',
+  'Backend Developer',
+  'Fullstack Developer',
+  'DevOps Engineer',
+  'Mobile Developer',
+  'Data Scientist',
+  'UI/UX Designer',
+  'QA Engineer',
+  'Project Manager',
+  'Business Analyst'
+])
 // Gọi hàm để lấy thông tin người dùng khi component được mounted
 onMounted(() => {
   if (isLoggedIn.value) {
@@ -88,16 +123,67 @@ onMounted(() => {
           <div class="absolute inset-x-0 top-full h-2"></div>
           <!-- Dropdown Menu for Jobs -->
           <ul
-            class="absolute top-full mt-2 bg-white dark:bg-gray-800 shadow-lg rounded-lg z-50 opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-opacity duration-200 p-3"
+            class="absolute top-full mt-2 bg-white dark:bg-gray-800 shadow-lg rounded-lg z-50 opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-opacity duration-200"
             style="left: 20%; transform: translateX(-20%); width: 400px"
           >
             <li
-              class="flex items-center px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+              class="flex items-center px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer relative submenu-trigger"
             >
               <RouterLink to="/jobs" class="flex items-center w-full">
                 <i class="pi pi-search text-green-600 mr-6"></i>
                 <span class="text-gray-700 dark:text-gray-300">Search Jobs</span>
               </RouterLink>
+
+              <ul
+                class="absolute left-full top-0 bg-white dark:bg-gray-800 shadow-lg rounded-lg z-50 opacity-0 invisible transition-opacity duration-200 submenu"
+              >
+                <li
+                  class="flex items-center px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer relative nested-submenu-trigger"
+                >
+                  <RouterLink to="/jobs?search_by=skill" class="flex items-center min-w-32">
+                    <span class="text-gray-700 dark:text-gray-300">Jobs by Skill</span>
+                  </RouterLink>
+                  <ul
+                    class="absolute left-full top-0 bg-white dark:bg-gray-800 shadow-lg rounded-lg z-50 opacity-0 invisible transition-opacity duration-200 p-3 nested-submenu grid grid-cols-4 gap-2"
+                    style="width: 500px; min-width: 500px"
+                  >
+                    <li
+                      v-for="skill in itSkills"
+                      :key="skill"
+                      class="flex items-center px-2 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer text-sm"
+                    >
+                      <RouterLink :to="`/jobs?skill=${skill}`" class="flex items-center w-full">
+                        <span class="text-gray-700 dark:text-gray-300 whitespace-nowrap">{{
+                          skill
+                        }}</span>
+                      </RouterLink>
+                    </li>
+                  </ul>
+                </li>
+                <li
+                  class="flex items-center px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer relative nested-submenu-trigger"
+                >
+                  <RouterLink to="/jobs?search_by=title" class="flex items-center w-full">
+                    <span class="text-gray-700 dark:text-gray-300">Jobs by Title</span>
+                  </RouterLink>
+                  <ul
+                    class="absolute left-full top-0 bg-white dark:bg-gray-800 shadow-lg rounded-lg z-50 opacity-0 invisible transition-opacity duration-200 p-3 nested-submenu grid grid-cols-2 gap-2"
+                    style="width: 500px; min-width: 500px"
+                  >
+                    <li
+                      v-for="title in jobTitles"
+                      :key="title"
+                      class="flex items-center px-2 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer text-sm"
+                    >
+                      <RouterLink :to="`/jobs?title=${title}`" class="flex items-center w-full">
+                        <span class="text-gray-700 dark:text-gray-300 whitespace-nowrap">{{
+                          title
+                        }}</span>
+                      </RouterLink>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
             </li>
             <li
               class="flex items-center px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
@@ -346,5 +432,16 @@ header {
   top: 110%;
   width: max-content;
   z-index: 50;
+}
+
+.submenu-trigger:hover .submenu {
+  opacity: 100;
+  visibility: visible;
+}
+
+/* New styles for the nested sub-menus (Skill, Title, Location examples) */
+.nested-submenu-trigger:hover .nested-submenu {
+  opacity: 100;
+  visibility: visible;
 }
 </style>
