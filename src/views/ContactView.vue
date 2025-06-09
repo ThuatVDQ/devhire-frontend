@@ -3,10 +3,7 @@
     <div class="container">
       <div class="grid md:grid-cols-12 grid-cols-1 items-center gap-[30px]">
         <div class="lg:col-span-7 md:col-span-6">
-          <img
-            src="https://jobstack-shreethemes.vercel.app/static/media/contact.fa1dcec179ab187ef0877382779d71df.svg"
-            alt=""
-          />
+          <img src="@/assets/contact.svg" alt="Contact Us" />
         </div>
         <div class="lg:col-span-5 md:col-span-6">
           <div class="lg:ms-5">
