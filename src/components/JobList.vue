@@ -110,7 +110,20 @@ const fetchSearchData = async (page = 0, criteria = {}) => {
       },
       headers
     })
-    jobs.value = response.data.jobs
+    if (response.data && Array.isArray(response.data.jobs)) {
+      const sortedJobs = [...response.data.jobs].sort((a, b) => {
+        if (a.status === 'HOT' && b.status !== 'HOT') {
+          return -1
+        }
+        if (b.status === 'HOT' && a.status !== 'HOT') {
+          return 1
+        }
+        return 0
+      })
+      jobs.value = sortedJobs
+    } else {
+      jobs.value = []
+    }
     totalPages.value = response.data.totalPages
     currentPage.value = page
   } catch (error) {
@@ -128,7 +141,7 @@ watch(
     console.log('Search criteria changed:', newCriteria)
     fetchSearchData(currentPage.value, newCriteria)
   },
-  { immediate: true }
+  { immediate: true, deep: true }
 )
 
 const changePage = (page) => {
