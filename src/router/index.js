@@ -46,6 +46,8 @@ import CategoriesManagement from '@/views/Admin/CategoriesManagement.vue'
 import SubscriptionsManagement from '@/views/Admin/SubscriptionsManagement.vue'
 import PaymentResultView from '@/views/Recruiter/PaymentResultView.vue'
 import RecruiterInterviews from '@/views/Recruiter/RecruiterInterviews.vue'
+import JobsBySkill from '@/views/JobsBySkill.vue'
+import JobsByTitle from '@/views/JobsByTitle.vue'
 
 const routes = [
   {
@@ -132,6 +134,16 @@ const routes = [
         path: 'signup',
         name: 'signup',
         component: RegisterView
+      },
+      {
+        path: 'job-skill-index',
+        name: 'job-skill-index',
+        component: JobsBySkill
+      },
+      {
+        path: 'job-title-index',
+        name: 'job-title-index',
+        component: JobsByTitle
       }
     ]
   },

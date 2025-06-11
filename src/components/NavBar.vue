@@ -67,10 +67,10 @@ const itSkills = ref([
   'Node.js',
   'Python',
   'Java',
-  'C#',
+  'JavaScript',
   'PHP',
   'Ruby',
-  'Go',
+  'Flutter',
   'Swift',
   'Kotlin',
   'Rust',
@@ -158,6 +158,16 @@ onMounted(() => {
                         }}</span>
                       </RouterLink>
                     </li>
+                    <li
+                      class="col-span-4 px-2 py-2 text-center hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer text-sm font-semibold border-t border-gray-200 dark:border-gray-700 mt-2 pt-2"
+                    >
+                      <RouterLink
+                        to="/job-skill-index"
+                        class="block w-full text-green-600 dark:text-green-400"
+                      >
+                        View All Jobs by Skill
+                      </RouterLink>
+                    </li>
                   </ul>
                 </li>
                 <li
@@ -179,6 +189,16 @@ onMounted(() => {
                         <span class="text-gray-700 dark:text-gray-300 whitespace-nowrap">{{
                           title
                         }}</span>
+                      </RouterLink>
+                    </li>
+                    <li
+                      class="col-span-2 px-2 py-2 text-center hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer text-sm font-semibold border-t border-gray-200 dark:border-gray-700 mt-2 pt-2"
+                    >
+                      <RouterLink
+                        to="/job-title-index"
+                        class="block w-full text-green-600 dark:text-green-400"
+                      >
+                        View All Jobs by Title
                       </RouterLink>
                     </li>
                   </ul>

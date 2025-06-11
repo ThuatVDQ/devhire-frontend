@@ -13,7 +13,7 @@
             <input
               v-model="keyword"
               type="text"
-              placeholder="Search..."
+              placeholder="Enter keyword skill, job title, company name..."
               class="w-full bg-transparent border-none outline-none text-gray-900 dark:text-white text-lg"
             />
           </div>
@@ -280,9 +280,12 @@
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount, computed, defineEmits, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import axios from 'axios'
 import VueSlider from 'vue-slider-component'
 import 'vue-slider-component/theme/antd.css'
+
+const route = useRoute()
 
 // State for cities, job types, and main search values
 const cities = ref([])
@@ -296,6 +299,23 @@ const selectedSalaryRange = ref('') // This will hold the display string like "U
 const salaryValues = ref([0, 0]) // Initialize with some default, will be set by currency
 const currentCurrency = ref('') // Default currency
 const hasInteractedWithSalaryFilter = ref(false)
+
+const setKeywordFromUrl = () => {
+  if (route.query.skill) {
+    keyword.value = route.query.skill
+    console.log('Keyword set from skill:', keyword.value)
+  } else if (route.query.title) {
+    keyword.value = route.query.title
+    console.log('Keyword set from title:', keyword.value)
+  }
+}
+watch(
+  () => route.query,
+  () => {
+    setKeywordFromUrl()
+  },
+  { deep: true, immediate: true }
+)
 
 // --- Computed Properties ---
 const minBound = computed(() => {
@@ -361,7 +381,9 @@ const tempSelectedLevels = ref([])
 const experiences = ref([
   { display: '1+ years', value: '1+ years' },
   { display: '2+ years', value: '2+ years' },
-  { display: '3+ years', value: '3+ years' }
+  { display: '3+ years', value: '3+ years' },
+  { display: '3+ years', value: '4+ years' },
+  { display: '3+ years', value: '5+ years' }
 ])
 const selectedExperience = ref('')
 
@@ -384,6 +406,7 @@ const emit = defineEmits(['search'])
 
 // Fetch cities data on component mount
 onMounted(async () => {
+  setKeywordFromUrl()
   try {
     const response = await axios.get('https://provinces.open-api.vn/api/?depth=2')
     cities.value = response.data.map((city) => ({ name: city.name, code: city.code }))
