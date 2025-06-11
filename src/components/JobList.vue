@@ -89,7 +89,7 @@ const convertToJobFilterDTO = (criteria) => {
     levels: criteria.level || [],
     experiences: criteria.experience ? [criteria.experience] : [],
     positions: [],
-    categories: [],
+    categories: criteria.category ? [criteria.category] : [],
     skills: criteria.skills
   }
 }

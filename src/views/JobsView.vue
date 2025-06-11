@@ -16,7 +16,8 @@ const searchCriteria = ref({
   currency: '',
   experience: '',
   level: '',
-  skills: ''
+  skills: '',
+  category: ''
 })
 
 const handleSearch = (criteria) => {
@@ -40,6 +41,22 @@ const updateSkillsFromSkillUrl = () => {
   }
 }
 
+const updateCategoriesFromCategoryUrl = () => {
+  if (route.query.category) {
+    searchCriteria.value.category = route.query.category
+  } else {
+    searchCriteria.value.category = ''
+  }
+}
+
+watch(
+  () => route.query.category,
+  (newCategory) => {
+    updateCategoriesFromCategoryUrl()
+  },
+  { immediate: true }
+)
+
 watch(
   () => route.query.title,
   () => {
@@ -59,6 +76,7 @@ watch(
 onMounted(() => {
   updateKeywordFromTitleUrl()
   updateSkillsFromSkillUrl()
+  updateCategoriesFromCategoryUrl()
 })
 </script>
 

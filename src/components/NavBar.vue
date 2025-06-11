@@ -95,6 +95,24 @@ const jobTitles = ref([
   'Project Manager',
   'Business Analyst'
 ])
+
+const jobCategories = ref([
+  'Software Development',
+  'Web Development',
+  'Mobile Development',
+  'Data Science and Analytics',
+  'Artificial Intelligence and Machine Learning',
+  'Cybersecurity',
+  'Cloud Computing',
+  'DevOps and Infrastructure',
+  'UI/UX Design',
+  'IT Project Management',
+  'Database Management and Administration',
+  'Network Engineering',
+  'AI Engineer',
+  'Tester',
+  'Embedded Software Engineer'
+])
 // Gọi hàm để lấy thông tin người dùng khi component được mounted
 onMounted(() => {
   if (isLoggedIn.value) {
@@ -199,6 +217,34 @@ onMounted(() => {
                         class="block w-full text-green-600 dark:text-green-400"
                       >
                         View All Jobs by Title
+                      </RouterLink>
+                    </li>
+                  </ul>
+                </li>
+                <li
+                  class="flex items-center px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer relative nested-submenu-trigger"
+                >
+                  <RouterLink to="/jobs?search_by=category" class="flex items-center min-w-32">
+                    <span class="text-gray-700 dark:text-gray-300">Jobs by Category</span>
+                  </RouterLink>
+                  <ul
+                    class="absolute left-full top-0 bg-white dark:bg-gray-800 shadow-lg rounded-lg z-50 opacity-0 invisible transition-opacity duration-200 p-3 nested-submenu grid grid-cols-2 gap-2"
+                    style="width: 500px; min-width: 500px"
+                  >
+                    <li
+                      v-for="category in jobCategories"
+                      :key="category"
+                      class="flex items-start px-2 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer text-sm"
+                    >
+                      <!-- Đổi items-center thành items-start để căn trên khi text xuống dòng -->
+                      <RouterLink
+                        :to="`/jobs?category=${category}`"
+                        class="flex items-start w-full"
+                      >
+                        <!-- Loại bỏ whitespace-nowrap, overflow-hidden, text-ellipsis -->
+                        <span class="text-gray-700 dark:text-gray-300">
+                          {{ category }}
+                        </span>
                       </RouterLink>
                     </li>
                   </ul>
