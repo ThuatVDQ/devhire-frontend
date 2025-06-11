@@ -65,7 +65,9 @@ const notificationPopup = ref(null)
 
 // Hàm định dạng thời gian từ createdAt đến hiện tại
 const formatTimeAgo = (dateString) => {
-  return formatDistanceToNow(new Date(dateString), { addSuffix: true })
+  if (!dateString) return ''
+  const date = new Date(dateString * 1000)
+  return formatDistanceToNow(date, { addSuffix: true })
 }
 
 // Toggle hiển thị popup và gọi API lấy thông báo
