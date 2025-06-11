@@ -56,17 +56,6 @@ function closeActionMenu() {
   actionMenuVisible.value = false
 }
 
-// function handleClickOutside(event) {
-//   if (dropdownPortal.value && !dropdownPortal.value.contains(event.target)) {
-//     closeActionMenu()
-//   }
-// }
-
-// // Xóa listener nếu component bị huỷ
-// onBeforeUnmount(() => {
-//   document.removeEventListener('click', handleClickOutside)
-// })
-
 const jobApplications = ref([])
 const isLoading = ref(true)
 const isRequireBackEnd = ref(false)
@@ -158,7 +147,6 @@ async function fetchCVScore() {
     })
     const scoredData = response.data // [{ applicationId, score }, ...]
 
-    // Gán score vào jobApplications theo từng id khớp với applicationId
     scoredData.forEach((scoredItem) => {
       const target = jobApplications.value.find((app) => app.id === scoredItem.applicationId)
       if (target) {
@@ -220,6 +208,7 @@ function prevPage() {
 function handleDownloadCV() {
   const app = actionMenuVisibleData.value.application
   downloadCV(app.cv_id, app.full_name)
+  fetchCVScore()
   closeActionMenu()
 }
 
@@ -262,6 +251,7 @@ async function downloadCV(cvId, candidateName) {
 function handleViewCV() {
   const app = actionMenuVisibleData.value.application
   viewCV(app.cv_url, app.id)
+  fetchCVScore()
   closeActionMenu()
 }
 
@@ -280,15 +270,27 @@ async function updateApplicationStatus(applicationId, newStatus) {
   try {
     await axios.post(`http://localhost:8090/api/job-application/${applicationId}/${newStatus}`, {})
     fetchJobApplications()
+    fetchCVScore()
   } catch (error) {
     console.error('Error updating application status:', error)
   }
 }
 
 // Format date utility
-function formatDate(dateString) {
-  const options = { year: 'numeric', month: 'long', day: 'numeric' }
-  return new Date(dateString).toLocaleDateString(undefined, options)
+function formatDate(dateArray) {
+  if (!Array.isArray(dateArray) || dateArray.length < 7) {
+    return ''
+  }
+
+  const [year, month, day, hour, minute, second, millisecond] = dateArray
+
+  const date = new Date(year, month - 1, day, hour, minute, second, millisecond)
+
+  return date.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  })
 }
 
 // Back button functionality
