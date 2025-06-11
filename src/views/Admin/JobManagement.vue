@@ -314,6 +314,9 @@ const fetchData = async (page = 0) => {
     console.log(response.data.jobs)
   } catch (error) {
     jobs.value = []
+    totalPages.value = 0
+    currentPage.value = 0
+
     console.error('Error fetching jobs:', error)
   } finally {
     isLoading.value = false
@@ -439,11 +442,21 @@ function changePage(page) {
   }
 }
 
-function formatDate(dateString) {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('vi-VN', {
+function formatDate(dateArray) {
+  if (!Array.isArray(dateArray) || dateArray.length < 7) {
+    return ''
+  }
+
+  // Mảng của bạn: [year, month, day, hour, minute, second, millisecond]
+  const [year, month, day, hour, minute, second, millisecond] = dateArray
+
+  // Chuyển mảng thành đối tượng Date
+  const date = new Date(year, month - 1, day, hour, minute, second, millisecond)
+
+  // Định dạng ngày tháng theo kiểu 'dd-MMM-yyyy'
+  return date.toLocaleDateString('en-GB', {
     day: '2-digit',
-    month: '2-digit',
+    month: 'short',
     year: 'numeric'
   })
 }
