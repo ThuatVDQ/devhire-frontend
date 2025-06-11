@@ -382,8 +382,8 @@ const experiences = ref([
   { display: '1+ years', value: '1+ years' },
   { display: '2+ years', value: '2+ years' },
   { display: '3+ years', value: '3+ years' },
-  { display: '3+ years', value: '4+ years' },
-  { display: '3+ years', value: '5+ years' }
+  { display: '4+ years', value: '4+ years' },
+  { display: '5+ years', value: '5+ years' }
 ])
 const selectedExperience = ref('')
 
