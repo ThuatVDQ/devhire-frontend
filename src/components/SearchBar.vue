@@ -122,7 +122,7 @@
             <button
               v-if="selectedSalaryRange"
               @click.stop="clearSalary"
-              class="text-gray-500 hover:text-red-500"
+              class="text-gray-500 hover:text-red-500 ml-3"
             >
               ✕
             </button>
@@ -174,7 +174,7 @@
                 v-model="salaryValues"
                 :min="minBound"
                 :max="maxBound"
-                :interval="currentCurrency === 'USD' ? 100 : 1000000"
+                :interval="currentCurrency === 'USD' ? 50 : 1000000"
                 :enable-cross="false"
                 :tooltip="'none'"
                 :process-style="{ backgroundColor: '#10B981' }"
@@ -295,6 +295,7 @@ const selectedJobType = ref('')
 const selectedSalaryRange = ref('') // This will hold the display string like "USD 100 - 1000"
 const salaryValues = ref([0, 0]) // Initialize with some default, will be set by currency
 const currentCurrency = ref('') // Default currency
+const hasInteractedWithSalaryFilter = ref(false)
 
 // --- Computed Properties ---
 const minBound = computed(() => {
@@ -306,19 +307,21 @@ const maxBound = computed(() => {
 })
 
 const formattedSalaryRange = computed(() => {
-  const [min, max] = salaryValues.value
-  if (currentCurrency.value === 'USD') {
-    return `$${min} - $${max}`
-  } else {
-    // Format VND as "X M" for millions
-    const formatVND = (value) => {
-      if (value >= 1000000) {
-        return `${value / 1000000}M`
+  if (hasInteractedWithSalaryFilter.value == true) {
+    const [min, max] = salaryValues.value
+    if (currentCurrency.value === 'USD') {
+      return `$${min} - $${max}`
+    } else {
+      // Format VND as "X M" for millions
+      const formatVND = (value) => {
+        if (value >= 1000000) {
+          return `${value / 1000000}M`
+        }
+        // For values less than a million, format traditionally with Vietnamese locale
+        return value.toLocaleString('vi-VN')
       }
-      // For values less than a million, format traditionally with Vietnamese locale
-      return value.toLocaleString('vi-VN')
+      return `${formatVND(min)} - ${formatVND(max)}`
     }
-    return `${formatVND(min)} - ${formatVND(max)}`
   }
 })
 
@@ -333,18 +336,14 @@ const selectedSalaryRangeDisplay = computed(() => {
 watch(
   currentCurrency,
   (newCurrency) => {
-    if (currentCurrency.value === '') {
-      salaryValues.value = [0, 1000000000] // Reset to default values when no currency is selected
-    } else {
-      // Set salary values based on the selected currency
-      salaryValues.value = [minBound.value, maxBound.value]
-    }
+    salaryValues.value = [minBound.value, maxBound.value]
   },
   { immediate: true }
 ) // Run this on component mount
 
 const setCurrency = (currency) => {
   currentCurrency.value = currency
+  hasInteractedWithSalaryFilter.value = true
 }
 
 const clearSalary = () => {
@@ -360,14 +359,12 @@ const selectedLevels = ref([]) // CHANGED: Changed from ref('') to ref([]) for m
 const tempSelectedLevels = ref([])
 
 const experiences = ref([
-  { display: '0 - 1 Year', value: '0-1' },
-  { display: '1 - 3 Years', value: '1-3' },
-  { display: '3 - 5 Years', value: '3-5' },
-  { display: '5 + Years', value: '5+' }
+  { display: '1+ years', value: '1+ years' },
+  { display: '2+ years', value: '2+ years' },
+  { display: '3+ years', value: '3+ years' }
 ])
 const selectedExperience = ref('')
 
-// Separate states for dropdown visibility
 const isLocationDropdownOpen = ref(false)
 const isJobTypeDropdownOpen = ref(false)
 const isSalaryDropdownOpen = ref(false)
@@ -498,8 +495,7 @@ const applySalaryFilter = () => {
 
 const areFiltersActive = computed(() => {
   return (
-    currentCurrency.value !== '' ||
-    selectedSalaryRange.value !== '' ||
+    hasInteractedWithSalaryFilter.value == true ||
     selectedLevels.value.length > 0 ||
     selectedExperience.value !== ''
   )
@@ -532,6 +528,7 @@ const clearAllFilters = () => {
   isSalaryDropdownOpen.value = false
   isLevelDropdownOpen.value = false
   isExperienceDropdownOpen.value = false
+  hasInteractedWithSalaryFilter.value = false
 }
 
 // Clear main search filters (updated to include new filters)
@@ -547,6 +544,15 @@ const clearJobType = () => {
 
 // Update onSearch to include all filters
 const onSearch = () => {
+  if (salaryValues.value[0] === minBound.value && salaryValues.value[1] === maxBound.value) {
+    selectedSalaryRange.value = ''
+  } else {
+    selectedSalaryRange.value = formattedSalaryRange.value
+  }
+  if (hasInteractedWithSalaryFilter.value == false) {
+    salaryValues.value = [null, null]
+  }
+
   emit('search', {
     keyword: keyword.value,
     location: selectedCity.value,

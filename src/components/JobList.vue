@@ -75,14 +75,14 @@ const fetchFavorites = async (page = 0) => {
 const convertToJobFilterDTO = (criteria) => {
   return {
     keyword: criteria.keyword || '',
-    company_name: criteria.keyword || '',
+    company_name: '',
 
     cities: criteria.location ? [criteria.location] : [],
     districts: [],
 
     salary_min: criteria.salary?.min ?? null,
     salary_max: criteria.salary?.max ?? null,
-    currency: criteria.currency ? [criteria.currency] : ['USD', 'VND'], // hoặc để trống nếu không có
+    currency: criteria.currency ? [criteria.currency] : ['USD', 'VND'],
 
     types: criteria.type ? [criteria.type] : [],
 
