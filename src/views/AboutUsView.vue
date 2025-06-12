@@ -4,6 +4,8 @@ import CardExploreJob from '../components/CardExploreJob.vue'
 import { RouterLink } from 'vue-router'
 import axios from 'axios'
 import { ref, onMounted, computed } from 'vue'
+import aboutus01 from '../assets/about_us01-Dky8rhyA.jpg'
+import aboutus02 from '../assets/about_us02-Dnw9ga1r.jpg'
 
 const jobsCount = ref(0)
 const companiesCount = ref(0)
@@ -144,7 +146,7 @@ const faqs = [
             <div class="relative">
               <img
                 class="lg:w-[400px] w-[280px] rounded-md shadow dark:shadow-gray-700"
-                src="https://jobstack-shreethemes.vercel.app/static/media/ab01.016884c7bf778010e79c.jpg"
+                :src="aboutus01"
                 alt=""
               />
               <div class="absolute top-0 translate-y-2/4 end-0 text-center">
@@ -160,7 +162,7 @@ const faqs = [
             </div>
             <div class="absolute md:-end-5 end-0 -bottom-16">
               <img
-                src="https://jobstack-shreethemes.vercel.app/static/media/ab02.f851a3dde08585493f97.jpg"
+                :src="aboutus02"
                 alt=""
                 class="lg:w-[280px] w-[200px] border-8 border-white dark:border-slate-900 rounded-md shadow dark:shadow-gray-700"
               />
