@@ -125,7 +125,6 @@ async function fetchJobApplications() {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     })
-    console.log('response:', response.data)
     jobApplications.value = response.data || []
     if (jobApplications.value.length > 0 && jobApplications.value[0].job_title) {
       title.value = jobApplications.value[0].job_title
@@ -154,8 +153,6 @@ async function fetchCVScore() {
         target.scoreDetail = scoredItem.scoreDetails
       }
     })
-
-    console.log('Updated jobApplications:', jobApplications.value)
   } catch (error) {
     toastr.error('Error fetching job applications:', error)
   } finally {
@@ -278,13 +275,9 @@ async function updateApplicationStatus(applicationId, newStatus) {
 
 // Format date utility
 function formatDate(dateArray) {
-  if (!Array.isArray(dateArray) || dateArray.length < 7) {
-    return ''
-  }
+  const [year, month, day, hour, minute, second] = dateArray
 
-  const [year, month, day, hour, minute, second, millisecond] = dateArray
-
-  const date = new Date(year, month - 1, day, hour, minute, second, millisecond)
+  const date = new Date(year, month - 1, day, hour, minute, second)
 
   return date.toLocaleDateString('en-GB', {
     day: '2-digit',

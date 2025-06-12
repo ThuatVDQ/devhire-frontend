@@ -83,10 +83,10 @@ const formatDate = (dateArray) => {
   }
 
   // Mảng của bạn: [year, month, day, hour, minute, second, millisecond]
-  const [year, month, day, hour, minute, second, millisecond] = dateArray
+  const [year, month, day, hour, minute, second] = dateArray
 
   // Chuyển mảng thành đối tượng Date
-  const date = new Date(year, month - 1, day, hour, minute, second, millisecond)
+  const date = new Date(year, month - 1, day, hour, minute, second)
 
   // Định dạng ngày tháng theo kiểu 'dd-MMM-yyyy'
   return date.toLocaleDateString('en-GB', {

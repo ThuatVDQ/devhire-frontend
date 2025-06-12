@@ -72,10 +72,17 @@ const totalApplications = ref(0)
 const jobsPendingApproval = ref(0)
 const latestJobPosts = ref([])
 
-const formatDate = (dateString) => {
-  const options = { year: 'numeric', month: 'long', day: 'numeric' }
-  const date = new Date(dateString)
-  return date.toLocaleDateString('en-US', options)
+const formatDate = (dateArray) => {
+  console.log('dateArray', dateArray)
+  const [year, month, day, hour, minute, second] = dateArray
+
+  const date = new Date(year, month - 1, day, hour, minute, second)
+
+  return date.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  })
 }
 
 const applicationsPerJobData = ref({
