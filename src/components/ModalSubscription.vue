@@ -16,6 +16,7 @@
               v-model="subscription.name"
               type="text"
               class="border border-gray-300 rounded-lg w-full p-2 focus:ring-2 focus:ring-emerald-500"
+              :disabled="readOnly"
             />
           </div>
 
@@ -23,7 +24,8 @@
             <label class="block text-gray-700 text-sm font-medium mb-1">Benefit</label>
             <textarea
               v-model="subscription.benefit"
-              class="border border-gray-300 rounded-lg w-full p-2 focus:ring-2 focus:ring-emerald-500 resize-none"
+              :disabled="readOnly"
+              class="border border-gray-300 rounded-lg w-full p-2 focus:ring-2 focus:ring-emerald-500 resize-none min-h-[100px]"
             ></textarea>
           </div>
 
@@ -33,6 +35,7 @@
               v-model.number="subscription.price"
               type="number"
               class="border border-gray-300 rounded-lg w-full p-2 focus:ring-2 focus:ring-emerald-500"
+              :disabled="readOnly"
             />
           </div>
 
@@ -40,17 +43,9 @@
             <label class="block text-gray-700 text-sm font-medium mb-1">Description</label>
             <textarea
               v-model="subscription.description"
+              :disabled="readOnly"
               class="border border-gray-300 rounded-lg w-full p-2 focus:ring-2 focus:ring-emerald-500 resize-none"
             ></textarea>
-          </div>
-
-          <div>
-            <label class="block text-gray-700 text-sm font-medium mb-1">Amount</label>
-            <input
-              v-model.number="subscription.amount"
-              type="number"
-              class="border border-gray-300 rounded-lg w-full p-2 focus:ring-2 focus:ring-emerald-500"
-            />
           </div>
         </div>
 
@@ -62,6 +57,7 @@
             Cancel
           </button>
           <button
+            v-if="!readOnly"
             @click="save"
             class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
           >
@@ -82,6 +78,10 @@ defineProps({
   subscription: Object,
   buttonText: String,
   save: Function,
-  close: Function
+  close: Function,
+  readOnly: {
+    type: Boolean,
+    default: false
+  }
 })
 </script>

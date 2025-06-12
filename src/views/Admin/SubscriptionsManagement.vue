@@ -70,7 +70,9 @@
               </label>
             </td>
             <td class="py-3 px-6">{{ subscription.id }}</td>
-            <td class="py-3 px-6">{{ subscription.name }}</td>
+            <td @click="openSubscriptionDetailsModal(subscription)" class="py-3 px-6">
+              {{ subscription.name }}
+            </td>
             <td class="py-3 px-6">${{ subscription.price }}</td>
             <td class="py-3 px-6">30</td>
             <td class="py-3 px-6">
@@ -106,6 +108,14 @@
       :buttonText="modalButtonText"
       :save="saveSubscription"
       :close="closeModal"
+      :readOnly="false"
+    />
+    <ModalSubscription
+      :show="showDetailsModal"
+      title="Subscription Details"
+      :subscription="selectedSubscriptionDetails"
+      :close="closeDetailsModal"
+      :readOnly="true"
     />
     <ConfirmationDialog
       v-if="showModalConfirmDialog"
@@ -133,6 +143,10 @@ const modalButtonText = ref('')
 const currentSubscription = ref({ name: '', price: 0, benefit: '', description: '', amount: 0 })
 const isEditing = ref(false)
 
+// New refs for details modal
+const showDetailsModal = ref(false)
+const selectedSubscriptionDetails = ref(null)
+
 const fetchSubscriptions = async () => {
   try {
     const response = await axios.get('http://localhost:8090/api/subscription', {
@@ -159,6 +173,16 @@ const openEditSubscriptionModal = (subscription) => {
   modalTitle.value = 'Edit Subscription'
   modalButtonText.value = 'Save'
   showModal.value = true
+}
+
+const openSubscriptionDetailsModal = (subscription) => {
+  selectedSubscriptionDetails.value = { ...subscription }
+  showDetailsModal.value = true
+}
+
+const closeDetailsModal = () => {
+  showDetailsModal.value = false
+  selectedSubscriptionDetails.value = null
 }
 
 const closeModal = () => {
