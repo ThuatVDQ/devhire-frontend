@@ -303,10 +303,10 @@ const hasInteractedWithSalaryFilter = ref(false)
 const setKeywordFromUrl = () => {
   if (route.query.skill) {
     keyword.value = route.query.skill
-    console.log('Keyword set from skill:', keyword.value)
   } else if (route.query.title) {
     keyword.value = route.query.title
-    console.log('Keyword set from title:', keyword.value)
+  } else {
+    keyword.value = ''
   }
 }
 watch(
