@@ -60,7 +60,11 @@
                       <thead class="bg-indigo-100">
                         <tr>
                           <th class="px-4 py-2 text-sm font-medium text-gray-700">
-                            <input type="checkbox" @change="toggleAll(job.id, $event)" />
+                            <input
+                              type="checkbox"
+                              :checked="areAllApplicantsSelected(job.id)"
+                              @change="toggleAll(job.id, $event)"
+                            />
                           </th>
                           <th class="px-4 py-2 text-sm font-medium text-gray-700 text-left">
                             Name
@@ -205,7 +209,7 @@
 <script setup>
 import VueCal from 'vue-cal'
 import 'vue-cal/dist/vuecal.css'
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import axios from 'axios'
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
@@ -248,6 +252,21 @@ const toggleAll = (jobId, event) => {
   selectedApplicants.value[jobId] = isChecked ? list.map((applicant) => applicant.id) : []
 }
 
+const areAllApplicantsSelected = computed(() => (jobId) => {
+  const jobApplicants = applicants.value[jobId]
+  const selectedIds = selectedApplicants.value[jobId]
+
+  if (!jobApplicants || jobApplicants.length === 0) {
+    return false // Không có ứng viên hoặc chưa tải, coi như không chọn tất cả
+  }
+  if (!selectedIds || selectedIds.length === 0) {
+    return false // Không có ứng viên nào được chọn
+  }
+
+  // Kiểm tra xem tất cả các ID ứng viên có trong mảng selectedIds hay không
+  return jobApplicants.every((applicant) => selectedIds.includes(applicant.id))
+})
+
 const showPopup = ref(false)
 const interviewDetails = ref({
   interview_time: '',
@@ -283,6 +302,9 @@ function closeDialog() {
     note: '',
     message: ''
   }
+
+  fetchInterviewSchedules()
+  fetchJobs(currentPage.value)
 }
 
 const openInterviewPopupMultiple = (jobId) => {
@@ -505,6 +527,18 @@ onMounted(() => {
   fetchJobs(currentPage.value)
   fetchInterviewSchedules()
 })
+
+watch(
+  applicants,
+  (newApplicants) => {
+    for (const jobId in newApplicants) {
+      if (!selectedApplicants.value[jobId]) {
+        selectedApplicants.value[jobId] = []
+      }
+    }
+  },
+  { deep: true }
+)
 </script>
 
 <style scoped>
