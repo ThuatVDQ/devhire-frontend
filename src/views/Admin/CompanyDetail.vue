@@ -311,9 +311,21 @@ watch(
           <div class="relative">
             <button
               @click="toggleMenu"
-              class="p-2 rounded-full transition hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center"
+              :disabled="state.company.company_status !== 'PENDING'"
+              class="p-2 rounded-full transition hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center relative group"
             >
-              <i class="pi pi-ellipsis-v text-gray-500 text-xl"></i>
+              <i
+                class="pi pi-ellipsis-v text-gray-500 text-xl"
+                :class="{
+                  'cursor-not-allowed text-gray-400': state.company.company_status !== 'PENDING'
+                }"
+              ></i>
+              <span
+                v-if="state.company.company_status !== 'PENDING'"
+                class="absolute left-1/2 -top-8 transform -translate-x-1/2 scale-0 group-hover:scale-100 transition-transform bg-gray-700 text-white text-xs py-1 px-2 rounded-md whitespace-nowrap"
+              >
+                Company is not pending approval
+              </span>
             </button>
 
             <div
