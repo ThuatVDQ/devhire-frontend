@@ -89,12 +89,12 @@
           <tr v-for="(job, index) in jobs" :key="job.id" class="border-b hover:bg-gray-100">
             <td class="pl-2">
               <label
-                v-if="job.status === 'OPEN'"
+                v-if="job.status === 'OPEN' || job.status === 'HOT'"
                 class="relative inline-flex items-center cursor-pointer"
               >
                 <input
                   type="checkbox"
-                  :checked="job.status === 'OPEN'"
+                  :checked="job.status === 'OPEN' || job.status === 'HOT'"
                   @click="(e) => handleToggleClick(e, job.id)"
                   class="sr-only peer"
                 />
@@ -304,7 +304,7 @@ const handleToggleClick = (event, jobId) => {
   if (!job) return
 
   // Nếu trạng thái là OPEN và người dùng muốn đóng
-  if (job.status === 'OPEN') {
+  if (job.status === 'OPEN' || job.status === 'HOT') {
     currentJobId.value = jobId
     modalMessage.value = `Are you sure you want to close this job?`
     showModal.value = true // Hiển thị modal
