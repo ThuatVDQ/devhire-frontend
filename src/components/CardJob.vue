@@ -186,6 +186,10 @@ function formatSalary(amount) {
           <!-- Job Type and Salary -->
           <div class="mt-1">
             <span
+              class="bg-slate-100 dark:bg-slate-800 inline-block text-slate-900 dark:text-slate-300 text-xs px-2.5 py-0.5 font-semibold rounded-full me-1"
+              >{{ state.job.category.name }}</span
+            >
+            <span
               class="bg-emerald-600/10 inline-block text-emerald-600 text-xs px-2.5 py-0.5 font-semibold rounded-full me-1"
             >
               {{ state.job.type }}
