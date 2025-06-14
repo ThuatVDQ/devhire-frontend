@@ -187,6 +187,10 @@ const showApplicationForm = () => {
     state.isAddingLetter = false
   } else {
     toastr.error('Please login to apply for this job.', 'Error')
+    localStorage.setItem('redirectAfterLogin', window.location.pathname)
+    setTimeout(() => {
+      window.location.href = '/login'
+    }, 2000)
   }
 }
 
@@ -219,7 +223,6 @@ const submitApplication = async () => {
         'Content-Type': 'multipart/form-data'
       }
     })
-
     toastr.success(response.data, 'Success')
     state.job.apply_status = 'IN_PROGRESS'
     fetchLastedCV()

@@ -110,10 +110,13 @@ const login = async () => {
     if (response.status === 200 && response.data.token) {
       localStorage.setItem('token', response.data.token)
       localStorage.setItem('username', form.value.phone)
-      console.log(response.data)
-      router.push('/').then(() => {
+      const redirectPath = localStorage.getItem('redirectAfterLogin')
+      localStorage.removeItem('redirectAfterLogin')
+      if (redirectPath) {
+        window.location.href = redirectPath
+      } else {
         window.location.href = '/'
-      })
+      }
       toastr.success('Login successfully!')
     } else {
       toastr.error('Login failed: Invalid credentials')
