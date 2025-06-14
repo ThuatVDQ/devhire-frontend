@@ -24,6 +24,7 @@
               :value="template.id"
               v-model="selectedTemplateId"
               class="form-radio h-5 w-5 text-green-600 transition duration-150 ease-in-out"
+              style="min-width: 1.25rem; min-height: 1.25rem"
             />
             <span class="text-gray-700 font-medium">{{ template.summary }}</span>
           </label>
