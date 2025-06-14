@@ -6,6 +6,8 @@ import axios from 'axios'
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
 import { defineProps, defineEmits } from 'vue'
+import adVideo from '@/assets/ads.mp4'
+const adVideoSrc = ref(adVideo)
 
 const emit = defineEmits(['submit'])
 
@@ -420,8 +422,8 @@ async function fetchCategories() {
 
 <template>
   <section class="relative bg-slate-50 dark:bg-slate-800 lg:py-16 py-10">
-    <div class="container">
-      <div class="lg:flex justify-center">
+    <div class="flex relative justify-center">
+      <div class="lg:flex">
         <div>
           <div class="p-6 bg-white dark:bg-slate-900 shadow dark:shadow-gray-700 rounded-md">
             <div class="text-left">
@@ -691,15 +693,29 @@ async function fetchCategories() {
             </div>
           </div>
         </div>
+        <div class="lg:flex-none video-sticky-wrapper">
+          <router-link to="/recruiter/upgrade">
+            <video autoplay loop muted playsinline width="300" class="cursor-pointer">
+              <source :src="adVideoSrc" type="video/mp4" />
+              Trình duyệt của bạn không hỗ trợ thẻ video.
+            </video>
+          </router-link>
+        </div>
       </div>
     </div>
   </section>
 </template>
 <style scoped>
 h1 {
-  font-size: 35px; /* Kích thước chữ của h1 */
-  font-weight: bold; /* Chữ đậm */
+  font-size: 35px;
+  font-weight: bold;
   margin-bottom: 20px;
   color: #333;
+}
+
+.video-sticky-wrapper {
+  align-self: flex-start;
+  height: fit-content;
+  margin-left: 20px;
 }
 </style>

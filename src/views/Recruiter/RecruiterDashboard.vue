@@ -2,6 +2,15 @@
   <header class="">
     <h1 class="text-3xl font-semibold text-white bg-blue-700 px-11 py-10">Dashboard</h1>
   </header>
+  <div class="w-full flex justify-center py-4 bg-gray-100">
+    <router-link to="/recruiter/upgrade">
+      <img
+        :src="adsDashboard"
+        alt="Dashboard Advertisement"
+        class="max-w-full h-auto rounded-lg shadow-md cursor-pointer"
+      />
+    </router-link>
+  </div>
   <section class="p-11 bg-gray-100 min-h-screen">
     <!-- Summary cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
@@ -65,6 +74,7 @@
 import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
 import BarChart from '@/components/BarChart.vue'
+import adsDashboard from '@/assets/ads_dashboard.png'
 
 // Define reactive variables
 const totalJobsPosted = ref(0)
