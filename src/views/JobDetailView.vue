@@ -78,7 +78,7 @@ onBeforeUnmount(() => {
 
 const formatDate = (dateArray) => {
   console.log('dateArray', dateArray)
-  if (!Array.isArray(dateArray) || dateArray.length < 7) {
+  if (!Array.isArray(dateArray) || dateArray.length < 6) {
     return ''
   }
 
@@ -190,7 +190,7 @@ const showApplicationForm = () => {
     localStorage.setItem('redirectAfterLogin', window.location.pathname)
     setTimeout(() => {
       window.location.href = '/login'
-    }, 2000)
+    }, 1000)
   }
 }
 

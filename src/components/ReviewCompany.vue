@@ -21,6 +21,39 @@ const newReview = reactive({
   comment: ''
 })
 
+const isAuthenticated = () => {
+  const token = localStorage.getItem('token')
+  return !!token // Trả về true nếu có token, false nếu không
+}
+
+// Hàm xử lý hành động khi người dùng chưa đăng nhập
+const handleLoginRequired = () => {
+  toastr.error('Please login to continue.', 'Error') // Thông báo tổng quát hơn
+  localStorage.setItem('redirectAfterLogin', window.location.pathname) // Lưu đường dẫn hiện tại
+  setTimeout(() => {
+    window.location.href = '/login' // Chuyển hướng
+  }, 1000)
+}
+
+// Hàm được gọi khi focus vào textarea
+const handleTextareaFocus = (event) => {
+  if (!isAuthenticated()) {
+    event.target.blur() // Bỏ focus khỏi textarea
+    handleLoginRequired()
+  }
+}
+
+// Hàm được gọi khi click vào ngôi sao
+const setRating = (star) => {
+  if (isAuthenticated()) {
+    // Nếu đã đăng nhập, cho phép đặt rating
+    newReview.rating = star
+  } else {
+    // Nếu chưa đăng nhập, xử lý yêu cầu đăng nhập
+    handleLoginRequired()
+  }
+}
+
 const reviews = ref([])
 const currentPage = ref(0)
 const totalPages = ref(0)
@@ -54,14 +87,14 @@ const loadMoreReviews = () => {
   }
 }
 
-const setRating = (star) => {
-  newReview.rating = star
-}
-
 const submitReview = async () => {
-  const token = localStorage.getItem('token')
-  if (token === null) {
+  if (!isAuthenticated()) {
     toastr.error('Please login to submit a review', 'Error')
+    handleLoginRequired()
+    return
+  }
+  if (newReview.rating === 0 || !newReview.comment.trim()) {
+    toastr.info('Please provide a rating and a comment.', 'Info')
     return
   }
   try {
@@ -74,7 +107,13 @@ const submitReview = async () => {
     newReview.comment = ''
     fetchReviews()
   } catch (error) {
-    console.error('Error submitting review:', error)
+    if (error.response && error.response.status === 401) {
+      toastr.error('Session expired. Please login again.', 'Error')
+      localStorage.removeItem('token')
+      handleLoginRequired()
+    } else {
+      toastr.error('Failed to submit review. Please try again.', 'Error')
+    }
   }
 }
 
@@ -151,6 +190,7 @@ onMounted(() => {
           placeholder="Write your review here..."
           class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           rows="4"
+          @focus="handleTextareaFocus"
         ></textarea>
 
         <!-- Submit Button -->

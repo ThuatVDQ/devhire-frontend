@@ -591,7 +591,6 @@ const uploadLicense = async () => {
       }
     )
     toastr.success('License uploaded successfully', 'Success')
-    selectedLicense.value = null
   } catch (error) {
     toastr.error('Failed to upload license', 'Error')
     console.error('Error uploading license:', error)

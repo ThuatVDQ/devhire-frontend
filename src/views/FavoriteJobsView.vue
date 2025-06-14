@@ -20,7 +20,12 @@ const fetchData = async (page = 0) => {
 
     // Exit function if no token is available
     if (!token) {
-      toastr.error('You must login', 'Error')
+      toastr.error('Please login to view your applied jobs.', 'Authentication Required')
+      localStorage.setItem('redirectAfterLogin', window.location.pathname)
+      setTimeout(() => {
+        window.location.href = '/login'
+      }, 1000)
+      isLoading.value = false
       return
     }
 
