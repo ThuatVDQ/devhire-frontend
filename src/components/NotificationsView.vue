@@ -78,13 +78,17 @@ const markAsRead = async (notification) => {
       }
     )
 
-    // Cập nhật trạng thái "đã đọc" của thông báo
     if (notification) {
       notification.is_read = true
+    }
+    // Chuyển hướng trang sau khi cập nhật thành công
+    if (notification.targetUrl) {
+      window.location.href = notification.targetUrl
     }
   } catch (error) {
     console.error('Error marking notification as read:', error)
   }
+  console.log('Notification marked as read:', notification)
 }
 const markAllAsRead = async (notifications) => {
   try {

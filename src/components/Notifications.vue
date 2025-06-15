@@ -30,6 +30,7 @@
             'p-5 border-b last:border-b-0 flex justify-between items-center',
             notification.is_read ? 'bg-white' : 'bg-gray-100 font-semibold'
           ]"
+          @click="markAsRead(notification)"
         >
           <div>
             <p :class="notification.is_read ? 'text-gray-600' : 'text-gray-900'">
@@ -93,6 +94,31 @@ const fetchNotifications = async () => {
   } catch (error) {
     console.error('Error fetching notifications:', error)
   }
+}
+
+const markAsRead = async (notification) => {
+  try {
+    const response = await axios.put(
+      `http://localhost:8090/api/notifications/${notification.id}/read`,
+      null,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      }
+    )
+
+    if (notification) {
+      notification.is_read = true
+    }
+    // Chuyển hướng trang sau khi cập nhật thành công
+    if (notification.targetUrl) {
+      window.location.href = notification.targetUrl
+    }
+  } catch (error) {
+    console.error('Error marking notification as read:', error)
+  }
+  console.log('Notification marked as read:', notification)
 }
 
 // Gọi API đánh dấu tất cả thông báo là đã đọc

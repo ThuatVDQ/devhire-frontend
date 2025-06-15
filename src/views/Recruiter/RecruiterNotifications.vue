@@ -28,7 +28,7 @@ const fetchNotifications = async () => {
         Authorization: `Bearer ${token}` // Gửi token vào tiêu đề
       }
     })
-
+    console.log('Fetched notifications:', response.data)
     notifications.value = response.data || []
   } catch (error) {
     console.error('Error fetching notifications:', error)
