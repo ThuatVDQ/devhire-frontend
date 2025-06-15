@@ -106,6 +106,26 @@ function formatSalary(amount) {
   }
   return amount
 }
+
+const formatDate = (dateArray) => {
+  console.log('dateArray', dateArray)
+  if (!Array.isArray(dateArray) || dateArray.length < 6) {
+    return ''
+  }
+
+  // Mảng của bạn: [year, month, day, hour, minute, second, millisecond]
+  const [year, month, day, hour, minute, second] = dateArray
+
+  // Chuyển mảng thành đối tượng Date
+  const date = new Date(year, month - 1, day, hour, minute, second)
+
+  // Định dạng ngày tháng theo kiểu 'dd-MMM-yyyy'
+  return date.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  })
+}
 </script>
 
 <template>
@@ -173,22 +193,12 @@ function formatSalary(amount) {
           <div>
             <span v-if="state.job.date_applied" class="text-gray-600">
               Application period:
-              {{
-                new Date(state.job.date_applied).toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'short',
-                  day: 'numeric'
-                })
-              }}
+              {{ formatDate(state.job.date_applied) }}
             </span>
           </div>
 
           <!-- Job Type and Salary -->
           <div class="mt-1">
-            <span
-              class="bg-slate-100 dark:bg-slate-800 inline-block text-slate-900 dark:text-slate-300 text-xs px-2.5 py-0.5 font-semibold rounded-full me-1"
-              >{{ state.job.category.name }}</span
-            >
             <span
               class="bg-emerald-600/10 inline-block text-emerald-600 text-xs px-2.5 py-0.5 font-semibold rounded-full me-1"
             >

@@ -36,6 +36,8 @@ const fetchData = async (page = 0) => {
       params: { page, limit: pageSize.value },
       headers
     })
+
+    console.log('Fetched favorite jobs:', response.data.jobs)
     jobs.value = response.data.jobs.map((job) => {
       return {
         ...job,
@@ -87,7 +89,7 @@ const scrollToTop = () => {
           class="mx-auto mb-4"
           style="width: 300px; height: auto"
         />
-        <p class="text-gray-700">You haven't favorite any jobs!</p>
+        <p class="text-gray-700">You haven't applied any jobs!</p>
         <RouterLink
           to="/jobs"
           class="mt-4 bg-green-600 text-white font-semibold px-6 py-2 rounded-lg hover:bg-green-700 transition inline-block"
