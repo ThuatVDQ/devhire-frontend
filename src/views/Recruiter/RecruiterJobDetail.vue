@@ -47,17 +47,16 @@ function openActionMenu(event, application) {
     left: rect.left + window.scrollX - 130,
     application: application
   }
-  console.log('actionMenuVisibleData:', actionMenuVisibleData.value)
 }
 
 function closeActionMenu() {
-  console.log('closeActionMenu')
   actionMenuVisibleData.value = null
   actionMenuVisible.value = false
 }
 
 const jobApplications = ref([])
 const isLoading = ref(true)
+const isSchedule = ref(false)
 const isRequireBackEnd = ref(false)
 
 // Pagination settings
@@ -125,9 +124,13 @@ async function fetchJobApplications() {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     })
+    console.log('Job Applications:', response.data)
     jobApplications.value = response.data || []
     if (jobApplications.value.length > 0 && jobApplications.value[0].job_title) {
       title.value = jobApplications.value[0].job_title
+      if (jobApplications.value[0].job_status === 'CLOSED') {
+        isSchedule.value = true
+      }
     }
   } catch (error) {
     toastr.error('Error fetching job applications:', error)
@@ -286,6 +289,10 @@ function formatDate(dateArray) {
   })
 }
 
+const goToScheduleInterview = () => {
+  router.push({ name: 'recruiter-interviews', query: { job: route.params.id } })
+}
+
 // Back button functionality
 function goBack() {
   router.back()
@@ -325,7 +332,15 @@ function goBack() {
       <div v-if="isLoading" class="text-center py-4">Loading...</div>
 
       <!-- Applications Section -->
-      <div v-else class="bg-white shadow-md rounded-lg overflow-hidden">
+      <div v-else class="bg-white rounded-lg overflow-hidden">
+        <div v-if="isSchedule" class="flex justify-end mb-4">
+          <button
+            @click="goToScheduleInterview"
+            class="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors duration-300"
+          >
+            <i class="pi pi-calendar-plus mr-2"></i> Schedule Interview
+          </button>
+        </div>
         <table class="min-w-full bg-white border-collapse">
           <!-- Header -->
           <thead class="bg-blue-100">
@@ -388,7 +403,7 @@ function goBack() {
       </div>
 
       <!-- Pagination Controls -->
-      <div class="flex justify-center mt-6">
+      <div v-if="totalPages > 1" class="flex justify-center mt-6">
         <!-- Previous Button -->
         <button
           @click="prevPage"
