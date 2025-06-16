@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import PostForm from '@/components/PostForm.vue'
 import axios from 'axios'
 import toastr from 'toastr'
@@ -137,11 +137,55 @@ async function createJob(data) {
   }
 }
 
+const totalPostedJobsMonth = ref(0)
+const fetchTotalPostedJobsMonth = async () => {
+  try {
+    const response = await axios.get('http://localhost:8090/api/jobs/total-posted-month', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    totalPostedJobsMonth.value = response.data
+    console.log('Total posted jobs for the month:', totalPostedJobsMonth.value)
+  } catch (error) {
+    console.error('Error fetching total posted jobs for the month:', error)
+    totalPostedJobsMonth.value = 0 // Set to 0 or handle error appropriately
+    toastr.error('Failed to load total posted jobs for the month.', 'Error')
+  }
+}
+
+const totalAllowedJobs = ref(3)
+const fetchUpgradedSubscriptions = async () => {
+  try {
+    const response = await axios.get('http://localhost:8090/api/subscription/upgraded', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    totalAllowedJobs.value = response.data?.[0]?.amount || 3
+  } catch (error) {
+    console.error('Error fetching upgraded subscriptions:', error)
+    totalAllowedJobs.value = 3
+  }
+}
+
+const canPostJob = computed(() => {
+  return totalPostedJobsMonth.value < totalAllowedJobs.value
+})
+
 // Trigger the fetch methods on mount
 onMounted(async () => {
   await fetchCities()
   await fetchSkills()
   await fetchAddresses()
+  await fetchTotalPostedJobsMonth()
+  await fetchUpgradedSubscriptions()
+  if (!canPostJob.value) {
+    toastr.info(
+      `You have reached the limit of ${totalAllowedJobs.value} jobs for this month. Please upgrade your subscription to post more jobs.`,
+      'Limit Reached'
+    )
+  }
 })
 </script>
 
@@ -153,6 +197,12 @@ onMounted(async () => {
   </header>
   <div class="text-left">
     <!-- Pass the data as props to PostForm -->
-    <PostForm :skills="skills" :address="address" :isEdit="false" @submit="createJob" />
+    <PostForm
+      :skills="skills"
+      :address="address"
+      :isEdit="false"
+      :isPostJob="canPostJob"
+      @submit="createJob"
+    />
   </div>
 </template>

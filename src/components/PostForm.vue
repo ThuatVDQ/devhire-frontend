@@ -15,7 +15,8 @@ const props = defineProps({
   job: Object,
   skills: Array,
   address: Array,
-  isEdit: Boolean
+  isEdit: Boolean,
+  canPostJob: Boolean
 })
 
 const errors = reactive({
@@ -195,12 +196,79 @@ watch(
   { immediate: true }
 )
 
-function addSkill() {
-  inf.skills.push({ name: '' })
+const newSkillInput = ref('')
+const selectedSkills = ref(
+  props.isEdit && props.skills
+    ? props.skills.map((s) => {
+        return typeof s === 'string' ? { name: s } : s
+      })
+    : []
+)
+
+const filteredSkillSuggestions = computed(() => {
+  if (newSkillInput.value.length === 0) {
+    return []
+  }
+
+  const inputLower = newSkillInput.value.toLowerCase()
+
+  // selectedSkillNames vẫn cần truy cập .name nếu selectedSkills lưu object
+  const selectedSkillNames = new Set(selectedSkills.value.map((s) => s.name.toLowerCase()))
+
+  if (props.skills && Array.isArray(props.skills)) {
+    // Bước 1: Lọc các kỹ năng phù hợp
+    const filtered = props.skills.filter((skill) => {
+      // Lấy tên kỹ năng, xử lý cả trường hợp là string hoặc object { name: '...' }
+      const skillName = typeof skill === 'string' ? skill : skill && skill.name ? skill.name : ''
+
+      if (!skillName) return false // Bỏ qua nếu skillName không hợp lệ
+
+      return (
+        skillName.toLowerCase().includes(inputLower) &&
+        !selectedSkillNames.has(skillName.toLowerCase())
+      )
+    })
+
+    // Bước 2: Dùng .map để TRẢ VỀ CHỈ TÊN KỸ NĂNG (chuỗi)
+    return filtered.map((skill) => {
+      return typeof skill === 'string' ? skill : skill.name
+    })
+  } else {
+    console.warn("Prop 'skills' is not a valid array or contains invalid items:", props.skills)
+    return []
+  }
+})
+
+// Xử lý khi người dùng gõ vào ô nhập liệu (không cần logic lọc ở đây vì đã có computed)
+const handleSkillInput = () => {
+  // Logic lọc đã được xử lý bởi computed property filteredSkillSuggestions
+  // Không cần làm gì thêm ở đây nếu không có side-effect nào khác
 }
 
-function removeSkill(index) {
-  inf.skills.splice(index, 1)
+// Khi người dùng chọn một gợi ý
+const selectSuggestion = (suggestion) => {
+  newSkillInput.value = suggestion // Đặt gợi ý vào ô nhập liệu
+  addSkillFromInput() // Thêm kỹ năng đó vào danh sách đã chọn
+  // filteredSkillSuggestions sẽ tự động cập nhật
+}
+
+// Khi người dùng nhấn Enter hoặc nút "Thêm"
+const addSkillFromInput = () => {
+  const skillName = newSkillInput.value.trim() // Lấy tên kỹ năng và loại bỏ khoảng trắng thừa
+  // Kiểm tra nếu tên kỹ năng không rỗng và chưa có trong danh sách 'selectedSkills'
+  if (
+    skillName &&
+    !selectedSkills.value.some((s) => s.name.toLowerCase() === skillName.toLowerCase())
+  ) {
+    selectedSkills.value.push({ name: skillName })
+    newSkillInput.value = '' // Xóa nội dung ô nhập liệu
+    // filteredSkillSuggestions sẽ tự động cập nhật
+  }
+}
+
+// Xóa kỹ năng khỏi danh sách 'selectedSkills' dựa trên index
+const removeSkill = (index) => {
+  selectedSkills.value.splice(index, 1)
 }
 
 async function fetchCities() {
@@ -356,7 +424,7 @@ function handleSubmit() {
   date.setHours(15)
   date.setMinutes(59)
   date.setSeconds(59)
-
+  console.log('Selected date:', selectedSkills.value)
   const formattedDate = date.toISOString().slice(0, 19)
   const data = {
     title: details.title,
@@ -381,11 +449,10 @@ function handleSubmit() {
       city: addr.selectedCityName,
       district: addr.selectedDistrictName
     })),
-    skills: inf.skills.map((skill) => ({
+    skills: selectedSkills.value.map((skill) => ({
       name: skill.name
     }))
   }
-  console.log('Data:', data.deadline)
   emit('submit', data)
 }
 
@@ -513,7 +580,7 @@ async function fetchCategories() {
                     class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 min-h-[200px]"
                   ></textarea>
                 </div>
-                <div class="col-span-12 ltr:text-left rtl:text-right">
+                <!-- <div class="col-span-12 ltr:text-left rtl:text-right">
                   <div class="flex items-center gap-4">
                     <label class="font-semibold">Skills</label>
                     <i
@@ -538,6 +605,72 @@ async function fetchCategories() {
                       @click="removeSkill(index)"
                       title="Remove skill"
                     ></i>
+                  </div>
+                </div> -->
+
+                <div class="relative col-span-12 ltr:text-left rtl:text-right">
+                  <div class="relative mb-6">
+                    <label class="font-semibold text-lg text-gray-800 mb-2 block">Job Skills</label>
+                    <input
+                      v-model="newSkillInput"
+                      @input="handleSkillInput"
+                      @keyup.enter="addSkillFromInput"
+                      type="text"
+                      class="block w-full px-4 py-2 text-gray-900 border border-gray-300 rounded-lg bg-white shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
+                      placeholder="Type to add a skill (e.g., JavaScript)"
+                    />
+                    <ul
+                      v-if="filteredSkillSuggestions.length && newSkillInput.length > 0"
+                      class="absolute z-10 w-full bg-white border border-gray-300 rounded-lg shadow-lg mt-1 max-h-48 overflow-y-auto"
+                    >
+                      <li
+                        v-for="suggestion in filteredSkillSuggestions"
+                        :key="suggestion"
+                        @click="selectSuggestion(suggestion)"
+                        class="px-4 py-2 cursor-pointer hover:bg-blue-50 text-gray-800 transition duration-150 ease-in-out"
+                      >
+                        {{ suggestion }}
+                      </li>
+                    </ul>
+                    <button
+                      @click="addSkillFromInput"
+                      class="mt-3 px-5 py-2.5 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 focus:ring-4 focus:outline-none focus:ring-emerald-300 transition duration-150 ease-in-out shadow-md"
+                    >
+                      Add Skill
+                    </button>
+                  </div>
+
+                  <div
+                    v-if="selectedSkills.length > 0"
+                    class="flex flex-wrap gap-2 pt-2 border-t border-gray-200"
+                  >
+                    <div
+                      v-for="(skill, index) in selectedSkills"
+                      :key="index"
+                      class="inline-flex items-center bg-blue-50 text-blue-700 text-sm font-medium px-3 py-1.5 rounded-full shadow-sm"
+                    >
+                      <span class="mr-2">{{ skill.name }}</span>
+                      <button
+                        @click="removeSkill(index)"
+                        class="flex items-center justify-center w-5 h-5 text-blue-500 hover:text-blue-700 bg-blue-100 hover:bg-blue-200 rounded-full focus:outline-none transition duration-150 ease-in-out"
+                        title="Remove skill"
+                      >
+                        <svg
+                          class="w-3 h-3"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12"
+                          ></path>
+                        </svg>
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -685,6 +818,8 @@ async function fetchCategories() {
                     class="px-6 py-2 rounded-md bg-emerald-600 hover:bg-emerald-700 border-emerald-600 hover:border-emerald-700 text-white"
                     type="submit"
                     @click="handleSubmit"
+                    :disabled="!isEdit && !canPostJob"
+                    :class="{ 'opacity-50 cursor-not-allowed': !isEdit && !canPostJob }"
                   >
                     {{ isEdit ? 'Update' : 'Post Now' }}
                   </button>
