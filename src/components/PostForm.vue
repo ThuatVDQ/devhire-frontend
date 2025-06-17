@@ -16,7 +16,7 @@ const props = defineProps({
   skills: Array,
   address: Array,
   isEdit: Boolean,
-  canPostJob: Boolean
+  isPostJob: Boolean
 })
 
 const errors = reactive({
@@ -818,8 +818,8 @@ async function fetchCategories() {
                     class="px-6 py-2 rounded-md bg-emerald-600 hover:bg-emerald-700 border-emerald-600 hover:border-emerald-700 text-white"
                     type="submit"
                     @click="handleSubmit"
-                    :disabled="!isEdit && !canPostJob"
-                    :class="{ 'opacity-50 cursor-not-allowed': !isEdit && !canPostJob }"
+                    :disabled="!isEdit && !isPostJob"
+                    :class="{ 'opacity-50 cursor-not-allowed': !isEdit && !isPostJob }"
                   >
                     {{ isEdit ? 'Update' : 'Post Now' }}
                   </button>

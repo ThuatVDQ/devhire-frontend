@@ -120,7 +120,9 @@ function setDistricts(cityCode) {
   }
 }
 
+const isLoading = ref(false)
 async function createJob(data) {
+  isLoading.value = true
   try {
     const response = await axios.post('http://localhost:8090/api/jobs', data, {
       headers: {
@@ -134,6 +136,8 @@ async function createJob(data) {
   } catch (error) {
     console.error()
     toastr.error(JSON.stringify(error.response.data), 'Error')
+  } finally {
+    isLoading.value = false
   }
 }
 
@@ -163,6 +167,7 @@ const fetchUpgradedSubscriptions = async () => {
       }
     })
     totalAllowedJobs.value = response.data?.[0]?.amount || 3
+    console.log('Total allowed jobs for the month:', totalAllowedJobs.value)
   } catch (error) {
     console.error('Error fetching upgraded subscriptions:', error)
     totalAllowedJobs.value = 3
@@ -204,5 +209,14 @@ onMounted(async () => {
       :isPostJob="canPostJob"
       @submit="createJob"
     />
+  </div>
+  <div
+    v-if="isLoading"
+    class="fixed inset-0 bg-black bg-opacity-75 flex flex-col items-center justify-center z-[9999]"
+  >
+    <div
+      class="w-16 h-16 border-4 border-t-4 border-gray-300 border-t-emerald-600 rounded-full animate-spin mb-4"
+    ></div>
+    <p class="text-white text-lg">Please waiting ...</p>
   </div>
 </template>
