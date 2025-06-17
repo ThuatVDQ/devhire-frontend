@@ -16,21 +16,6 @@ const tooltipVisible = ref(false)
 const tooltipContent = ref('')
 const tooltipPosition = ref({ x: 0, y: 0 })
 
-function showTooltip(event, content) {
-  tooltipVisible.value = true
-  tooltipContent.value = content
-
-  // Hiển thị phía dưới - bên trái
-  tooltipPosition.value = {
-    x: event.clientX - 100, // lùi sang trái 200px
-    y: event.clientY + 10 // xuống dưới 16px
-  }
-}
-
-function hideTooltip() {
-  tooltipVisible.value = false
-}
-
 const actionMenuVisibleData = ref(null)
 const dropdownPortal = ref(null)
 const actionMenuVisible = ref(false)
@@ -152,7 +137,7 @@ async function fetchCVScore() {
     scoredData.forEach((scoredItem) => {
       const target = jobApplications.value.find((app) => app.id === scoredItem.applicationId)
       if (target) {
-        target.score = scoredItem.score
+        target.score = scoredItem.score * 10
         target.scoreDetail = scoredItem.scoreDetails
       }
     })
@@ -358,7 +343,7 @@ function goBack() {
                 Status
               </th>
               <th class="py-4 px-6 text-left text-sm font-medium text-gray-700 uppercase w-1/6">
-                Score
+                CV/Job Match
               </th>
               <th
                 class="py-4 px-6 text-left text-sm font-medium text-gray-700 uppercase w-1/6"
@@ -378,13 +363,7 @@ function goBack() {
               </td>
               <td class="py-4 px-6 text-sm text-gray-700">{{ application.status }}</td>
               <td class="py-4 px-6 text-sm text-gray-700">
-                <span
-                  class="underline cursor-pointer"
-                  @mouseenter="showTooltip($event, application.scoreDetail)"
-                  @mouseleave="hideTooltip"
-                >
-                  {{ application.score?.toFixed(1) }}
-                </span>
+                <span class=""> {{ application.score?.toFixed(1) }} % </span>
               </td>
               <td class="py-4 px-6 text-sm text-gray-700 text-right">
                 <button
