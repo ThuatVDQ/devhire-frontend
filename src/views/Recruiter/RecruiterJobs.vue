@@ -353,7 +353,6 @@ const filteredJobs = computed(() => {
 const changePage = (page) => {
   if (page >= 0 && page < totalPages.value) {
     fetchJobs(page)
-    scrollToTop()
   }
 }
 

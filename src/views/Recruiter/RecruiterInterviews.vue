@@ -1057,12 +1057,14 @@ const submitEmailSend = async () => {
   }
   isLoading.value = true
 
+  const formattedBody = emailBody.value.replace(/\n/g, '<br>')
+
   try {
     const emailDto = {
       name: selectedInterview.value.candidate_name,
       email: selectedInterview.value.candidate_email,
       subject: emailSubject.value,
-      content: emailBody.value
+      content: formattedBody
     }
 
     await axios.post(
