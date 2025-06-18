@@ -164,6 +164,8 @@ import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
 import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 const router = useRouter()
 // State
 const users = ref([])
@@ -208,7 +210,7 @@ const fetchUsers = async (page = 0) => {
       params.status = currentStatusFilter.value
     }
 
-    const response = await axios.get('http://localhost:8090/api/admin/getAllUsers', {
+    const response = await axios.get(`${API_URL}/admin/getAllUsers`, {
       params: params,
       headers: {
         Authorization: 'Bearer ' + localStorage.getItem('token')
@@ -268,7 +270,7 @@ function closeDialog() {
 const blockUser = async (userId) => {
   try {
     const response = await axios.post(
-      'http://localhost:8090/api/admin/banUser',
+      `${API_URL}/admin/banUser`,
       {},
       {
         params: { userId },
@@ -287,7 +289,7 @@ const blockUser = async (userId) => {
 const unblockUser = async (userId) => {
   try {
     const response = await axios.post(
-      'http://localhost:8090/api/admin/unbanUser',
+      `${API_URL}/admin/unbanUser`,
       {},
       {
         params: { userId },

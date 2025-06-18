@@ -80,6 +80,8 @@ import EditAvatar from '@/components/EditAvatar.vue'
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 const avatarSrc = ref(defaultAvatar)
 const cropAvatar = ref(defaultAvatar)
 const showAvatarPopup = ref(false)
@@ -93,7 +95,7 @@ const openPopup = () => {
 
 async function fetchDataUser() {
   try {
-    const response = await axios.get('http://localhost:8090/api/users/profile', {
+    const response = await axios.get(`${API_URL}/users/profile`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
@@ -110,7 +112,7 @@ async function fetchDataUser() {
 
 const saveUserDetails = async () => {
   try {
-    const response = await axios.put('http://localhost:8090/api/users/updateProfile', data.user, {
+    const response = await axios.put(`${API_URL}/users/updateProfile`, data.user, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }

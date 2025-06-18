@@ -104,6 +104,8 @@ import axios from 'axios'
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 const currentPassword = ref('')
 const newPassword = ref('')
 const confirmPassword = ref('')
@@ -140,7 +142,7 @@ const isFormValid = computed(() => {
 const changePassword = async () => {
   try {
     const response = await axios.put(
-      'http://localhost:8090/api/users/update-password',
+      `${API_URL}/users/update-password`,
       {
         password: currentPassword.value,
         newPassword: newPassword.value,

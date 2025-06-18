@@ -7,6 +7,8 @@ import { ref, onMounted, computed } from 'vue'
 import aboutus01 from '../assets/about_us01-Dky8rhyA.jpg'
 import aboutus02 from '../assets/about_us02-Dnw9ga1r.jpg'
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 const jobsCount = ref(0)
 const companiesCount = ref(0)
 
@@ -53,7 +55,7 @@ function calculateExperience() {
 
 const getJobCount = async () => {
   try {
-    const response = await axios.get('http://localhost:8090/api/jobs/total')
+    const response = await axios.get(`${API_URL}/jobs/total`)
     jobsCount.value = response.data
   } catch (error) {
     console.error(error)
@@ -62,7 +64,7 @@ const getJobCount = async () => {
 
 const getCompanyCount = async () => {
   try {
-    const response = await axios.get('http://localhost:8090/api/companies/total')
+    const response = await axios.get(`${API_URL}/companies/total`)
     companiesCount.value = response.data
   } catch (error) {
     console.error(error)

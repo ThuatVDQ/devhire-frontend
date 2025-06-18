@@ -9,6 +9,8 @@ import 'toastr/build/toastr.min.css'
 import axios from 'axios'
 import logo from '../../assets/logo.svg'
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 // Reactive state
 const form = ref({
   phone: '',
@@ -29,7 +31,7 @@ const openVerifyPopup = async (messageType) => {
   }
   isSubmitting.value = true
   try {
-    const endpoint = `http://localhost:8090/api/users/resend?email=${form.value.phone}`
+    const endpoint = `${API_URL}/users/resend?email=${form.value.phone}`
 
     const response = await axios.post(endpoint)
 
@@ -103,7 +105,7 @@ const login = async () => {
       role_id: 2
     }
 
-    const response = await axios.post('http://localhost:8090/api/users/login', payload)
+    const response = await axios.post(`${API_URL}/users/login`, payload)
 
     if (response.status === 200 && response.data.token) {
       localStorage.setItem('token', response.data.token)

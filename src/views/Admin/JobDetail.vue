@@ -211,6 +211,8 @@ import toastr from 'toastr'
 import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
 import 'toastr/build/toastr.min.css'
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 const route = useRoute()
 const jobId = route.params.id
 const job = ref(null)
@@ -250,7 +252,7 @@ function closeDialog() {
 
 async function approveJob() {
   try {
-    const response = await axios.post(`http://localhost:8090/api/jobs/${jobId}/approve`)
+    const response = await axios.post(`${API_URL}/jobs/${jobId}/approve`)
     if (response.status === 200) {
       job.value.status = 'APPROVED'
       toastr.success('Job approved successfully.')
@@ -263,7 +265,7 @@ async function approveJob() {
 
 async function rejectJob() {
   try {
-    const response = await axios.post(`http://localhost:8090/api/jobs/${jobId}/reject`)
+    const response = await axios.post(`${API_URL}/jobs/${jobId}/reject`)
     if (response.status === 200) {
       job.value.status = 'REJECTED'
       toastr.success('Job rejected successfully.')
@@ -276,7 +278,7 @@ async function rejectJob() {
 
 async function closeJob() {
   try {
-    const response = await axios.post(`http://localhost:8090/api/jobs/${jobId}/close`)
+    const response = await axios.post(`${API_URL}/jobs/${jobId}/close`)
     if (response.status === 200) {
       job.value.status = 'CLOSED'
       toastr.success('Job closed successfully.')
@@ -293,7 +295,7 @@ function toggleDropdown() {
 
 const fetchJobDetail = async () => {
   try {
-    const response = await axios.get(`http://localhost:8090/api/jobs/${jobId}`)
+    const response = await axios.get(`${API_URL}/jobs/${jobId}`)
     job.value = response.data
   } catch (error) {
     console.error('Error fetching job details:', error)

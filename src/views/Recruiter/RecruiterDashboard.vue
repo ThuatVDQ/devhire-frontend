@@ -76,6 +76,8 @@ import axios from 'axios'
 import BarChart from '@/components/BarChart.vue'
 import adsDashboard from '@/assets/ads_dashboard.png'
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 // Define reactive variables
 const totalJobsPosted = ref(0)
 const totalApplications = ref(0)
@@ -120,7 +122,7 @@ const monthlyApplicationsData = ref({
 // Hàm để lấy số liệu ứng tuyển theo công việc từ API
 async function fetchApplicationsPerJob() {
   try {
-    const response = await axios.get('http://localhost:8090/api/job-application/count-per-job', {
+    const response = await axios.get(`${API_URL}/job-application/count-per-job`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
@@ -151,7 +153,7 @@ async function fetchApplicationsPerJob() {
 // Hàm lấy số liệu ứng tuyển theo tháng từ API
 async function fetchMonthlyApplications() {
   try {
-    const response = await axios.get('http://localhost:8090/api/job-application/monthly-count', {
+    const response = await axios.get(`${API_URL}/job-application/monthly-count`, {
       params: { year: new Date().getFullYear() },
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -203,7 +205,7 @@ async function fetchMonthlyApplications() {
 // Hàm lấy tổng số công việc đã đăng
 async function fetchTotalJobsPosted() {
   try {
-    const response = await axios.get('http://localhost:8090/api/jobs/total-posted', {
+    const response = await axios.get(`${API_URL}/jobs/total-posted`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
@@ -217,7 +219,7 @@ async function fetchTotalJobsPosted() {
 // Hàm lấy tổng số công việc đang chờ phê duyệt
 async function fetchJobsPendingApproval() {
   try {
-    const response = await axios.get('http://localhost:8090/api/jobs/total-pending', {
+    const response = await axios.get(`${API_URL}/jobs/total-pending`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
@@ -231,7 +233,7 @@ async function fetchJobsPendingApproval() {
 // Hàm lấy tổng số ứng tuyển
 async function fetchTotalApplications() {
   try {
-    const response = await axios.get('http://localhost:8090/api/job-application/total', {
+    const response = await axios.get(`${API_URL}/job-application/total`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
@@ -244,7 +246,7 @@ async function fetchTotalApplications() {
 
 async function fetchLatestJobs() {
   try {
-    const response = await axios.get('http://localhost:8090/api/jobs/latest', {
+    const response = await axios.get(`${API_URL}/jobs/latest`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }

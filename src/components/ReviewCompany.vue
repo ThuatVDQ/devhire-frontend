@@ -5,6 +5,8 @@ import { formatDistanceToNow, parseISO } from 'date-fns'
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 const props = defineProps({
   companyId: {
     type: String,
@@ -60,7 +62,7 @@ const totalPages = ref(0)
 
 const fetchReviews = async () => {
   try {
-    const response = await axios.get(`http://localhost:8090/api/reviews/${props.companyId}`, {
+    const response = await axios.get(`${API_URL}/reviews/${props.companyId}`, {
       params: { page: currentPage.value, limit: 5 }
     })
     reviews.value = response.data.company_reviews
@@ -99,7 +101,7 @@ const submitReview = async () => {
   }
   try {
     await axios.post(
-      `http://localhost:8090/api/reviews/${props.companyId}`,
+      `${API_URL}/reviews/${props.companyId}`,
       { rating: newReview.rating, comment: newReview.comment },
       { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
     )

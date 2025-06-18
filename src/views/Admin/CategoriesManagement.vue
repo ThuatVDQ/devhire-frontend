@@ -93,6 +93,8 @@ import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
 import ModalCategory from '@/components/ModalCategory.vue'
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 const categories = ref([])
 const keyword = ref('')
 const showModal = ref(false)
@@ -103,7 +105,7 @@ const isEditing = ref(false)
 
 const fetchCategories = async () => {
   try {
-    const response = await axios.get('http://localhost:8090/api/category', {
+    const response = await axios.get(`${API_URL}/category`, {
       headers: { Authorization: 'Bearer ' + localStorage.getItem('token') }
     })
     console.log(response.data)
@@ -144,7 +146,7 @@ const saveCategory = async () => {
     formData.append('category', currentCategory.value.name)
 
     if (isEditing.value) {
-      await axios.post('http://localhost:8090/api/category/update', null, {
+      await axios.post(`${API_URL}/category/update`, null, {
         params: {
           id: currentCategory.value.id,
           category: currentCategory.value.name
@@ -153,7 +155,7 @@ const saveCategory = async () => {
       })
       toastr.success('Category updated successfully!')
     } else {
-      await axios.post('http://localhost:8090/api/category/add', formData, {
+      await axios.post(`${API_URL}/category/add`, formData, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       })
       toastr.success('Category added successfully!')

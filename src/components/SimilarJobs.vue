@@ -4,6 +4,8 @@ import CardJob from './CardJob.vue'
 import CardExploreJob from './CardExploreJob.vue'
 import axios from 'axios'
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 const props = defineProps({
   id: {
     type: Number,
@@ -18,7 +20,7 @@ const state = reactive({
 
 const fetchJobs = async (jobId) => {
   try {
-    const response = await axios.get(`http://localhost:8090/api/jobs/related`, {
+    const response = await axios.get(`${API_URL}/jobs/related`, {
       params: {
         jobId
       }

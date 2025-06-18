@@ -1,8 +1,9 @@
 <script setup>
 import { ref, onMounted, onUnmounted, watchEffect, nextTick } from 'vue'
 import axios from 'axios'
-import CardJob from './CardJob.vue'
 import CardJobRecommend from './CardJobRecommend.vue'
+
+const API_URL = import.meta.env.VITE_APP_API_URL
 
 const recommendedJobs = ref([])
 const isLoading = ref(true)
@@ -20,7 +21,7 @@ const fetchRecommendedJobs = async () => {
       return
     }
 
-    const response = await axios.get('http://localhost:8090/api/recommendations', {
+    const response = await axios.get(`${API_URL}/recommendations`, {
       params: { topK: 10 },
       headers: {
         Authorization: `Bearer ${token}`

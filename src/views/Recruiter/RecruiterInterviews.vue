@@ -501,6 +501,8 @@ import toastr, { error } from 'toastr'
 import 'toastr/build/toastr.min.css'
 import CreateInterviewSchedulePopup from '@/components/CreateInterviewSchedulePopup.vue'
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 const route = useRoute()
 const jobsTableRef = ref(null)
 const isLoading = ref(false)
@@ -652,7 +654,7 @@ function onConfirm(data) {
     }
     payload.job_application_ids = ids
     axios
-      .post('http://localhost:8090/api/interview-schedules/create-bulk', payload, {
+      .post(`${API_URL}/interview-schedules/create-bulk`, payload, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
@@ -671,7 +673,7 @@ function onConfirm(data) {
   } else {
     payload.job_application_id = selectedApplicant.value.id
     axios
-      .post('http://localhost:8090/api/interview-schedules/create', payload, {
+      .post(`${API_URL}/interview-schedules/create`, payload, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
@@ -704,7 +706,7 @@ function onEdit(data) {
   }
 
   axios
-    .post(`http://localhost:8090/api/interview-schedules/${data.id}`, payload, {
+    .post(`${API_URL}/interview-schedules/${data.id}`, payload, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
@@ -731,7 +733,7 @@ async function fetchJobs(page = 0) {
       status: 'CLOSED'
     }
 
-    const response = await axios.get('http://localhost:8090/api/jobs/company', {
+    const response = await axios.get(`${API_URL}/jobs/company`, {
       params: params,
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -781,7 +783,7 @@ const toggleApplicants = async (jobId) => {
     expandedJobId.value = jobId
     if (!applicants.value[jobId]) {
       try {
-        const res = await axios.get(`http://localhost:8090/api/job-application/${jobId}`, {
+        const res = await axios.get(`${API_URL}/job-application/${jobId}`, {
           params: {
             status: 'ACCEPTED'
           },
@@ -832,7 +834,7 @@ const events = ref([])
 
 const fetchInterviewSchedules = async () => {
   try {
-    const response = await axios.get('http://localhost:8090/api/interview-schedules', {
+    const response = await axios.get(`${API_URL}/interview-schedules`, {
       params: {
         page: 0,
         size: 10
@@ -932,7 +934,7 @@ const fetchInterviewSchedulesResult = async () => {
   try {
     const statusParam = currentFilter.value === 'ALL' ? '' : currentFilter.value
 
-    const response = await axios.get('http://localhost:8090/api/interview-schedules/result', {
+    const response = await axios.get(`${API_URL}/interview-schedules/result`, {
       params: {
         status: statusParam,
         page: pagination.value.currentPage, // Send current page
@@ -1013,13 +1015,9 @@ const submitResultUpdate = async () => {
       recruiter_note: popupRecruiterNote.value
     }
 
-    await axios.put(
-      `http://localhost:8090/api/interview-schedules/${currentInterviewId.value}/result`,
-      dto,
-      {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      }
-    )
+    await axios.put(`${API_URL}/interview-schedules/${currentInterviewId.value}/result`, dto, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    })
 
     closeResultPopup()
     fetchInterviewSchedulesResult()
@@ -1068,7 +1066,7 @@ const submitEmailSend = async () => {
     }
 
     await axios.post(
-      `http://localhost:8090/api/interview-schedules/${selectedInterview.value.id}/send-email`,
+      `${API_URL}/interview-schedules/${selectedInterview.value.id}/send-email`,
       emailDto,
       {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } // Gửi token xác thực

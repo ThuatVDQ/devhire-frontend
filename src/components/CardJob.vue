@@ -7,6 +7,8 @@ import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
 import defaultLogo from '../assets/logo.svg'
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 const router = useRouter()
 
 function applyJob() {
@@ -58,7 +60,7 @@ async function favoriteJob() {
 
     if (!state.job.is_favorite) {
       await axios.post(
-        `http://localhost:8090/api/jobs/${state.job.id}/like`,
+        `${API_URL}/jobs/${state.job.id}/like`,
         {},
         {
           headers
@@ -67,7 +69,7 @@ async function favoriteJob() {
       state.job.is_favorite = true
     } else {
       await axios.delete(
-        `http://localhost:8090/api/favorite-job/remove`,
+        `${API_URL}/favorite-job/remove`,
 
         {
           params: { jobId: state.job.id },

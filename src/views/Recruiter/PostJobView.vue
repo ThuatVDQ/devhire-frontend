@@ -5,13 +5,15 @@ import axios from 'axios'
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 const skills = ref([])
 const address = ref([])
 const cities = ref([])
 
 const fetchSkills = async () => {
   try {
-    const response = await axios.get('http://localhost:8090/api/companies/skills', {
+    const response = await axios.get(`${API_URL}/companies/skills`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
@@ -28,7 +30,7 @@ const fetchSkills = async () => {
 
 const fetchAddresses = async () => {
   try {
-    const response = await axios.get('http://localhost:8090/api/companies/addresses', {
+    const response = await axios.get(`${API_URL}/companies/addresses`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
@@ -124,7 +126,7 @@ const isLoading = ref(false)
 async function createJob(data) {
   isLoading.value = true
   try {
-    const response = await axios.post('http://localhost:8090/api/jobs', data, {
+    const response = await axios.post(`${API_URL}/jobs`, data, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
@@ -144,7 +146,7 @@ async function createJob(data) {
 const totalPostedJobsMonth = ref(0)
 const fetchTotalPostedJobsMonth = async () => {
   try {
-    const response = await axios.get('http://localhost:8090/api/jobs/total-posted-month', {
+    const response = await axios.get(`${API_URL}/jobs/total-posted-month`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
@@ -161,7 +163,7 @@ const fetchTotalPostedJobsMonth = async () => {
 const totalAllowedJobs = ref(3)
 const fetchUpgradedSubscriptions = async () => {
   try {
-    const response = await axios.get('http://localhost:8090/api/subscription/upgraded', {
+    const response = await axios.get(`${API_URL}/subscription/upgraded`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }

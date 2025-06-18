@@ -9,6 +9,8 @@ import CardJob from '@/components/CardJob.vue'
 import { formatDistanceToNow, parseISO } from 'date-fns'
 import Reviews from '@/components/ReviewCompany.vue'
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 const route = useRoute()
 
 const state = reactive({
@@ -67,7 +69,7 @@ onBeforeUnmount(() => {
 
 const fetchCompanies = async () => {
   try {
-    const response = await axios.get('http://localhost:8090/api/companies/related', {
+    const response = await axios.get(`${API_URL}/companies/related`, {
       params: {
         companyId: route.params.id
       }
@@ -80,7 +82,7 @@ const fetchCompanies = async () => {
 
 const fetchJobsByCompany = async () => {
   try {
-    const response = await axios.get('http://localhost:8090/api/jobs/candidate/company', {
+    const response = await axios.get(`${API_URL}/jobs/candidate/company`, {
       params: { companyId: route.params.id }
     })
 
@@ -93,7 +95,7 @@ const fetchJobsByCompany = async () => {
 
 const fetchCompanyData = async (id) => {
   try {
-    const response = await axios.get(`http://localhost:8090/api/companies/${id}`)
+    const response = await axios.get(`${API_URL}/companies/${id}`)
     state.company = response.data
     if (state.company.logo)
       state.company.logo = `http://localhost:8090/uploads/${state.company.logo}`

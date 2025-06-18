@@ -3,6 +3,8 @@ import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
 import BarChart from '@/components/BarChart.vue'
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 // State để lưu dữ liệu từ API
 const dashboardData = ref(null)
 const recentJobs = ref([])
@@ -32,7 +34,7 @@ const monthlyJobs = ref({
 // Gọi API khi component được mount
 const fetchDashboardData = async () => {
   try {
-    const response = await axios.get('http://localhost:8090/api/admin/dashboard', {
+    const response = await axios.get(`${API_URL}/admin/dashboard`, {
       headers: {
         Authorization: 'Bearer ' + localStorage.getItem('token')
       }
@@ -46,14 +48,11 @@ const fetchDashboardData = async () => {
 
 const fetchMonthlyApplications = async () => {
   try {
-    const response = await axios.get(
-      'http://localhost:8090/api/admin/monthlyApplications?year=2024',
-      {
-        headers: {
-          Authorization: 'Bearer ' + localStorage.getItem('token')
-        }
+    const response = await axios.get(`${API_URL}/admin/monthlyApplications?year=2025`, {
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('token')
       }
-    )
+    })
     const monthlyData = response.data
 
     // Khởi tạo mảng labels cho 12 tháng
@@ -99,7 +98,7 @@ const fetchMonthlyApplications = async () => {
 
 const fetchMonthlyJobs = async () => {
   try {
-    const response = await axios.get('http://localhost:8090/api/admin/monthlyJobs?year=2024', {
+    const response = await axios.get(`${API_URL}/admin/monthlyJobs?year=2025`, {
       headers: {
         Authorization: 'Bearer ' + localStorage.getItem('token')
       }
@@ -149,7 +148,7 @@ const fetchMonthlyJobs = async () => {
 
 const fetchLatestUsers = async () => {
   try {
-    const response = await axios.get('http://localhost:8090/api/admin/latestUsers', {
+    const response = await axios.get(`${API_URL}/admin/latestUsers`, {
       headers: {
         Authorization: 'Bearer ' + localStorage.getItem('token')
       }
@@ -162,7 +161,7 @@ const fetchLatestUsers = async () => {
 
 const fetchLatestJobs = async () => {
   try {
-    const response = await axios.get('http://localhost:8090/api/admin/latestJobs', {
+    const response = await axios.get(`${API_URL}/admin/latestJobs`, {
       headers: {
         Authorization: 'Bearer ' + localStorage.getItem('token')
       }

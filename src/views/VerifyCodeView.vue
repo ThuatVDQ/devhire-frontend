@@ -59,6 +59,8 @@
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import axios from 'axios'
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 const props = defineProps({
   show: Boolean,
   email: String,
@@ -137,7 +139,7 @@ async function submitCode() {
   isLoading.value = true // Bắt đầu trạng thái loading
   try {
     const verificationCode = code.value.join('')
-    const response = await axios.post(`http://localhost:8090/api/users/verify`, {
+    const response = await axios.post(`${API_URL}/users/verify`, {
       email: props.email,
       verification_code: verificationCode
     })
@@ -158,7 +160,7 @@ async function resendCode() {
   try {
     countdown.value = 300
 
-    const response = await axios.post(`http://localhost:8090/api/users/resend?email=` + props.email)
+    const response = await axios.post(`${API_URL}/users/resend?email=` + props.email)
 
     if (response.status === 200) {
       error.value = 'A new verification code has been sent to your email.'

@@ -8,6 +8,8 @@ import axios from 'axios'
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 // Router
 const router = useRouter()
 const route = useRoute()
@@ -79,7 +81,7 @@ async function sendEmail(application, subject, body) {
   try {
     const formattedBody = body.replace(/\n/g, '<br>')
     const response = await axios.post(
-      'http://localhost:8090/api/job-application/send-email',
+      `${API_URL}/job-application/send-email`,
       {
         name: application.full_name,
         subject: subject,
@@ -104,7 +106,7 @@ async function sendEmail(application, subject, body) {
 async function fetchJobApplications() {
   const jobId = route.params.id
   try {
-    const response = await axios.get(`http://localhost:8090/api/job-application/${jobId}`, {
+    const response = await axios.get(`${API_URL}/job-application/${jobId}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
@@ -127,7 +129,7 @@ async function fetchJobApplications() {
 async function fetchCVScore() {
   const jobId = route.params.id
   try {
-    const response = await axios.get(`http://localhost:8090/api/job-application/${jobId}/scored`, {
+    const response = await axios.get(`${API_URL}/job-application/${jobId}/scored`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
@@ -199,7 +201,7 @@ function handleDownloadCV() {
 
 async function downloadCV(cvId, candidateName) {
   try {
-    const response = await axios.get(`http://localhost:8090/api/cv/${cvId}/download`, {
+    const response = await axios.get(`${API_URL}/cv/${cvId}/download`, {
       responseType: 'blob',
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -253,7 +255,7 @@ async function viewCV(cv_url, id) {
 
 async function updateApplicationStatus(applicationId, newStatus) {
   try {
-    await axios.post(`http://localhost:8090/api/job-application/${applicationId}/${newStatus}`, {})
+    await axios.post(`${API_URL}/job-application/${applicationId}/${newStatus}`, {})
     fetchJobApplications()
     fetchCVScore()
   } catch (error) {

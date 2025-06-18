@@ -6,6 +6,8 @@ import axios from 'axios'
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 // Lấy ID từ URL params
 const route = useRoute()
 const id = route.params.id
@@ -29,7 +31,7 @@ const fetchCities = async () => {
 // Hàm gọi API lấy chi tiết công việc
 const fetchJobDetails = async () => {
   try {
-    const response = await axios.get(`http://localhost:8090/api/jobs/${id}`)
+    const response = await axios.get(`${API_URL}/jobs/${id}`)
     const job = response.data
     console.log('Job details:', job)
     jobDetails.value = job
@@ -67,7 +69,7 @@ const fetchJobDetails = async () => {
 
 async function updateJob(data) {
   try {
-    const response = await axios.post(`http://localhost:8090/api/jobs/${id}/edit`, data, {
+    const response = await axios.post(`${API_URL}/jobs/${id}/edit`, data, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }

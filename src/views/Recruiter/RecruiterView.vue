@@ -8,6 +8,8 @@ import axios from 'axios'
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -57,7 +59,7 @@ const newNotification = ref(false)
 const fetchUnreadCount = async () => {
   try {
     const token = localStorage.getItem('token') // Lấy token từ localStorage
-    const response = await axios.get('http://localhost:8090/api/notifications/unread-count', {
+    const response = await axios.get(`${API_URL}/notifications/unread-count`, {
       headers: {
         Authorization: `Bearer ${token}`
       }

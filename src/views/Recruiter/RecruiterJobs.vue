@@ -217,6 +217,8 @@ import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
 import icon_sad from '@/assets/icon-sad.png'
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 const router = useRouter()
 
 const jobs = ref([]) // Store job data
@@ -276,7 +278,7 @@ async function fetchJobs(page = 0) {
     if (searchQuery.value.trim() !== '') {
       params.keyword = searchQuery.value.trim() // Thêm từ khóa tìm kiếm
     }
-    const response = await axios.get('http://localhost:8090/api/jobs/company', {
+    const response = await axios.get(`${API_URL}/jobs/company`, {
       params: params,
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -314,7 +316,7 @@ const handleToggleClick = (event, jobId) => {
 const confirmCloseJob = async () => {
   try {
     await axios.post(
-      `http://localhost:8090/api/jobs/${currentJobId.value}/expire`,
+      `${API_URL}/jobs/${currentJobId.value}/expire`,
       {},
       {
         headers: {
@@ -376,15 +378,12 @@ const scrollToTop = () => {
 
 async function downloadCVs(jobId, title) {
   try {
-    const response = await axios.get(
-      `http://localhost:8090/api/job-application/${jobId}/download-cv`,
-      {
-        responseType: 'blob',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
+    const response = await axios.get(`${API_URL}/job-application/${jobId}/download-cv`, {
+      responseType: 'blob',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
       }
-    )
+    })
     const url = window.URL.createObjectURL(new Blob([response.data]))
     const link = document.createElement('a')
     link.href = url

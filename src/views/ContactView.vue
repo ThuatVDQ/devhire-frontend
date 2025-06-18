@@ -154,6 +154,8 @@ import axios from 'axios'
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 const formData = ref({
   name: '',
   email: '',
@@ -185,7 +187,7 @@ const submitForm = async () => {
       return
     }
     isSubmitting.value = true
-    const response = await axios.post('http://localhost:8090/api/users/contact', formData.value, {
+    const response = await axios.post(`${API_URL}/users/contact`, formData.value, {
       headers: {
         'Content-Type': 'application/json'
       }

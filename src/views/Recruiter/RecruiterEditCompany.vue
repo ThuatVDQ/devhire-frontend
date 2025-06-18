@@ -282,6 +282,8 @@ import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
 import EditAvatar from '../../components/EditAvatar.vue'
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 const company = ref({})
 const isCompanyExist = ref(false)
 const isSigningUp = ref(false)
@@ -390,7 +392,7 @@ const uploadImages = async () => {
   })
 
   try {
-    const response = await axios.put('http://localhost:8090/api/companies/updateImages', formData, {
+    const response = await axios.put(`${API_URL}/companies/updateImages`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
         Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -452,18 +454,14 @@ const handleSubmit = async () => {
 
   try {
     if (isCompanyExist.value) {
-      const response = await axios.put(
-        'http://localhost:8090/api/companies/updateCompany',
-        company.value,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
+      const response = await axios.put(`${API_URL}/companies/updateCompany`, company.value, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
         }
-      )
+      })
       toastr.success('Updated company successfully', 'Success')
     } else {
-      const response = await axios.post('http://localhost:8090/api/companies', company.value, {
+      const response = await axios.post(`${API_URL}/companies`, company.value, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
@@ -485,7 +483,7 @@ const handleSubmit = async () => {
 
 const fetchCompanyInfo = async () => {
   try {
-    const response = await axios.get('http://localhost:8090/api/companies/profile', {
+    const response = await axios.get(`${API_URL}/companies/profile`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
@@ -516,7 +514,7 @@ const fetchCompanyInfo = async () => {
 
 const fetchCompanyScore = async () => {
   try {
-    const response = await axios.get('http://localhost:8090/api/scoring/company', {
+    const response = await axios.get(`${API_URL}/scoring/company`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
@@ -580,16 +578,12 @@ const uploadLicense = async () => {
   formData.append('license', newLicense.value.file)
 
   try {
-    const response = await axios.post(
-      'http://localhost:8090/api/companies/verify-license',
-      formData,
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
+    const response = await axios.post(`${API_URL}/companies/verify-license`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${localStorage.getItem('token')}`
       }
-    )
+    })
     toastr.success('License uploaded successfully', 'Success')
   } catch (error) {
     toastr.error('Failed to upload license', 'Error')

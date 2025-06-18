@@ -5,6 +5,8 @@ import { reactive, onMounted } from 'vue'
 import axios from 'axios'
 import CardCompany from './CardCompany.vue'
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 const state = reactive({
   companies: [],
   isLoading: true
@@ -12,7 +14,7 @@ const state = reactive({
 
 onMounted(async () => {
   try {
-    const response = await axios.get('http://localhost:8090/api/companies')
+    const response = await axios.get(`${API_URL}/companies`)
     state.companies = response.data.companies.slice(0, 8)
     console.log(response.data)
   } catch (e) {

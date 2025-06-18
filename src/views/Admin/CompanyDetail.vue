@@ -8,6 +8,8 @@ import Reviews from '@/components/ReviewCompany.vue'
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 const route = useRoute()
 
 const state = reactive({
@@ -51,7 +53,7 @@ const fetchJobsByCompany = async () => {
   try {
     const token = localStorage.getItem('token')
 
-    const response = await axios.get('http://localhost:8090/api/jobs/company/' + route.params.id, {
+    const response = await axios.get(`${API_URL}/jobs/company/` + route.params.id, {
       headers: token ? { Authorization: `Bearer ${token}` } : {}
     })
 
@@ -105,7 +107,7 @@ onBeforeUnmount(() => {
 
 const fetchCompanyData = async (id) => {
   try {
-    const response = await axios.get(`http://localhost:8090/api/companies/${id}`)
+    const response = await axios.get(`${API_URL}/companies/${id}`)
     state.company = response.data
     if (state.company.logo)
       state.company.logo = `http://localhost:8090/uploads/${state.company.logo}`
@@ -201,7 +203,7 @@ const approveCompany = async () => {
   isMenuOpen.value = false
   try {
     const response = await axios.put(
-      `http://localhost:8090/api/companies/approve-company?companyId=${route.params.id}`,
+      `${API_URL}/companies/approve-company?companyId=${route.params.id}`,
       {},
       {
         headers: {
@@ -229,7 +231,7 @@ const rejectCompany = async () => {
 
   try {
     await axios.put(
-      `http://localhost:8090/api/companies/reject-company?companyId=${route.params.id}&reason=${encodeURIComponent(rejectReason.value)}`,
+      `${API_URL}/companies/reject-company?companyId=${route.params.id}&reason=${encodeURIComponent(rejectReason.value)}`,
       {},
       {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }

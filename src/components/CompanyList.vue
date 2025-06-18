@@ -4,6 +4,8 @@ import { ref, onMounted, watch } from 'vue'
 import axios from 'axios'
 import icon_sad from '@/assets/icon-sad.png'
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 const props = defineProps({
   keyword: {
     type: String,
@@ -26,7 +28,7 @@ const searchCompanies = async (keyword, page = 0) => {
     // Cấu hình headers chỉ khi có token
     const headers = token ? { Authorization: `Bearer ${token}` } : {}
 
-    const response = await axios.get('http://localhost:8090/api/companies/search', {
+    const response = await axios.get(`${API_URL}/companies/search`, {
       params: { keyword, page, limit: pageSize.value },
       headers
     })
@@ -65,7 +67,7 @@ const fetchData = async (page = 0) => {
     // Cấu hình headers chỉ khi có token
     const headers = token ? { Authorization: `Bearer ${token}` } : {}
 
-    const response = await axios.get('http://localhost:8090/api/companies', {
+    const response = await axios.get(`${API_URL}/companies`, {
       params: { page, limit: pageSize.value },
       headers
     })

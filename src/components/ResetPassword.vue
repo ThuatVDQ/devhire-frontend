@@ -61,6 +61,8 @@
 import { ref } from 'vue'
 import axios from 'axios'
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 const props = defineProps({
   show: Boolean,
   email: String
@@ -98,7 +100,7 @@ async function submitNewPassword() {
   console.log(props.email)
 
   try {
-    const response = await axios.post(`http://localhost:8090/api/users/forgot-password/reset`, {
+    const response = await axios.post(`${API_URL}/users/forgot-password/reset`, {
       email: props.email,
       newPassword: newPassword.value,
       confirmPassword: confirmPassword.value

@@ -56,6 +56,8 @@ import axios from 'axios'
 import { initializeWebSocket, disconnectWebSocket } from '@/utils/websocket'
 import { formatDistanceToNow } from 'date-fns'
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 const notifications = ref([]) // Lưu danh sách thông báo
 const unreadCount = ref(0) // Số lượng thông báo chưa đọc
 const newNotifications = ref(false) // Hiển thị chấm đỏ khi có thông báo mới
@@ -84,7 +86,7 @@ const toggleNotifications = async () => {
 // Gọi API lấy danh sách thông báo
 const fetchNotifications = async () => {
   try {
-    const response = await axios.get('http://localhost:8090/api/notifications/', {
+    const response = await axios.get(`${API_URL}/notifications/`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -98,15 +100,11 @@ const fetchNotifications = async () => {
 
 const markAsRead = async (notification) => {
   try {
-    const response = await axios.put(
-      `http://localhost:8090/api/notifications/${notification.id}/read`,
-      null,
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
+    const response = await axios.put(`${API_URL}/notifications/${notification.id}/read`, null, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
       }
-    )
+    })
 
     if (notification) {
       notification.is_read = true
@@ -125,7 +123,7 @@ const markAsRead = async (notification) => {
 const markAllAsRead = async () => {
   try {
     await axios.put(
-      'http://localhost:8090/api/notifications/mark-all-read',
+      `${API_URL}/notifications/mark-all-read`,
       {},
       {
         headers: {
@@ -145,7 +143,7 @@ const markAllAsRead = async () => {
 // Gọi API xóa một thông báo
 const deleteNotification = async (notificationId) => {
   try {
-    await axios.delete(`http://localhost:8090/api/notifications/${notificationId}`, {
+    await axios.delete(`${API_URL}/notifications/${notificationId}`, {
       headers: {
         Authorization: `Bearer ${token}`
       }

@@ -171,6 +171,8 @@ import axios from 'axios'
 import defaultAvatar from '../../assets/logo.svg'
 import icon_sad from '@/assets/icon-sad.png'
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 const router = useRouter()
 // State
 const companies = ref([])
@@ -201,7 +203,7 @@ const fetchCompanies = async (page = 0) => {
       params.keyword = keyword.value.trim() // Thêm từ khóa tìm kiếm
     }
 
-    const response = await axios.get('http://localhost:8090/api/companies/search', {
+    const response = await axios.get(`${API_URL}/companies/search`, {
       params: params,
       headers: {
         Authorization: 'Bearer ' + localStorage.getItem('token')

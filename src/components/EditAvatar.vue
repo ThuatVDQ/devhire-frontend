@@ -75,6 +75,8 @@ import axios from 'axios'
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 const selectedImage = ref(null)
 const cropper = ref(null)
 const fileInput = ref(null)
@@ -146,7 +148,7 @@ const saveImage = () => {
       formData.append('file', blob)
       if (!props.isLogoCompany)
         axios
-          .post('http://localhost:8090/api/users/uploadAvatar', formData, {
+          .post(`${API_URL}/users/uploadAvatar`, formData, {
             headers: {
               'Content-Type': 'multipart/form-data',
               Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -161,7 +163,7 @@ const saveImage = () => {
           })
       else {
         axios
-          .put('http://localhost:8090/api/companies/upload-logo', formData, {
+          .put(`${API_URL}/companies/upload-logo`, formData, {
             headers: {
               'Content-Type': 'multipart/form-data',
               Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -180,7 +182,7 @@ const saveImage = () => {
   } else {
     axios
       .put(
-        'http://localhost:8090/api/users/deleteAvatar',
+        `${API_URL}/users/deleteAvatar`,
         {},
         {
           headers: {

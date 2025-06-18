@@ -132,6 +132,8 @@ import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
 import axios from 'axios'
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 const templates = [
   {
     id: 1,
@@ -236,7 +238,7 @@ function saveCV() {
     formData.append('name', cvName.value) // Attach user ID
 
     // Send the PDF to the backend to save it
-    const response = axios.post('http://localhost:8090/api/cv/upload', formData, {
+    const response = axios.post(`${API_URL}/cv/upload`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
         Authorization: `Bearer ${localStorage.getItem('token')}`

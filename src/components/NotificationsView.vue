@@ -50,6 +50,8 @@ import { formatDistanceToNow } from 'date-fns'
 import axios from 'axios'
 import { ref } from 'vue'
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 // Hàm định dạng thời gian thành dạng "x phút trước"
 const formatTimeAgo = (dateString) => {
   if (!dateString) return ''
@@ -68,15 +70,11 @@ const props = defineProps({
 
 const markAsRead = async (notification) => {
   try {
-    const response = await axios.put(
-      `http://localhost:8090/api/notifications/${notification.id}/read`,
-      null,
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
+    const response = await axios.put(`${API_URL}/notifications/${notification.id}/read`, null, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
       }
-    )
+    })
 
     if (notification) {
       notification.is_read = true
@@ -95,15 +93,11 @@ const markAllAsRead = async (notifications) => {
     const token = localStorage.getItem('token') // Lấy token từ localStorage
 
     // Gửi yêu cầu PUT đến API
-    const response = await axios.put(
-      'http://localhost:8090/api/notifications/mark-all-read',
-      null,
-      {
-        headers: {
-          Authorization: `Bearer ${token}` // Gửi token trong tiêu đề
-        }
+    const response = await axios.put(`${API_URL}/notifications/mark-all-read`, null, {
+      headers: {
+        Authorization: `Bearer ${token}` // Gửi token trong tiêu đề
       }
-    )
+    })
     for (const notification of notifications) {
       notification.is_read = true
     }
@@ -115,7 +109,7 @@ const markAllAsRead = async (notifications) => {
 const deleteNotification = async (notificationId) => {
   try {
     const token = localStorage.getItem('token')
-    await axios.delete(`http://localhost:8090/api/notifications/${notificationId}`, {
+    await axios.delete(`${API_URL}/notifications/${notificationId}`, {
       headers: {
         Authorization: `Bearer ${token}`
       }

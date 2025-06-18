@@ -4,6 +4,8 @@ import CardJob from './CardJob.vue'
 import axios from 'axios'
 import icon_sad from '@/assets/icon-sad.png'
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 const jobs = ref([])
 const currentPage = ref(0)
 const pageSize = ref(8) // số lượng công việc trên mỗi trang
@@ -23,7 +25,7 @@ const fetchData = async (page = 0) => {
     // Cấu hình headers chỉ khi có token
     const headers = token ? { Authorization: `Bearer ${token}` } : {}
 
-    const response = await axios.post('http://localhost:8090/api/jobs/filter', {
+    const response = await axios.post(`${API_URL}/jobs/filter`, {
       params: { page, limit: pageSize.value },
       headers
     })
@@ -55,7 +57,7 @@ const fetchFavorites = async (page = 0) => {
   const headers = { Authorization: `Bearer ${token}` }
   isLoading.value = true
   try {
-    const response = await axios.get('http://localhost:8090/api/favorite-job/favorite', {
+    const response = await axios.get(`${API_URL}/favorite-job/favorite`, {
       params: { page, limit: pageSize.value },
       headers
     })
@@ -103,7 +105,7 @@ const fetchSearchData = async (page = 0, criteria = {}) => {
     console.log('Job Filter DTO:', jobFilterDTO)
     // Cấu hình headers chỉ khi có token
     const headers = token ? { Authorization: `Bearer ${token}` } : {}
-    const response = await axios.post('http://localhost:8090/api/jobs/filter', jobFilterDTO, {
+    const response = await axios.post(`${API_URL}/jobs/filter`, jobFilterDTO, {
       params: {
         page,
         limit: pageSize.value

@@ -8,6 +8,8 @@ import 'toastr/build/toastr.min.css'
 import defaultLogo from '../assets/logo.svg'
 import Reviews from '@/components/ReviewCompany.vue'
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 const route = useRoute()
 
 const state = reactive({
@@ -111,7 +113,7 @@ const fetchCandidateData = async () => {
     const headers = { Authorization: `Bearer ${token}` }
 
     // Make API call
-    const response = await axios.get('http://localhost:8090/api/users/profile', {
+    const response = await axios.get(`${API_URL}/users/profile`, {
       headers
     }) // Change URL according to your API
 
@@ -158,7 +160,7 @@ const fetchJobData = async (id) => {
     // Cấu hình headers chỉ khi có token
     const headers = token ? { Authorization: `Bearer ${token}` } : {}
 
-    const response = await axios.get(`http://localhost:8090/api/jobs/${id}`, {
+    const response = await axios.get(`${API_URL}/jobs/${id}`, {
       headers
     })
     state.job = response.data
@@ -217,7 +219,7 @@ const submitApplication = async () => {
     formData.append('cvId', state.latestCV ? state.latestCV.id : 0)
 
     // Gửi POST request đến endpoint phù hợp với jobId
-    const response = await axios.post(`http://localhost:8090/api/jobs/${jobId}/apply`, formData, {
+    const response = await axios.post(`${API_URL}/jobs/${jobId}/apply`, formData, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
         'Content-Type': 'multipart/form-data'
@@ -276,7 +278,7 @@ const fetchLastedCV = async () => {
     if (`Bearer ${localStorage.getItem('token')}` == 'Bearer null') {
       return
     }
-    const response = await axios.get('http://localhost:8090/api/cv/latest', {
+    const response = await axios.get(`${API_URL}/cv/latest`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }

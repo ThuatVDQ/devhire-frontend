@@ -5,8 +5,10 @@ import axios from 'axios'
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 const message = ref('')
-const status = ref('loading') // 🟢 Mặc định là "loading"
+const status = ref('loading')
 const router = useRouter()
 
 const handlePaymentResult = async () => {
@@ -23,7 +25,7 @@ const handlePaymentResult = async () => {
 
   if (vnp_ResponseCode === '00' && vnp_TransactionStatus === '00') {
     try {
-      await axios.get('http://localhost:8090/api/payments/payment-callback', {
+      await axios.get(`${API_URL}/payments/payment-callback`, {
         params: {
           vnp_ResponseCode,
           vnp_OrderInfo: subscriptionId

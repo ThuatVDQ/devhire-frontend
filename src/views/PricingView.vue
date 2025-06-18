@@ -6,6 +6,8 @@ import CardExploreJob from '../components/CardExploreJob.vue'
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 // Card data
 const cardItems = [
   {
@@ -34,16 +36,16 @@ const subscription = ref([])
 // Hàm gọi API lấy danh sách subscription
 const fetchSubscription = async () => {
   try {
-    const response = await axios.get('http://localhost:8090/api/subscription', {
-      params: { page: 0, limit: 10 } // Thêm tham số phân trang
+    const response = await axios.get(`${API_URL}/subscription`, {
+      params: { page: 0, limit: 10 }
     })
     subscription.value = response.data.map((sub) => ({
       id: sub.id,
       name: sub.name,
       price: sub.price,
       description: sub.description || 'No description available',
-      benefit: sub.benefit ? sub.benefit.split(',') : [], // Chuyển chuỗi thành mảng
-      duration: sub.duration || '1 month', // Giá trị mặc định nếu thiếu
+      benefit: sub.benefit ? sub.benefit.split(',') : [],
+      duration: sub.duration || '1 month',
       buttonLabel: 'Subscribe Now',
       borderColor: 'border-gray-300',
       bgColor: 'bg-white'
@@ -62,15 +64,11 @@ const handleSubscribe = async (plan) => {
       language: 'vn'
     }
     console.log('Payment request:', paymentRequest) // In ra thông tin yêu cầu thanh toán
-    const response = await axios.post(
-      'http://localhost:8090/api/payments/create_payment_url',
-      paymentRequest,
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
+    const response = await axios.post(`${API_URL}/payments/create_payment_url`, paymentRequest, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
       }
-    )
+    })
     if (response.data.status === 'OK') {
       window.location.href = response.data.data // Chuyển hướng đến URL thanh toán
     } else {
@@ -85,7 +83,7 @@ const upgradedSubscriptions = ref([])
 // Hàm gọi API lấy danh sách upgraded subscriptions
 const fetchUpgradedSubscriptions = async () => {
   try {
-    const response = await axios.get('http://localhost:8090/api/subscription/upgraded', {
+    const response = await axios.get(`${API_URL}/subscription/upgraded`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }

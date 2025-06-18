@@ -9,6 +9,8 @@ import { defineProps, defineEmits } from 'vue'
 import adVideo from '@/assets/ads.mp4'
 const adVideoSrc = ref(adVideo)
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 const emit = defineEmits(['submit'])
 
 const props = defineProps({
@@ -479,7 +481,7 @@ onMounted(async () => {
 
 async function fetchCategories() {
   try {
-    const response = await axios.get('http://localhost:8090/api/category')
+    const response = await axios.get(`${API_URL}/category`)
     details.categories = response.data
   } catch (e) {
     console.error(e)

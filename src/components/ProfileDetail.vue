@@ -7,6 +7,8 @@ import 'toastr/build/toastr.min.css'
 import EditAvatar from '@/components/EditAvatar.vue'
 import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 const data = reactive({
   user: {},
   cv: {},
@@ -21,7 +23,7 @@ const cropAvatar = ref(defaultAvatar)
 
 async function fetchDataUser() {
   try {
-    const response = await axios.get('http://localhost:8090/api/users/profile', {
+    const response = await axios.get(`${API_URL}/users/profile`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
@@ -38,7 +40,7 @@ async function fetchDataUser() {
 
 const updateUserInf = async () => {
   try {
-    const response = await axios.put('http://localhost:8090/api/users/updateProfile', data.user, {
+    const response = await axios.put(`${API_URL}/users/updateProfile`, data.user, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
@@ -52,7 +54,7 @@ const updateUserInf = async () => {
 
 const fetchCV = async () => {
   try {
-    const response = await axios.get('http://localhost:8090/api/cv/all', {
+    const response = await axios.get(`${API_URL}/cv/all`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
@@ -65,7 +67,7 @@ const fetchCV = async () => {
 
 async function downloadCV(cvId, job_title) {
   try {
-    const response = await axios.get(`http://localhost:8090/api/cv/${cvId}/download`, {
+    const response = await axios.get(`${API_URL}/cv/${cvId}/download`, {
       responseType: 'blob',
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -120,14 +122,11 @@ const actionType = ref('')
 
 const checkSubscriptionStatus = async () => {
   try {
-    const response = await axios.get(
-      'http://localhost:8090/api/job-notification/check-subscribed',
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
+    const response = await axios.get(`${API_URL}/job-notification/check-subscribed`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
       }
-    )
+    })
     isSubscribed.value = response.data
   } catch (error) {
     console.error('Error checking subscription status:', error)
@@ -157,8 +156,8 @@ const onConfirm = async () => {
   try {
     const url =
       actionType.value === 'subscribe'
-        ? 'http://localhost:8090/api/job-notification/subscribe'
-        : 'http://localhost:8090/api/job-notification/unsubscribe'
+        ? `${API_URL}/job-notification/subscribe`
+        : `${API_URL}/job-notification/unsubscribe`
     await axios.post(url, null, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -183,7 +182,7 @@ const onConfirm = async () => {
 
 const fetchInterviews = async () => {
   try {
-    const response = await axios.get('http://localhost:8090/api/interview-schedules/user', {
+    const response = await axios.get(`${API_URL}/interview-schedules/user`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }

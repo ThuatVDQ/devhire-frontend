@@ -7,6 +7,8 @@ import 'toastr/build/toastr.min.css'
 import { useRouter } from 'vue-router'
 import logo from '../../assets/logo.svg'
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 const router = useRouter()
 
 const showVerificationPopup = ref(false)
@@ -86,7 +88,7 @@ const register = async () => {
     }
 
     // Gửi yêu cầu POST tới API
-    const response = await axios.post('http://localhost:8090/api/users/signup', payload)
+    const response = await axios.post(`${API_URL}/users/signup`, payload)
 
     if (response.status === 200 || response.status === 201) {
       showVerificationPopup.value = true

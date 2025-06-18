@@ -135,6 +135,8 @@ import 'toastr/build/toastr.min.css'
 import ModalSubscription from '@/components/ModalSubscription.vue'
 import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 const subscriptions = ref([])
 const keyword = ref('')
 const showModal = ref(false)
@@ -149,7 +151,7 @@ const selectedSubscriptionDetails = ref(null)
 
 const fetchSubscriptions = async () => {
   try {
-    const response = await axios.get('http://localhost:8090/api/subscription', {
+    const response = await axios.get(`${API_URL}/subscription`, {
       headers: { Authorization: 'Bearer ' + localStorage.getItem('token') }
     })
     subscriptions.value = response.data
@@ -196,13 +198,13 @@ const saveSubscription = async () => {
 
   try {
     if (isEditing.value) {
-      await axios.post('http://localhost:8090/api/subscription/update', null, {
+      await axios.post(`${API_URL}/subscription/update`, null, {
         params: currentSubscription.value,
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       })
       toastr.success('Subscription updated successfully!')
     } else {
-      await axios.post('http://localhost:8090/api/subscription/add', currentSubscription.value, {
+      await axios.post(`${API_URL}/subscription/add`, currentSubscription.value, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       })
       toastr.success('Subscription added successfully!')
@@ -253,14 +255,14 @@ const confirmAction = async () => {
 
     if (subscription.status === 'ACTIVE') {
       // Nếu subscription đang ACTIVE, gọi API để vô hiệu hóa (CLOSED)
-      await axios.post('http://localhost:8090/api/subscription/delete', null, {
+      await axios.post(`${API_URL}/subscription/delete`, null, {
         params: { id: currentSubscriptionId.value },
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       })
       toastr.success('Subscription has been closed.')
     } else {
       // Nếu subscription đang CLOSED, gọi API để mở lại (ACTIVE)
-      await axios.post('http://localhost:8090/api/subscription/active', null, {
+      await axios.post(`${API_URL}/subscription/active`, null, {
         params: { id: currentSubscriptionId.value },
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       })

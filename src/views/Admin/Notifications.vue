@@ -15,6 +15,8 @@ import axios from 'axios'
 import NotificationsView from '@/components/NotificationsView.vue'
 import { initializeWebSocket, disconnectWebSocket } from '@/utils/websocket'
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 // State để lưu danh sách thông báo
 const notifications = ref([])
 
@@ -23,7 +25,7 @@ const fetchNotifications = async () => {
   try {
     const token = localStorage.getItem('token') // Lấy token từ localStorage
 
-    const response = await axios.get('http://localhost:8090/api/notifications/', {
+    const response = await axios.get(`${API_URL}/notifications/`, {
       headers: {
         Authorization: `Bearer ${token}` // Gửi token vào tiêu đề
       }

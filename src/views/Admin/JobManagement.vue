@@ -236,6 +236,8 @@ import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
 import { useRouter } from 'vue-router'
 import icon_sad from '@/assets/icon-sad.png'
 
+const API_URL = import.meta.env.VITE_API_URL
+
 const router = useRouter()
 
 const searchQuery = ref('')
@@ -302,7 +304,7 @@ const fetchData = async (page = 0) => {
     if (searchQuery.value.trim() !== '') {
       params.keyword = searchQuery.value.trim() // Thêm từ khóa tìm kiếm
     }
-    const response = await axios.get('http://localhost:8090/api/admin/getAllJobs', {
+    const response = await axios.get(`${API_URL}/admin/getAllJobs`, {
       params: params,
       headers: {
         Authorization: 'Bearer ' + localStorage.getItem('token')
@@ -402,7 +404,7 @@ function closeDialog() {
 
 async function closeJob(jobId) {
   try {
-    const response = await axios.post(`http://localhost:8090/api/jobs/${jobId}/expire`, null)
+    const response = await axios.post(`${API_URL}/jobs/${jobId}/expire`, null)
 
     if (response.status === 200) {
       fetchData(currentPage.value)
@@ -414,7 +416,7 @@ async function closeJob(jobId) {
 
 async function approveJob(jobId) {
   try {
-    const response = await axios.post(`http://localhost:8090/api/jobs/${jobId}/approve`, null)
+    const response = await axios.post(`${API_URL}/jobs/${jobId}/approve`, null)
 
     if (response.status === 200) {
       fetchData(currentPage.value)
@@ -426,7 +428,7 @@ async function approveJob(jobId) {
 
 async function rejectJob(jobId) {
   try {
-    const response = await axios.post(`http://localhost:8090/api/jobs/${jobId}/reject`, null)
+    const response = await axios.post(`${API_URL}/jobs/${jobId}/reject`, null)
 
     if (response.status === 200) {
       fetchData(currentPage.value) // Làm mới danh sách sau khi từ chối
@@ -465,13 +467,9 @@ function goToJobDetail(jobId) {
 async function approveJobsBulk() {
   console.log(selectedJobIds.value)
   try {
-    const response = await axios.post(
-      'http://localhost:8090/api/jobs/approveJobs',
-      selectedJobIds.value,
-      {
-        headers: { Authorization: 'Bearer ' + localStorage.getItem('token') }
-      }
-    )
+    const response = await axios.post(`${API_URL}/jobs/approveJobs`, selectedJobIds.value, {
+      headers: { Authorization: 'Bearer ' + localStorage.getItem('token') }
+    })
     toastr.success(response.data, 'Success')
     fetchData(currentPage.value) // Làm mới dữ liệu
   } catch (error) {
@@ -483,13 +481,9 @@ async function rejectJobsBulk() {
   console.log(selectedJobIds.value)
 
   try {
-    const response = await axios.post(
-      'http://localhost:8090/api/jobs/rejectJobs',
-      selectedJobIds.value,
-      {
-        headers: { Authorization: 'Bearer ' + localStorage.getItem('token') }
-      }
-    )
+    const response = await axios.post(`${API_URL}/jobs/rejectJobs`, selectedJobIds.value, {
+      headers: { Authorization: 'Bearer ' + localStorage.getItem('token') }
+    })
     toastr.success(response.data, 'Success')
     fetchData(currentPage.value) // Làm mới dữ liệu
   } catch (error) {
@@ -501,13 +495,9 @@ async function closeJobsBulk() {
   console.log(selectedJobIds.value)
 
   try {
-    const response = await axios.post(
-      'http://localhost:8090/api/jobs/closeJobs',
-      selectedJobIds.value,
-      {
-        headers: { Authorization: 'Bearer ' + localStorage.getItem('token') }
-      }
-    )
+    const response = await axios.post(`${API_URL}/jobs/closeJobs`, selectedJobIds.value, {
+      headers: { Authorization: 'Bearer ' + localStorage.getItem('token') }
+    })
     toastr.success(response.data, 'Success')
     fetchData(currentPage.value) // Làm mới dữ liệu
   } catch (error) {

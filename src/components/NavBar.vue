@@ -5,6 +5,8 @@ import axios from 'axios'
 import defaultAvatar from '../assets/avatar-default.svg'
 import Notifications from '@/components/Notifications.vue'
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 const data = reactive({
   user: {}
 })
@@ -38,7 +40,7 @@ const router = useRouter()
 
 const fetchUserProfile = async () => {
   try {
-    const response = await axios.get('http://localhost:8090/api/users/profile', {
+    const response = await axios.get(`${API_URL}/users/profile`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }

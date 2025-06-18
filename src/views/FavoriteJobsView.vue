@@ -7,6 +7,8 @@ import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
 import icon_sad from '@/assets/icon-sad.png'
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 const jobs = ref([])
 const currentPage = ref(0)
 const pageSize = ref(8) // số lượng công việc trên mỗi trang
@@ -31,7 +33,7 @@ const fetchData = async (page = 0) => {
 
     // Configure headers with token
     const headers = { Authorization: `Bearer ${token}` }
-    const response = await axios.get('http://localhost:8090/api/favorite-job/favorite', {
+    const response = await axios.get(`${API_URL}/favorite-job/favorite`, {
       params: { page, limit: pageSize.value },
       headers
     })

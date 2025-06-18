@@ -90,6 +90,8 @@ import { initializeWebSocket, disconnectWebSocket } from '@/utils/websocket'
 import { useRouter, RouterLink } from 'vue-router'
 import axios from 'axios'
 
+const API_URL = import.meta.env.VITE_APP_API_URL
+
 const isCollapsed = ref(false) // Trạng thái của sidebar
 const toggleSidebar = () => {
   isCollapsed.value = !isCollapsed.value
@@ -120,7 +122,7 @@ const newNotification = ref(false)
 const fetchUnreadCount = async () => {
   try {
     const token = localStorage.getItem('token') // Lấy token từ localStorage
-    const response = await axios.get('http://localhost:8090/api/notifications/unread-count', {
+    const response = await axios.get(`${API_URL}/notifications/unread-count`, {
       headers: {
         Authorization: `Bearer ${token}`
       }

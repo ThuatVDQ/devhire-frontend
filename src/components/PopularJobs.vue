@@ -1,9 +1,10 @@
 <script setup>
-import JobList from './JobList.vue'
 import { reactive, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import axios from 'axios'
 import CardJob from './CardJob.vue'
+
+const API_URL = import.meta.env.VITE_APP_API_URL
 
 const state = reactive({
   jobs: [],
@@ -12,7 +13,7 @@ const state = reactive({
 
 onMounted(async () => {
   try {
-    const response = await axios.get('http://localhost:8090/api/jobs')
+    const response = await axios.get(`${API_URL}/jobs`)
     state.jobs = response.data.jobs.slice(0, 6)
     console.log(response.data)
   } catch (e) {
