@@ -134,19 +134,29 @@ async function fetchCVScore() {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     })
-    const scoredData = response.data // [{ applicationId, score }, ...]
+    console.log('Scored Data:', response.data)
+    const scoredData = response.data
 
     scoredData.forEach((scoredItem) => {
       const target = jobApplications.value.find((app) => app.id === scoredItem.applicationId)
       if (target) {
-        target.score = scoredItem.score * 10
-        target.scoreDetail = scoredItem.scoreDetails
+        target.score = scoredItem.score
+        target.matchedSkills = scoredItem.matchedSkills
       }
     })
   } catch (error) {
     toastr.error('Error fetching job applications:', error)
   } finally {
     isLoading.value = false
+  }
+}
+
+const expandedApplicationId = ref(null)
+const toggleSkills = (applicantId) => {
+  if (expandedApplicationId.value === applicantId) {
+    expandedApplicationId.value = null // Đóng nếu đang mở
+  } else {
+    expandedApplicationId.value = applicantId // Mở nếu đang đóng
   }
 }
 
@@ -163,6 +173,7 @@ function handleReject() {
 onMounted(() => {
   fetchJobApplications()
   fetchCVScore()
+  console.log('Job ID:', jobApplications.value)
 })
 
 const totalPages = computed(() => {
@@ -345,7 +356,7 @@ function goBack() {
                 Status
               </th>
               <th class="py-4 px-6 text-left text-sm font-medium text-gray-700 uppercase w-1/6">
-                CV/Job Match
+                Match Percentage
               </th>
               <th
                 class="py-4 px-6 text-left text-sm font-medium text-gray-700 uppercase w-1/6"
@@ -353,32 +364,64 @@ function goBack() {
             </tr>
           </thead>
           <tbody>
-            <tr
-              v-for="(application, index) in paginatedApplications"
-              :key="application.id"
-              class="border-b hover:bg-gray-100"
-            >
-              <td class="py-4 px-6 text-sm text-gray-700">{{ application.full_name }}</td>
-              <td class="py-4 px-6 text-sm text-gray-700">{{ application.email }}</td>
-              <td class="py-4 px-6 text-sm text-gray-700">
-                {{ formatDate(application.applyDate) }}
-              </td>
-              <td class="py-4 px-6 text-sm text-gray-700">{{ application.status }}</td>
-              <td class="py-4 px-6 text-sm text-gray-700">
-                <span class=""> {{ application.score?.toFixed(1) }} % </span>
-              </td>
-              <td class="py-4 px-6 text-sm text-gray-700 text-right">
-                <button
-                  @click="openActionMenu($event, application)"
-                  class="text-gray-500 hover:text-gray-700"
-                >
-                  <i class="pi pi-ellipsis-v text-lg"></i>
-                </button>
-              </td>
-            </tr>
-            <tr v-if="paginatedApplications.length === 0">
-              <td colspan="5" class="py-4 px-6 text-center text-gray-500">No candidates found.</td>
-            </tr>
+            <template v-for="application in paginatedApplications" :key="application.id">
+              <tr class="border-b hover:bg-gray-100">
+                <td class="py-4 px-6 text-sm text-gray-700">
+                  <div
+                    @click="toggleSkills(application.id)"
+                    class="cursor-pointer hover:text-blue-500 flex items-center"
+                  >
+                    <i
+                      :class="
+                        expandedApplicationId === application.id
+                          ? 'pi pi-angle-down'
+                          : 'pi pi-angle-right'
+                      "
+                      class="mr-2 text-blue-500"
+                    ></i>
+                    {{ application.full_name }}
+                  </div>
+                </td>
+                <td class="py-4 px-6 text-sm text-gray-700">{{ application.email }}</td>
+                <td class="py-4 px-6 text-sm text-gray-700">
+                  {{ formatDate(application.applyDate) }}
+                </td>
+                <td class="py-4 px-6 text-sm text-gray-700">{{ application.status }}</td>
+                <td class="py-4 px-6 text-sm text-gray-700">
+                  <span class=""> {{ application.score?.toFixed(1) }} % </span>
+                </td>
+                <td class="py-4 px-6 text-sm text-gray-700 text-right">
+                  <button
+                    @click="openActionMenu($event, application)"
+                    class="text-gray-500 hover:text-gray-700"
+                  >
+                    <i class="pi pi-ellipsis-v text-lg"></i>
+                  </button>
+                </td>
+              </tr>
+              <tr v-if="expandedApplicationId === application.id" class="bg-gray-100">
+                <td :colspan="4" class="px-6 py-3">
+                  <div v-if="application.matchedSkills && application.matchedSkills.length">
+                    <p class="text-sm font-semibold mb-2">Matched Skills:</p>
+                    <div class="flex flex-wrap gap-2">
+                      <span
+                        v-for="skill in application.matchedSkills"
+                        :key="skill"
+                        class="bg-blue-200 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full"
+                      >
+                        {{ skill }}
+                      </span>
+                    </div>
+                  </div>
+                  <p v-else class="text-gray-500 italic text-xs">No matched skills found.</p>
+                </td>
+              </tr>
+              <tr v-if="paginatedApplications.length === 0">
+                <td colspan="5" class="py-4 px-6 text-center text-gray-500">
+                  No candidates found.
+                </td>
+              </tr>
+            </template>
           </tbody>
         </table>
       </div>

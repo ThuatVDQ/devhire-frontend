@@ -201,10 +201,34 @@ const fetchInterviews = async () => {
       )
     }))
 
+    const now = new Date()
+
+    processedInterviews.sort((a, b) => {
+      const timeA = a.interview_time.getTime()
+      const timeB = b.interview_time.getTime()
+
+      const isAPast = timeA < now.getTime()
+      const isBPast = timeB < now.getTime()
+
+      if (isAPast && !isBPast) {
+        return 1
+      }
+      if (!isAPast && isBPast) {
+        return -1
+      }
+
+      return timeA - timeB
+    })
+
     data.interviews = processedInterviews
   } catch (error) {
     console.error('Error fetching interviews:', error)
   }
+}
+
+const isPastInterview = (interviewTime) => {
+  const now = new Date()
+  return new Date(interviewTime) < now
 }
 
 onMounted(checkSubscriptionStatus)
@@ -333,7 +357,12 @@ onMounted(checkSubscriptionStatus)
               <div
                 v-for="(interview, index) in data.interviews"
                 :key="index"
-                class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 hover:shadow-lg transition duration-300 space-y-3"
+                :class="[
+                  'p-6 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 hover:shadow-lg transition duration-300 space-y-3',
+                  isPastInterview(interview.interview_time)
+                    ? 'bg-gray-400 dark:bg-gray-700'
+                    : 'bg-white dark:bg-gray-800'
+                ]"
               >
                 <h6 class="text-xl font-semibold text-primary-600 mb-1">
                   {{ interview.job_title }}

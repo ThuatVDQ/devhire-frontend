@@ -31,6 +31,7 @@ const menuItems = [
   { name: 'Dashboard', path: '/recruiter/dashboard', icon: 'pi pi-home' },
   { name: 'Post Job', path: '/recruiter/post-job', icon: 'pi pi-plus' },
   { name: 'Jobs', path: '/recruiter/jobs', icon: 'pi pi-briefcase' },
+  { name: 'Candidates Search', path: '/recruiter/candidates', icon: 'pi pi-search' },
   {
     name: 'Upgrade to MemberVIP',
     path: '/recruiter/upgrade',

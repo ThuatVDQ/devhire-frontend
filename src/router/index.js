@@ -48,6 +48,7 @@ import PaymentResultView from '@/views/Recruiter/PaymentResultView.vue'
 import RecruiterInterviews from '@/views/Recruiter/RecruiterInterviews.vue'
 import JobsBySkill from '@/views/JobsBySkill.vue'
 import JobsByTitle from '@/views/JobsByTitle.vue'
+import CandidateSearch from '@/views/Recruiter/CandidateSearch.vue'
 
 const routes = [
   {
@@ -188,6 +189,11 @@ const routes = [
         path: 'edit-job/:id',
         name: 'recruiter-edit-job',
         component: EditJob
+      },
+      {
+        path: 'candidates',
+        name: 'recruiter-candidate-search',
+        component: CandidateSearch
       },
       {
         path: 'settings',
