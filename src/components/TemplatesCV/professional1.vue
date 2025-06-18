@@ -44,7 +44,7 @@
         <textarea
           v-else
           v-model="data.personal_info.summary"
-          class="mt-2 text-gray-600 border rounded px-2 py-1 w-full overflow-hidden"
+          class="mt-2 text-gray-600 border rounded px-2 py-1 w-full overflow-auto"
         ></textarea>
       </div>
     </div>
