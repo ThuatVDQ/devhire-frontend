@@ -25,6 +25,7 @@
     "json-server": "^1.0.0-beta.2",
     "jspdf": "^2.5.2",
     "primeicons": "^7.0.0",
+    "qs": "^6.14.0",
     "sockjs-client": "^1.6.1",
     "toastr": "^2.1.4",
     "vue": "^3.4.29",
