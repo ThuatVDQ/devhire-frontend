@@ -32,7 +32,7 @@
           ]"
           @click="markAsRead(notification)"
         >
-          <div>
+          <div @click="markAsRead(notification)" class="flex-grow cursor-pointer">
             <p :class="notification.is_read ? 'text-gray-600' : 'text-gray-900'">
               {{ notification.message }}
             </p>

@@ -15,11 +15,14 @@
           'p-2 border-b last:border-0 flex justify-between items-center cursor-pointer': true, // Con trỏ chuột bàn tay
           'bg-gray-100': !notification.is_read // Nền xám nếu chưa đọc
         }"
-        @click="markAsRead(notification)"
       >
         <!-- Nội dung thông báo -->
-        <div class="flex-1">
-          <p class="text-base text-gray-500">{{ notification.message }}</p>
+        <div class="flex-1 cursor-pointer">
+          <div @click="markAsRead(notification)">
+            <p class="text-base text-gray-500">
+              {{ notification.message }}
+            </p>
+          </div>
           <p class="text-sm text-gray-400 mt-1">
             {{ formatTimeAgo(notification.send_at) }}
           </p>
