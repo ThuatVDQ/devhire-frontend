@@ -662,6 +662,8 @@ function onConfirm(data) {
       .then((response) => {
         toastr.success('Interview schedules created successfully!')
         closeDialog()
+        fetchInterviewSchedules()
+        fetchInterviewSchedulesResult()
       })
       .catch((error) => {
         toastr.error('An error occurred while creating bulk interview schedules!')
@@ -681,6 +683,8 @@ function onConfirm(data) {
       .then((response) => {
         toastr.success('Interview schedule created successfully!')
         closeDialog()
+        fetchInterviewSchedules()
+        fetchInterviewSchedulesResult()
       })
       .catch((error) => {
         toastr.error('An error occurred while creating the interview schedule!')
@@ -1071,7 +1075,7 @@ const submitEmailSend = async () => {
       `${API_URL}/interview-schedules/${selectedInterview.value.id}/send-email`,
       emailDto,
       {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } // Gửi token xác thực
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       }
     )
     toastr.success('Email sent successfully!')
