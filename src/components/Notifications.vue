@@ -27,7 +27,7 @@
           v-for="notification in notifications"
           :key="notification.id"
           :class="[
-            'p-5 border-b last:border-b-0 flex justify-between items-center',
+            'p-5 border-b last:border-b-0 flex justify-between items-center cursor-pointer',
             notification.is_read ? 'bg-white' : 'bg-gray-100 font-semibold'
           ]"
           @click="markAsRead(notification)"
@@ -58,11 +58,11 @@ import { formatDistanceToNow } from 'date-fns'
 
 const API_URL = import.meta.env.VITE_APP_API_URL
 
-const notifications = ref([]) // Lưu danh sách thông báo
-const unreadCount = ref(0) // Số lượng thông báo chưa đọc
-const newNotifications = ref(false) // Hiển thị chấm đỏ khi có thông báo mới
-const showNotifications = ref(false) // Kiểm soát hiển thị popup
-const token = localStorage.getItem('token') // Lấy token từ localStorage
+const notifications = ref([])
+const unreadCount = ref(0)
+const newNotifications = ref(false)
+const showNotifications = ref(false)
+const token = localStorage.getItem('token')
 
 const notificationPopup = ref(null)
 
@@ -92,7 +92,6 @@ const fetchNotifications = async () => {
       }
     })
     notifications.value = response.data
-    console.log(notifications.value)
   } catch (error) {
     console.error('Error fetching notifications:', error)
   }
@@ -135,6 +134,8 @@ const markAllAsRead = async () => {
       notification.is_read = true
     })
     showNotifications.value = false
+    unreadCount.value = 0
+    newNotifications.value = false
   } catch (error) {
     console.error('Error marking all notifications as read:', error)
   }
@@ -176,7 +177,6 @@ onBeforeUnmount(() => {
   window.removeEventListener('click', handleClickOutside)
 })
 
-// Kết nối WebSocket khi component được mount
 onMounted(() => {
   const username = localStorage.getItem('username')
   if (username) {
