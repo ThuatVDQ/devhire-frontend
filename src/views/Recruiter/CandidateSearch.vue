@@ -129,22 +129,52 @@
                             </div>
                           </td>
                           <td class="px-6 py-4 text-emerald-600 font-semibold">
-                            {{ applicant.match_percentage }}%
+                            <div
+                              v-if="applicant && applicant.match_percentage !== null"
+                              class="flex items-center space-x-4"
+                            >
+                              <span>{{ applicant.match_percentage }}%</span>
+                              <button
+                                @click="viewApplicantCV(applicant.cv_file_url)"
+                                class="text-blue-600 hover:text-blue-800 text-sm py-1 px-2 rounded-md border border-blue-600 hover:border-blue-800 transition-colors"
+                              >
+                                View CV
+                              </button>
+                            </div>
+                            <div v-else class="text-sm text-gray-500 dark:text-gray-400">
+                              Unlock with VIP
+                            </div>
                           </td>
+
                           <td class="px-6 py-4 font-semibold">
-                            {{ formatDate(applicant.latest_apply_date) }}
-                          </td>
-                          <td class="px-6 py-4">
-                            <template v-if="applicant.isSendEmail">
-                              <span class="text-green-600 font-semibold">Email Sent</span>
+                            <template v-if="applicant && applicant.match_percentage !== null">
+                              {{ formatDate(applicant.latest_apply_date) }}
                             </template>
                             <template v-else>
-                              <button
-                                @click="openEmailPopup(applicant)"
-                                class="text-blue-600 hover:text-blue-800 mr-3"
-                              >
-                                Send Email
-                              </button>
+                              <div class="text-sm text-gray-500 dark:text-gray-400">
+                                Unlock with VIP
+                              </div>
+                            </template>
+                          </td>
+
+                          <td class="px-6 py-4">
+                            <template v-if="applicant && applicant.match_percentage !== null">
+                              <template v-if="applicant.email_sent">
+                                <span class="text-green-600 font-semibold">Email Sent</span>
+                              </template>
+                              <template v-else>
+                                <button
+                                  @click="openEmailPopup(applicant)"
+                                  class="text-blue-600 hover:text-blue-800 mr-3"
+                                >
+                                  Send Email
+                                </button>
+                              </template>
+                            </template>
+                            <template v-else>
+                              <div class="text-sm text-gray-500 dark:text-gray-400">
+                                Unlock with VIP
+                              </div>
                             </template>
                           </td>
                         </tr>
@@ -355,7 +385,33 @@ async function fetchMatchingCandidates(jobId) {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     })
-    loadedApplicants.value[jobId] = response.data.slice(0, 5)
+    let applicantsToShow = response.data.slice(0, 5)
+    if (!isMemberVip.value && applicantsToShow.length > 0) {
+      const lastApplicant = applicantsToShow[applicantsToShow.length - 1]
+
+      const filteredApplicants = []
+
+      for (let i = 0; i < applicantsToShow.length; i++) {
+        if (i === applicantsToShow.length - 1) {
+          filteredApplicants.push(lastApplicant)
+        } else {
+          filteredApplicants.push({
+            full_name: applicantsToShow[i].full_name || 'Anonymous Applicant',
+            email: null,
+            phone: null,
+            cv_file_url: null,
+            user_id: applicantsToShow[i].user_id,
+            match_percentage: null,
+            latest_apply_date: null,
+            matched_skills: [],
+            email_sent: null
+          })
+        }
+      }
+      applicantsToShow = filteredApplicants
+    }
+
+    loadedApplicants.value[jobId] = applicantsToShow
   } catch (error) {
     console.error(`Failed to fetch matching candidates for job ${jobId}:`, error)
     loadedApplicants.value[jobId] = []
@@ -430,7 +486,7 @@ const handleSendEmail = async () => {
     }
 
     // Bước 1: Gửi email
-    await axios.post(`${API_URL}/job-application/send-email`, emailDto, {
+    await axios.post(`${API_URL}/jobs/${expandedJobId.value}/send-notification`, emailDto, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     })
 
@@ -448,6 +504,7 @@ const handleSendEmail = async () => {
     })
     toastr.success('Email sent successfully!')
     closeEmailPopup()
+    fetchMatchingCandidates(expandedJobId.value)
   } catch (e) {
     console.error(`Failed to send email or notification:`, e)
     toastr.error(e.response?.data || 'Failed to complete action. Please try again later.')
@@ -490,8 +547,37 @@ const openEmailPopup = (applicant) => {
   showEmailPopup.value = true
 }
 
+const isMemberVip = ref(false)
+const fetchMemberVipStatus = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/subscription/upgraded`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    if (response.data?.[0]?.name === 'VIP Pro' || response.data?.[0]?.name === 'VIP Premium') {
+      isMemberVip.value = true
+    } else {
+      isMemberVip.value = false
+    }
+  } catch (error) {
+    console.error('Failed to fetch VIP status:', error)
+  }
+}
+
+const viewApplicantCV = (cvUrl) => {
+  if (!cvUrl) {
+    toastr.error('No CV URL available for this applicant.')
+    return
+  }
+  const baseUrl = 'http://localhost:8090/uploads/' // Change this base URL as needed
+  const fullUrl = `${baseUrl}${cvUrl}`
+  window.open(fullUrl, '_blank')
+}
+
 onMounted(() => {
   fetchJobs()
+  fetchMemberVipStatus()
 })
 
 watch(searchQuery, (newValue, oldValue) => {

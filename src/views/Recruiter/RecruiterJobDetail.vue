@@ -400,7 +400,7 @@ function goBack() {
                 </td>
               </tr>
               <tr v-if="expandedApplicationId === application.id" class="bg-gray-100">
-                <td :colspan="4" class="px-6 py-3">
+                <td :colspan="6" class="px-6 py-3">
                   <div v-if="application.matchedSkills && application.matchedSkills.length">
                     <p class="text-sm font-semibold mb-2">Matched Skills:</p>
                     <div class="flex flex-wrap gap-2">
