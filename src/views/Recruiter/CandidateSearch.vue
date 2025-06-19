@@ -440,14 +440,17 @@ const toggleSkills = (applicantId) => {
 }
 
 function formatDate(dateArray) {
-  if (!Array.isArray(dateArray) || dateArray.length < 7) {
+  if (!Array.isArray(dateArray) || dateArray.length < 6) {
     return ''
   }
 
-  const [year, month, day, hour, minute, second, millisecond] = dateArray
+  // Mảng của bạn: [year, month, day, hour, minute, second, millisecond]
+  const [year, month, day, hour, minute, second] = dateArray
 
-  const date = new Date(year, month - 1, day, hour, minute, second, millisecond)
+  // Chuyển mảng thành đối tượng Date
+  const date = new Date(year, month - 1, day, hour, minute, second)
 
+  // Định dạng ngày tháng theo kiểu 'dd-MMM-yyyy'
   return date.toLocaleDateString('en-GB', {
     day: '2-digit',
     month: 'short',
